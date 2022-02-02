@@ -21,7 +21,6 @@ file(GLOB_RECURSE SOURCE_FILES
 
 add_executable(${PROJECT_NAME} WIN32
         ${SOURCE_FILES}
-        thirdparty/glad/glad.c
         )
 
 target_link_libraries(
