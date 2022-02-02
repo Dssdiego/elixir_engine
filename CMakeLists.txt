@@ -9,6 +9,12 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(thirdparty/glfw)
 
+# Vulkan
+find_package(Vulkan REQUIRED)
+
+message(VULKAN_INCLUDE_DIRS: ${Vulkan_INCLUDE_DIRS})
+message(VULKAN_LIB: ${Vulkan_LIBRARIES})
+
 # include directories
 include_directories(
         thirdparty
@@ -26,4 +32,5 @@ add_executable(${PROJECT_NAME} WIN32
 target_link_libraries(
         ${PROJECT_NAME}
         glfw
+        Vulkan::Vulkan
 )
