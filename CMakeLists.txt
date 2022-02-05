@@ -40,6 +40,6 @@ target_link_libraries(
         ${PROJECT_NAME}
         glfw
         Vulkan::Vulkan
-#        d3d12
+        d3d12
         OpenGL::GL
 )

@@ -1,11 +1,13 @@
 #include <windows.h>
-#include "VulkanApplication.h"
+#include "DirectXApplication.h"
+//#include "VulkanApplication.h"
 //#include "OpenGLApplication.h"
 
 int main()
 {
-    VulkanApplication app{};
+//    VulkanApplication app{};
 //    OpenGLApplication app{};
+    DirectXApplication app{};
     try {
         app.run();
     } catch (const std::exception& e) {
