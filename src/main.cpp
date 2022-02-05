@@ -1,9 +1,9 @@
 #include <windows.h>
-#include "TriangleApplication.h"
+#include "VulkanApplication.h"
 
 int main()
 {
-    TriangleApplication app{};
+    VulkanApplication app{};
     try {
         app.run();
     } catch (const std::exception& e) {

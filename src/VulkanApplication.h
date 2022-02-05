@@ -2,8 +2,8 @@
 // Created by Diego S. Seabra on 01/02/22.
 //
 
-#ifndef VULKAN_ENGINE_TRIANGLEAPPLICATION_H
-#define VULKAN_ENGINE_TRIANGLEAPPLICATION_H
+#ifndef VULKAN_ENGINE_VULKANAPPLICATION_H
+#define VULKAN_ENGINE_VULKANAPPLICATION_H
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -37,7 +37,7 @@ struct QueueFamilyIndices {
     const bool enableValidationLayers = true;
 #endif
 
-class TriangleApplication
+class VulkanApplication
 {
 public:
     void run() {
@@ -235,4 +235,4 @@ private:
 };
 
 
-#endif //VULKAN_ENGINE_TRIANGLEAPPLICATION_H
+#endif //VULKAN_ENGINE_VULKANAPPLICATION_H
