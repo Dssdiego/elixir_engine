@@ -1,9 +1,11 @@
 #include <windows.h>
 #include "VulkanApplication.h"
+//#include "OpenGLApplication.h"
 
 int main()
 {
     VulkanApplication app{};
+//    OpenGLApplication app{};
     try {
         app.run();
     } catch (const std::exception& e) {

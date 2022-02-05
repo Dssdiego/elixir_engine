@@ -12,8 +12,14 @@ add_subdirectory(thirdparty/glfw)
 # Vulkan
 find_package(Vulkan REQUIRED)
 
+# OpenGL
+find_package(OpenGL REQUIRED)
+
+# Messages
+message("Libraries:")
 message(VULKAN_INCLUDE_DIRS: ${Vulkan_INCLUDE_DIRS})
 message(VULKAN_LIB: ${Vulkan_LIBRARIES})
+message(OPENGL_LIBRARIES: ${OPENGL_LIBRARIES})
 
 # include directories
 include_directories(
@@ -27,10 +33,13 @@ file(GLOB_RECURSE SOURCE_FILES
 
 add_executable(${PROJECT_NAME} WIN32
         ${SOURCE_FILES}
+        thirdparty/glad/glad.c
         )
 
 target_link_libraries(
         ${PROJECT_NAME}
         glfw
         Vulkan::Vulkan
+#        d3d12
+        OpenGL::GL
 )

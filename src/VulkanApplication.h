@@ -57,7 +57,7 @@ private:
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // tell GLFW to not create a OpenGL context
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // disable window resizing, for now
 
-        window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan Engine", nullptr, nullptr);
+        window = glfwCreateWindow(WIDTH, HEIGHT, "Game Engine (Vulkan)", nullptr, nullptr);
     }
 
     void initVulkan()
