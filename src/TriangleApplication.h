@@ -13,12 +13,22 @@
 #include <cstdlib>
 #include <cstring>
 #include <vector>
+#include <optional>
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
 
 const std::vector<const char*> validationLayers = {
         "VK_LAYER_KHRONOS_validation"
+};
+
+struct QueueFamilyIndices {
+    std::optional<uint32_t> graphicsFamily;
+
+    bool isComplete() const
+    {
+        return graphicsFamily.has_value();
+    }
 };
 
 #ifdef NDEBUG
@@ -145,10 +155,37 @@ private:
         }
     }
 
+    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device)
+    {
+        QueueFamilyIndices indices{};
+
+        uint32_t queueFamilyCount = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+        std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+        int i = 0;
+        for (const auto& queueFamily: queueFamilies)
+        {
+            if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            {
+                indices.graphicsFamily = i;
+            }
+
+            if (indices.isComplete())
+                break;
+
+            i++;
+        }
+
+        // Assign index to queue families that could be found
+        return indices;
+    }
+
     bool isDeviceSuitable(VkPhysicalDevice device)
     {
-        // NOTE: This can be later implemented to check wether our graphics card is suitable for what we need to do ;)
-        return true;
+        QueueFamilyIndices indices = findQueueFamilies(device);
+        return indices.isComplete();
     }
 
     void pickPhysicalDevice()
