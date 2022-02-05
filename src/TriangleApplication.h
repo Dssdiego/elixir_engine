@@ -11,6 +11,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
+#include <vector>
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -64,9 +65,27 @@ private:
 
         glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
+        std::cout << "extensions count: " << glfwExtensionCount << std::endl;
+        std::cout << *glfwExtensions << std::endl;
+
+        // TODO: Challenge:: try to create a function that checks if all of the extensions returned by
+        //      glfwGetRequiredInstanceExtensions are included in the supported ex-
+        //      tensions list
+
         createInfo.enabledExtensionCount = glfwExtensionCount;
         createInfo.ppEnabledExtensionNames = glfwExtensions;
         createInfo.enabledLayerCount = 0;
+
+        uint32_t extensionCount = 0;
+        vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+        std::vector<VkExtensionProperties> extensions(extensionCount);
+        vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
+        std::cout << "Available extensions:\n";
+
+        for (const auto& extension: extensions)
+        {
+            std::cout << "\t" << extension.extensionName << std::endl;
+        }
 
         if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
         {
@@ -84,6 +103,7 @@ private:
 
     void cleanup()
     {
+        vkDestroyInstance(instance, nullptr);
         glfwDestroyWindow(window);
         glfwTerminate();
     }
