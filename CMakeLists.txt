@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.19.2)
 project(vulkan_engine)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -36,10 +36,19 @@ add_executable(${PROJECT_NAME} WIN32
         thirdparty/glad/glad.c
         )
 
-target_link_libraries(
-        ${PROJECT_NAME}
-        glfw
-        Vulkan::Vulkan
-        d3d12
-        OpenGL::GL
-)
+if(WIN32)
+    target_link_libraries(
+            ${PROJECT_NAME}
+            glfw
+            Vulkan::Vulkan
+            d3d12
+            OpenGL::GL
+    )
+else()
+    target_link_libraries(
+            ${PROJECT_NAME}
+            glfw
+            Vulkan::Vulkan
+            OpenGL::GL
+    )
+endif()

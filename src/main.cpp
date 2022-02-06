@@ -1,13 +1,15 @@
+#ifdef WIN32
 #include <windows.h>
-#include "DirectXApplication.h"
-//#include "VulkanApplication.h"
+#endif
+//#include "DirectXApplication.h"
+#include "VulkanApplication.h"
 //#include "OpenGLApplication.h"
 
 int main()
 {
-//    VulkanApplication app{};
+    VulkanApplication app{};
 //    OpenGLApplication app{};
-    DirectXApplication app{};
+//    DirectXApplication app{};
     try {
         app.run();
     } catch (const std::exception& e) {
@@ -17,9 +19,11 @@ int main()
     return EXIT_SUCCESS;
 }
 
+#ifdef WIN32
 int APIENTRY WinMain(HINSTANCE hInstance,
 HINSTANCE hPrevInstance,
         LPSTR lpCmdLine, int nCmdShow)
 {
 return main();
 }
+#endif
