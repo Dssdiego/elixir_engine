@@ -1,0 +1,16 @@
+name: linux
+on: [push]
+jobs:
+  linux-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.0.0
+      - name: Download and Install GLFW
+        run: sudo apt-get install xorg-dev libglfw3 libglfw3-dev
+      - name: Build Project
+        uses: nicledomaS/cmake_build_action@v1.4
+        with:
+          submodule_update: ON
+          run_tests: ON
+          unit_test_build: -Dtest=ON

@@ -52,3 +52,5 @@ else()
             OpenGL::GL
     )
 endif()
+
+# TODO: Package project with CPACK

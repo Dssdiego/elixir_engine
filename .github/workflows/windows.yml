@@ -1,0 +1,22 @@
+name: windows
+on: [push]
+jobs:
+  windows-build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.0.0
+      - name: Install Vulkan SDK
+        uses: humbletim/setup-vulkan-sdk@v1.0.3
+      - name: Build Project
+        uses: nicledomaS/cmake_build_action@v1.4
+        with:
+          submodule_update: ON
+          run_tests: ON
+#          create_package: ON
+          unit_test_build: -Dtest=ON
+#      - name: Create Package
+#        uses: actions/upload-artifact@v2
+#        with:
+#          path: build\Release\vulkan_engine.exe
+#          name: artifact_${{ matrix.os }}_${{ matrix.configs }}.exe
