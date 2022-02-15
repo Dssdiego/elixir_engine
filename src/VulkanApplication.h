@@ -67,6 +67,7 @@ private:
     void initVulkan()
     {
         createInstance();
+        // TODO: setupDebugMessenger();
         pickPhysicalDevice();
         createLogicalDevice();
     }
@@ -231,9 +232,11 @@ private:
         queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
         queueCreateInfo.queueCount = 1;
 
+        // assigning a priority queue (0.0f -> 1.0f)
         float queuePriority = 1.0f;
         queueCreateInfo.pQueuePriorities = &queuePriority;
 
+        // creating the logical device
         VkDeviceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         createInfo.pQueueCreateInfos = &queueCreateInfo;
@@ -243,6 +246,7 @@ private:
 
         createInfo.enabledExtensionCount = 0;
 
+        // retro compatibility with older implementations
         if (enableValidationLayers)
         {
             createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
@@ -252,6 +256,7 @@ private:
             createInfo.enabledLayerCount = 0;
         }
 
+        // we're now ready to instantiate the logical device
         if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS)
         {
             throw std::runtime_error("Failed to create logical device");
