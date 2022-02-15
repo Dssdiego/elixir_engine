@@ -270,8 +270,8 @@ private:
 
     void cleanup()
     {
-        vkDestroyInstance(instance, nullptr);
         vkDestroyDevice(device, nullptr);
+        vkDestroyInstance(instance, nullptr);
         glfwDestroyWindow(window);
         glfwTerminate();
     }
