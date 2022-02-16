@@ -8,6 +8,7 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(thirdparty/glfw)
+add_subdirectory(thirdparty/lua)
 
 # Vulkan
 find_package(Vulkan REQUIRED)
@@ -43,6 +44,7 @@ if(WIN32)
             Vulkan::Vulkan
             d3d12
             OpenGL::GL
+            lua_lib
     )
 else()
     target_link_libraries(

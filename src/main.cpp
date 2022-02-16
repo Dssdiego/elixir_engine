@@ -2,12 +2,14 @@
 #include <windows.h>
 #endif
 //#include "DirectXApplication.h"
-#include "VulkanApplication.h"
+//#include "VulkanApplication.h"
 //#include "OpenGLApplication.h"
+#include "LuaApplication.h"
 
 int main()
 {
-    VulkanApplication app{};
+    LuaApplication app{};
+//    VulkanApplication app{};
 //    OpenGLApplication app{};
 //    DirectXApplication app{};
     try {
