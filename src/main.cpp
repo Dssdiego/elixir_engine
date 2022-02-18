@@ -1,15 +1,16 @@
 #ifdef WIN32
+#define NOMINMAX
 #include <windows.h>
 #endif
 //#include "DirectXApplication.h"
-//#include "VulkanApplication.h"
 //#include "OpenGLApplication.h"
-#include "LuaApplication.h"
+//#include "LuaApplication.h"
+#include "VulkanApplication.h"
 
 int main()
 {
-    LuaApplication app{};
-//    VulkanApplication app{};
+//    LuaApplication app{};
+    VulkanApplication app{};
 //    OpenGLApplication app{};
 //    DirectXApplication app{};
     try {
