@@ -75,6 +75,7 @@ private:
     VkFormat swapChainImageFormat;
     VkExtent2D swapChainExtent;
     std::vector<VkImageView> swapChainImageViews;
+    VkPipelineLayout pipelineLayout;
 
     void initWindow()
     {
@@ -583,6 +584,7 @@ private:
         auto vertShaderCode = readFile("../../shaders/vert.spv");
         auto fragShaderCode = readFile("../../shaders/frag.spv");
 
+        // SECTION: 1. Shader Modules
         // creating shader module
         VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
         VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
@@ -604,6 +606,122 @@ private:
 
         VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
+        // SECTION: 2. Vertex Input and Assembly
+        VkPipelineVertexInputStateCreateInfo vertexInputInfo{}; // type of vertex data that will be passed to the vertex shader
+        vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+
+        // bindings: spacing between data and whether the data is per-vertex or per-instance
+        vertexInputInfo.vertexBindingDescriptionCount = 0; // NOTE: is being hardcoded on the shader, so no data for now
+        vertexInputInfo.pVertexBindingDescriptions = nullptr; // optional
+
+        // attribute descriptions: type of attributes passed to the vertex shader, which binding and at which offset
+        vertexInputInfo.vertexAttributeDescriptionCount = 0; // NOTE: is being hardcoded on the shader, so no data for now
+        vertexInputInfo.pVertexAttributeDescriptions = nullptr; // optional
+
+        // vertex input assembly
+        VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
+        inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+        inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST; // because we want to draw a triangle for now
+        inputAssembly.primitiveRestartEnable = VK_FALSE;
+
+        // SECTION: 3. Viewport
+        //  region of the framebuffer that the output will be rendered to
+        // will probably be always from (0,0) to (width, height)
+        // NOTE: the size of the swap chain and its images may differ from the width and height of the window
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = (float) swapChainExtent.width;
+        viewport.height = (float) swapChainExtent.height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+
+        // SECTION: 4. Scissor
+        //   scissor rectangles define in which regions pixels will actually be stored
+        //   any pyxel outside will be discarded by the rasterizer (it's like a filter)
+        // for now, the scissor rectangle will be the size of the viewport
+        VkRect2D scissor{};
+        scissor.offset = {0, 0};
+        scissor.extent = swapChainExtent;
+
+        VkPipelineViewportStateCreateInfo viewportState{};
+        viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+        viewportState.viewportCount = 1; // REVIEW: More than one viewport makes a split screen game?
+        viewportState.pViewports = &viewport;
+        viewportState.scissorCount = 1;
+        viewportState.pScissors = &scissor;
+
+        // SECTION: 5. Rasterizer
+        //  takes the geometry that is shaped by the vertices from the vertex shader and turns it into fragments to be
+        //  colored by the fragment shader
+        VkPipelineRasterizationStateCreateInfo rasterizer{};
+        rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+        rasterizer.depthClampEnable = VK_FALSE;
+        rasterizer.rasterizerDiscardEnable = VK_FALSE; // setting this to VK_TRUE disabled any output to the framebuffer
+
+        // polygonMode: determines how fragments are generated for geometry, in this case it will fill the area of the polygon with fragments
+        // NOTE: if we wanted to draw wireframes, for example, this would be changed to VK_POLYGON_MODE_LINE (making this will require enabling a GPU feature)
+        rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+        rasterizer.lineWidth = 1.0f;
+        rasterizer.cullMode = VK_CULL_MODE_BACK_BIT; // for now, we'll always cull the back face
+        rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE; // order for faces to be considered front-facing
+        rasterizer.depthBiasEnable = VK_FALSE;
+        rasterizer.depthBiasConstantFactor = 0.0f; // optional
+        rasterizer.depthBiasClamp = 0.0f; // optional
+        rasterizer.depthBiasSlopeFactor = 0.0f; // optional
+
+        // SECTION: 6. Multisampling
+        //  one of the ways to perform anti-aliasing
+        // for now, multisampling will be kept DISABLED
+        VkPipelineMultisampleStateCreateInfo multisampling{};
+        multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+        multisampling.sampleShadingEnable = VK_FALSE;
+        multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+        multisampling.minSampleShading = 1.0f; // optional
+        multisampling.pSampleMask = nullptr; // optional
+        multisampling.alphaToCoverageEnable = VK_FALSE; // optional
+        multisampling.alphaToOneEnable = VK_FALSE; // optional
+
+        // SECTION: 7. Depth and stencil testing
+        // TODO: Implement struct
+
+        // SECTION: 8. Color Blending
+        //  combines the color returned from the fragment shader to the framebuffer color
+        VkPipelineColorBlendAttachmentState colorBlendAttachment{};
+        colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+        colorBlendAttachment.blendEnable = VK_FALSE;
+        colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE; // optional
+        colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO; // optional
+        colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD; // optional
+        colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; // optional
+        colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // optional
+        colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD; // optional
+
+        VkPipelineColorBlendStateCreateInfo colorBlending{};
+        colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+        colorBlending.logicOpEnable = VK_FALSE;
+        colorBlending.logicOp = VK_LOGIC_OP_COPY; // optional
+        colorBlending.attachmentCount = 1;
+        colorBlending.pAttachments = &colorBlendAttachment;
+        colorBlending.blendConstants[0] = 0.0f; // optional
+        colorBlending.blendConstants[1] = 0.0f; // optional
+        colorBlending.blendConstants[2] = 0.0f; // optional
+        colorBlending.blendConstants[3] = 0.0f; // optional
+
+        // SECTION: 9. Pipeline Layout
+        VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+        pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipelineLayoutInfo.setLayoutCount = 0; // optional
+        pipelineLayoutInfo.pSetLayouts = nullptr; // optional
+        pipelineLayoutInfo.pushConstantRangeCount= 0; // optional
+        pipelineLayoutInfo.pPushConstantRanges = nullptr; // optional
+
+        if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to create pipeline layout");
+        }
+
+        // SECTION: 10. Cleaning up
         // shaders are assigned to a pipeline stage, so we can destroy the shader modules
         vkDestroyShaderModule(device, vertShaderModule, nullptr);
         vkDestroyShaderModule(device, fragShaderModule, nullptr);
@@ -619,15 +737,16 @@ private:
 
     void cleanup()
     {
+        vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
         for (auto imageView : swapChainImageViews)
         {
             vkDestroyImageView(device, imageView, nullptr);
         }
-
         vkDestroySwapchainKHR(device, swapChain, nullptr);
         vkDestroyDevice(device, nullptr);
         vkDestroySurfaceKHR(instance, surface, nullptr);
         vkDestroyInstance(instance, nullptr);
+
         glfwDestroyWindow(window);
         glfwTerminate();
 
