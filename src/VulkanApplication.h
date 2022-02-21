@@ -22,6 +22,8 @@
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
 
+const int MAX_FRAMES_IN_FLIGHT = 2;
+
 const std::vector<const char*> validationLayers = {
         "VK_LAYER_KHRONOS_validation"
 };
@@ -81,8 +83,9 @@ private:
     std::vector<VkFramebuffer> swapChainFrameBuffers;
     VkCommandPool commandPool;
     std::vector<VkCommandBuffer> commandBuffers;
-    VkSemaphore imageAvailableSemaphore;
-    VkSemaphore renderFinishedSemaphore;
+    std::vector<VkSemaphore> imageAvailableSemaphores;
+    std::vector<VkSemaphore> renderFinishedSemaphores;
+    size_t currentFrame = 0;
 
     void initWindow()
     {
@@ -918,13 +921,19 @@ private:
     //  and we need them ordered)
     void createSemaphores()
     {
+        imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+        renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+
         VkSemaphoreCreateInfo semaphoreInfo{};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
-        if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS ||
-                vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS)
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
-            throw std::runtime_error("failed to create semaphores");
+            if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
+                    vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS)
+            {
+                throw std::runtime_error("failed to create semaphores for a frame");
+            }
         }
     }
 
@@ -935,19 +944,22 @@ private:
             glfwPollEvents();
             drawFrame();
         }
+
+        // waiting for the logical device to finish operations before exiting and destroying the window
+        vkDeviceWaitIdle(device);
     }
 
     void drawFrame()
     {
         // acquiring an image from the swap chain
         uint32_t imageIndex;
-        vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+        vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
         // queue submission
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
+        VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[currentFrame] };
         VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
         submitInfo.waitSemaphoreCount = 1;
@@ -956,7 +968,7 @@ private:
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &commandBuffers[imageIndex]; // which command buffers to actually submit for execution
 
-        VkSemaphore signalSemaphores[] = { renderFinishedSemaphore };
+        VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[currentFrame] };
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores; // which semaphore to signal once the command buffer(s) have finished execution
 
@@ -979,12 +991,20 @@ private:
 
         // submitting the request to present an image to the swap chain
         vkQueuePresentKHR(presentQueue, &presentInfo);
+        // waiting for work to finish right after submitting it
+        vkQueueWaitIdle(presentQueue);
+
+        // advance our frame count
+        currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 
     void cleanup()
     {
-        vkDestroySemaphore(device, renderFinishedSemaphore, nullptr);
-        vkDestroySemaphore(device, imageAvailableSemaphore, nullptr);
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        {
+            vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
+            vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
+        }
         vkDestroyCommandPool(device, commandPool, nullptr);
         for (auto framebuffer : swapChainFrameBuffers)
         {
