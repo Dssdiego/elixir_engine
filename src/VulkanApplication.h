@@ -79,6 +79,8 @@ private:
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
     std::vector<VkFramebuffer> swapChainFrameBuffers;
+    VkCommandPool commandPool;
+    std::vector<VkCommandBuffer> commandBuffers;
 
     void initWindow()
     {
@@ -101,6 +103,8 @@ private:
         createRenderPass();
         createGraphicsPipeline();
         createFramebuffers();
+        createCommandPool();
+        createCommandBuffers();
     }
 
     bool checkValidationLayerSupport()
@@ -591,7 +595,7 @@ private:
         VkAttachmentDescription colorAttachment{};
         colorAttachment.format = swapChainImageFormat; // matching the format of the swap chain images
         colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT; // matching the format of the swap chain images
-        colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR; // clear the framebuffer to black before drawing a new frame
+        colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR; // clear the framebuffer before drawing a new frame
         colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE; // rendered contents will be stored in memory
         colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE; // doing nothing with stencil buffers for now, so we don't care what is in the buffer
         colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE; // doing nothing with stencil buffers for now, so we don't care what is in the buffer
@@ -820,6 +824,83 @@ private:
         }
     }
 
+    // manages the memory that is used to store the buffers and command buffers are allocated from them
+    void createCommandPool()
+    {
+        QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
+
+        VkCommandPoolCreateInfo poolInfo{};
+        poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value(); // since we want to record the commands for drawing, we must use the graphics queue family
+        poolInfo.flags = 0; // optional
+
+        if (vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to create command pool");
+        }
+    }
+
+    // allocates and records the commands for each swap chain image
+    void createCommandBuffers()
+    {
+        commandBuffers.resize(swapChainFrameBuffers.size());
+
+        VkCommandBufferAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo.commandPool = commandPool;
+        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandBufferCount = (uint32_t) commandBuffers.size();
+
+        if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to allocate command buffers");
+        }
+
+        for (size_t i = 0; i < commandBuffers.size(); i++)
+        {
+            VkCommandBufferBeginInfo beginInfo{};
+            beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+            beginInfo.flags = 0; // optional
+            beginInfo.pInheritanceInfo = nullptr; // only relevant for secondary command buffers
+
+            if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS)
+            {
+                throw std::runtime_error("failed to begin recording command buffer");
+            }
+
+            VkRenderPassBeginInfo renderPassInfo{};
+            renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            renderPassInfo.renderPass = renderPass;
+            renderPassInfo.framebuffer = swapChainFrameBuffers[i];
+            renderPassInfo.renderArea.offset = {0, 0}; // size of the render area
+            renderPassInfo.renderArea.extent = swapChainExtent;
+
+            // which color we are going to use to clear the screen with, called by VK_ATTACHMENT_LOAD_OP_CLEAR
+            // in this case, the color is black with 100% opacity
+            VkClearValue clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+            renderPassInfo.clearValueCount = 1;
+            renderPassInfo.pClearValues = &clearColor;
+
+            // the render pass can now begin
+            vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+            // binding to the graphics pipeline
+            vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+
+            // drawing the triangle to the screen
+            vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+
+            // ending the render pass
+            vkCmdEndRenderPass(commandBuffers[i]);
+
+            // finished recording, pass commands to be rendered
+            if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
+            {
+                throw std::runtime_error("failed to record command buffer");
+            }
+        }
+    }
+
     void mainLoop()
     {
         while (!glfwWindowShouldClose(window))
@@ -830,6 +911,7 @@ private:
 
     void cleanup()
     {
+        vkDestroyCommandPool(device, commandPool, nullptr);
         for (auto framebuffer : swapChainFrameBuffers)
         {
             vkDestroyFramebuffer(device, framebuffer, nullptr);
@@ -849,11 +931,9 @@ private:
         glfwDestroyWindow(window);
         glfwTerminate();
 
-        // NOTE: device queues are implicitly cleaned up when the device is destroyed,
-        // so we don't need to do anything here
-
-        // NOTE: images in swap chain are cleaned up once the swap chain is destroyed,
-        // so we don't need to do anything here
+        // NOTE: command buffers will be automatically freed when their command pool is destroyed
+        // NOTE: device queues are implicitly cleaned up when the device is destroyed
+        // NOTE: images in swap chain are cleaned up once the swap chain is destroyed
     }
 };
 
