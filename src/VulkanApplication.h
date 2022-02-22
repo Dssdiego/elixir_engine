@@ -473,11 +473,21 @@ private:
 
     void recreateSwapChain()
     {
+        int width = 0, height = 0;
+        glfwGetFramebufferSize(window, &width, &height);
+        while (width == 0 || height == 0) // windows is minimized, wait for it to be on the foreground again
+        {
+            glfwGetFramebufferSize(window, &width, &height);
+            glfwWaitEvents();
+        }
+
         // don't touch resources that may still be in use
         vkDeviceWaitIdle(device);
 
+        // cleanup
         cleanupSwapChain();
 
+        // effectively recreate swap chain
         createSwapChain();
         createImageViews();
         createRenderPass();
