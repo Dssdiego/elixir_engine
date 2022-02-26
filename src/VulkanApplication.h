@@ -18,6 +18,8 @@
 #include <cstdint> // necessary for UINT32_MAX
 #include <algorithm>
 #include <set>
+#include <array>
+#include <glm/glm.hpp>
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -46,6 +48,47 @@ struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
     std::vector<VkPresentModeKHR> presentModes;
+};
+
+struct Vertex {
+    glm::vec2 pos;
+    glm::vec3 color;
+
+    // vertex binding describes at which rate to load data from memory throughout the vertices
+    //   it specifies the number of bytes between data entries and whether
+    //   to move to the next data entry after each vertex or after each instance
+    static VkVertexInputBindingDescription getBindingDescription() {
+        VkVertexInputBindingDescription bindingDescription{};
+        bindingDescription.binding = 0; // index of the binding in the array of bindings
+        bindingDescription.stride = sizeof(Vertex); // number of bytes from one entry to the next
+        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; // move to the next data entry after each vertex
+
+        return bindingDescription;
+    }
+
+    // an attribute description struct describes how to extract a vertex attribute from a chunk of vertex data
+    //  originating from a binding description
+    static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions()
+    {
+        std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
+        attributeDescriptions[0].binding = 0; // which binding the per-vertex data comes
+        attributeDescriptions[0].location = 0; // location directive of the input in the vertex shader
+        attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT; // inPosition is a vec2 (same enumeration as color formats)
+        attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+        attributeDescriptions[1].binding = 0; // which binding the per-vertex data comes
+        attributeDescriptions[1].location = 1; // location directive of the input in the vertex shader
+        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT; // inColor is a vec3
+        attributeDescriptions[1].offset = offsetof(Vertex, color);
+
+        return attributeDescriptions;
+    }
+};
+
+const std::vector<Vertex> vertices = {
+        {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+        {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
 };
 
 #ifdef NDEBUG
@@ -714,13 +757,16 @@ private:
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{}; // type of vertex data that will be passed to the vertex shader
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
+        auto bindingDescription = Vertex::getBindingDescription();
+        auto attributeDescriptions = Vertex::getAttributeDescriptions();
+
         // bindings: spacing between data and whether the data is per-vertex or per-instance
-        vertexInputInfo.vertexBindingDescriptionCount = 0; // NOTE: is being hardcoded on the shader, so no data for now
-        vertexInputInfo.pVertexBindingDescriptions = nullptr; // optional
+        vertexInputInfo.vertexBindingDescriptionCount = 1;
+        vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
 
         // attribute descriptions: type of attributes passed to the vertex shader, which binding and at which offset
-        vertexInputInfo.vertexAttributeDescriptionCount = 0; // NOTE: is being hardcoded on the shader, so no data for now
-        vertexInputInfo.pVertexAttributeDescriptions = nullptr; // optional
+        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+        vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
         // vertex input assembly
         VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
