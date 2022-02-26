@@ -50,6 +50,17 @@ struct SwapChainSupportDetails {
     std::vector<VkPresentModeKHR> presentModes;
 };
 
+struct Color {
+    static constexpr glm::vec3 RED = glm::vec3(1.0f, 0.0f, 0.0f);
+    static constexpr glm::vec3 WHITE = glm::vec3(1.0f, 1.0f, 1.0f);
+    static constexpr glm::vec3 GREEN = glm::vec3(0.0f, 1.0f, 0.0f);
+    static constexpr glm::vec3 BLUE = glm::vec3(0.0f, 0.0f, 1.0f);
+    static constexpr glm::vec3 YELLOW = glm::vec3(1.0f, 1.0f, 0.0f);
+    static constexpr glm::vec3 MAGENTA = glm::vec3(1.0f, 0.0f, 1.0f);
+    static constexpr glm::vec3 CYAN = glm::vec3(0.0f, 1.0f, 1.0f);
+    static constexpr glm::vec3 BLACK = glm::vec3(0.0f, 0.0f, 0.0f);
+};
+
 struct Vertex {
     glm::vec2 pos;
     glm::vec3 color;
@@ -86,9 +97,9 @@ struct Vertex {
 };
 
 const std::vector<Vertex> vertices = {
-        {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-        {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-        {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+        {{0.0f, -0.5f}, Color::WHITE},
+        {{0.5f, 0.5f}, Color::GREEN},
+        {{-0.5f, 0.5f}, Color::BLUE}
 };
 
 #ifdef NDEBUG
@@ -132,6 +143,8 @@ private:
     std::vector<VkFence> imagesInFlight;
     size_t currentFrame = 0;
     bool framebufferResized = false;
+    VkBuffer vertexBuffer;
+    VkDeviceMemory vertexBufferMemory;
 
     void initWindow()
     {
@@ -162,6 +175,7 @@ private:
         createGraphicsPipeline();
         createFramebuffers();
         createCommandPool();
+        createVertexBuffer();
         createCommandBuffers();
         createSyncObjects();
     }
@@ -943,6 +957,60 @@ private:
         }
     }
 
+    void createVertexBuffer()
+    {
+        VkBufferCreateInfo bufferInfo{};
+        bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        bufferInfo.size = sizeof(vertices[0]) * vertices.size(); // size of the buffer in bytes
+        bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT; // which purposes the data in the buffer is going to be used
+        bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE; // only used by the graphics queue, so it can have exclusive access
+
+        if (vkCreateBuffer(device, &bufferInfo, nullptr, &vertexBuffer) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to create vertex buffer");
+        }
+
+        VkMemoryRequirements memRequirements;
+        vkGetBufferMemoryRequirements(device, vertexBuffer, &memRequirements);
+
+        VkMemoryAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        allocInfo.allocationSize = memRequirements.size;
+        allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits,
+                                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+        if (vkAllocateMemory(device, &allocInfo, nullptr, &vertexBufferMemory) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to allocate vertex buffer memory");
+        }
+
+        vkBindBufferMemory(device, vertexBuffer, vertexBufferMemory, 0);
+
+        // copying the vertex data to the buffer (by mapping the buffer memory into the CPU accessible memory)
+        void* data;
+        vkMapMemory(device, vertexBufferMemory, 0, bufferInfo.size, 0, &data);
+        memcpy(data, vertices.data(), (size_t) bufferInfo.size);
+        vkUnmapMemory(device, vertexBufferMemory);
+    }
+
+    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+    {
+        // querying info about the available types of memory
+        VkPhysicalDeviceMemoryProperties memProperties;
+        vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+
+        for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+        {
+            if (typeFilter & (1 << i) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+            {
+                return i;
+            }
+        }
+
+        throw std::runtime_error("failed to find a suitable memory type");
+    }
+
     // allocates and records the commands for each swap chain image
     void createCommandBuffers()
     {
@@ -990,8 +1058,13 @@ private:
             // binding to the graphics pipeline
             vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
-            // drawing the triangle to the screen
-            vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+            // bind the vertex buffer
+            VkBuffer vertexBuffers[] = { vertexBuffer };
+            VkDeviceSize offsets[] = { 0 };
+            vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
+
+            // drawing the vertex buffer to the screen
+            vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(vertices.size()), 1, 0, 0);
 
             // ending the render pass
             vkCmdEndRenderPass(commandBuffers[i]);
@@ -1146,6 +1219,9 @@ private:
     void cleanup()
     {
         cleanupSwapChain();
+
+        vkDestroyBuffer(device, vertexBuffer, nullptr);
+        vkFreeMemory(device, vertexBufferMemory, nullptr);
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
