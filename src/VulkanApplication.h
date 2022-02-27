@@ -9,6 +9,7 @@
 #include <GLFW/glfw3.h>
 
 #define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -101,9 +102,9 @@ struct Vertex {
 };
 
 struct UniformBufferObject {
-    glm::mat4 model;
-    glm::mat4 view;
-    glm::mat4 proj;
+    alignas(16) glm::mat4 model;
+    alignas(16) glm::mat4 view;
+    alignas(16) glm::mat4 proj;
 };
 
 const std::vector<Vertex> vertices = {
@@ -165,6 +166,8 @@ private:
     VkDeviceMemory indexBufferMemory;
     std::vector<VkBuffer> uniformBuffers;
     std::vector<VkDeviceMemory> uniformBuffersMemory;
+    VkDescriptorPool descriptorPool;
+    std::vector<VkDescriptorSet> descriptorSets;
 
     void initWindow()
     {
@@ -174,6 +177,7 @@ private:
         window = glfwCreateWindow(WIDTH, HEIGHT, "Game Engine (Vulkan)", nullptr, nullptr);
         glfwSetWindowUserPointer(window, this);
         glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+        glfwSetWindowSizeLimits(window, 480, 320, GLFW_DONT_CARE, GLFW_DONT_CARE);
     }
 
     static void framebufferResizeCallback(GLFWwindow* window, int width, int height)
@@ -199,6 +203,8 @@ private:
         createVertexBuffer();
         createIndexBuffer();
         createUniformBuffers();
+        createDescriptorPool();
+        createDescriptorSets();
         createCommandBuffers();
         createSyncObjects();
     }
@@ -574,6 +580,8 @@ private:
         createGraphicsPipeline();
         createFramebuffers();
         createUniformBuffers();
+        createDescriptorPool();
+        createDescriptorSets();
         createCommandBuffers();
     }
 
@@ -872,7 +880,7 @@ private:
         rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
         rasterizer.lineWidth = 1.0f;
         rasterizer.cullMode = VK_CULL_MODE_BACK_BIT; // for now, we'll always cull the back face
-        rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE; // order for faces to be considered front-facing
+        rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE; // order for faces to be considered front-facing (in our case is counter clockwise because of MVP Y-flip in the shader)
         rasterizer.depthBiasEnable = VK_FALSE;
         rasterizer.depthBiasConstantFactor = 0.0f; // optional
         rasterizer.depthBiasClamp = 0.0f; // optional
@@ -1167,15 +1175,72 @@ private:
         float time = std::chrono::duration<float, std::chrono::seconds::period> (currentTime - startTime).count();
 
         UniformBufferObject ubo{};
-        ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, -1.0f));
         ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float) swapChainExtent.height, 0.01f, 10.0f);
+        ubo.proj = glm::perspective(glm::radians(45.0f), (float) swapChainExtent.width / (float) swapChainExtent.height, 0.01f, 10.0f);
         ubo.proj[1][1] *= -1; // flip the image (vulkan renders the opposite as OpenGL)
 
         void* data;
         vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
         memcpy(data, &ubo, sizeof(ubo));
         vkUnmapMemory(device, uniformBuffersMemory[currentImage]);
+    }
+
+    void createDescriptorPool()
+    {
+        VkDescriptorPoolSize poolSize{};
+        poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        poolSize.descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+
+        VkDescriptorPoolCreateInfo poolInfo{};
+        poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        poolInfo.poolSizeCount = 1;
+        poolInfo.pPoolSizes = &poolSize;
+        poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size()); // maximum number of descriptors that may be allocated
+
+        if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to create descriptor pool");
+        }
+    }
+
+    void createDescriptorSets()
+    {
+        std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
+
+        VkDescriptorSetAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        allocInfo.descriptorPool = descriptorPool;
+        allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImages.size());
+        allocInfo.pSetLayouts = layouts.data();
+
+        descriptorSets.resize(swapChainImages.size());
+        if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to allocate descriptor sets");
+        }
+
+        // populate every descriptor
+        for (size_t i = 0; i < swapChainImages.size(); i++)
+        {
+            VkDescriptorBufferInfo bufferInfo{};
+            bufferInfo.buffer = uniformBuffers[i];
+            bufferInfo.offset = 0;
+            bufferInfo.range = sizeof(UniformBufferObject);
+
+            VkWriteDescriptorSet descriptorWrite{};
+            descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrite.dstSet = descriptorSets[i];
+            descriptorWrite.dstBinding = 0;
+            descriptorWrite.dstArrayElement = 0;
+            descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptorWrite.descriptorCount = 1;
+            descriptorWrite.pBufferInfo = &bufferInfo;
+            descriptorWrite.pImageInfo = nullptr; // optional
+            descriptorWrite.pTexelBufferView = nullptr; // optional
+
+            vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
+        }
     }
 
     // allocates and records the commands for each swap chain image
@@ -1232,6 +1297,10 @@ private:
 
             // bind the index buffer
             vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+            // bind the descriptor sets
+            vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1,
+                                    &descriptorSets[i], 0, nullptr);
 
             // command to draw the vertex buffer to the screen
             vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
@@ -1393,6 +1462,8 @@ private:
             vkDestroyBuffer(device, uniformBuffers[i], nullptr);
             vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
         }
+
+        vkDestroyDescriptorPool(device, descriptorPool, nullptr);
     }
 
     void cleanup()
@@ -1424,6 +1495,7 @@ private:
         glfwDestroyWindow(window);
         glfwTerminate();
 
+        // NOTE: descriptor sets will be automatically freed when the descriptor pool is destroyed
         // NOTE: command buffers will be automatically freed when their command pool is destroyed
         // NOTE: device queues are implicitly cleaned up when the device is destroyed
         // NOTE: images in swap chain are cleaned up once the swap chain is destroyed
