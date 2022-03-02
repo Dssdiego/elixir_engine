@@ -32,11 +32,12 @@
 #include <set>
 #include <array>
 #include <chrono>
+#include "CardGame.h"
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
 const std::string MODEL_PATH = "../../models/viking_room.obj";
-const std::string TEXTURE_PATH = "../../textures/viking_room.png";
+const std::string TEXTURE_PATH = "../../textures/cards/spritesheet.png";
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -182,6 +183,9 @@ private:
     VkDeviceMemory depthImageMemory;
     VkImageView depthImageView;
 
+    // TODO: Implement mipmaps for images:
+    //  https://vulkan-tutorial.com/Generating_Mipmaps
+
     void initWindow()
     {
         glfwInit();
@@ -217,7 +221,8 @@ private:
         createTextureImage();
         createTextureImageView();
         createTextureSampler();
-        loadModel();
+        loadCard();
+//        loadModel();
         createVertexBuffer();
         createIndexBuffer();
         createUniformBuffers();
@@ -909,7 +914,7 @@ private:
         rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
         rasterizer.lineWidth = 1.0f;
         rasterizer.cullMode = VK_CULL_MODE_BACK_BIT; // for now, we'll always cull the back face
-        rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE; // order for faces to be considered front-facing (in our case is counter clockwise because of MVP Y-flip in the shader)
+        rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE; // order for faces to be considered front-facing (in our case is counter clockwise because of MVP Y-flip in the shader)
         rasterizer.depthBiasEnable = VK_FALSE;
         rasterizer.depthBiasConstantFactor = 0.0f; // optional
         rasterizer.depthBiasClamp = 0.0f; // optional
@@ -948,7 +953,7 @@ private:
         colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD; // optional
         colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; // optional
         colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // optional
-        colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD; // optional
+        colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_EXCLUSION_EXT; // optional
 
         VkPipelineColorBlendStateCreateInfo colorBlending{};
         colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -1314,8 +1319,8 @@ private:
     {
         VkSamplerCreateInfo samplerInfo{};
         samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-        samplerInfo.magFilter = VK_FILTER_LINEAR; // if we want to use pixel art, we use VK_FILTER_NEAREST
-        samplerInfo.minFilter = VK_FILTER_LINEAR; // if we want to use pixel art, we use VK_FILTER_NEAREST
+        samplerInfo.magFilter = VK_FILTER_NEAREST; // if we want to use pixel art, we use VK_FILTER_NEAREST
+        samplerInfo.minFilter = VK_FILTER_NEAREST; // if we want to use pixel art, we use VK_FILTER_NEAREST
         samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
@@ -1422,41 +1427,55 @@ private:
         vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
     }
 
-    void loadModel()
+    void loadCard()
     {
-        tinyobj::attrib_t attrib;
-        std::vector<tinyobj::shape_t> shapes;
-        std::vector<tinyobj::material_t> materials;
-        std::string err;
+        vertices = {
+                {{-0.5f, -0.5f, 0.0f}, Color::WHITE, { 0.0f, 0.0f}},
+                {{0.5f, -0.5f, 0.0f}, Color::WHITE, { 1.0f, 0.0f}},
+                {{0.5f, 0.5f, 0.0f}, Color::WHITE, { 1.0f, 1.0f}},
+                {{-0.5f, 0.5f, 0.0f}, Color::WHITE, { 0.0f, 1.0f}},
+        };
 
-        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, MODEL_PATH.c_str()))
-        {
-            throw std::runtime_error(err);
-        }
-
-        for (const auto& shape : shapes)
-        {
-            for (const auto& index : shape.mesh.indices)
-            {
-                Vertex vertex{};
-                vertex.pos = {
-                        attrib.vertices[3 * index.vertex_index + 0], // x
-                        attrib.vertices[3 * index.vertex_index + 1], // y
-                        attrib.vertices[3 * index.vertex_index + 2]  // z
-                };
-
-                vertex.texCoord = {
-                        attrib.texcoords[2 * index.texcoord_index + 0], // u
-                        1.0f - attrib.texcoords[2 * index.texcoord_index + 1]  // v
-                };
-
-                vertex.color = Color::WHITE;
-
-                vertices.push_back(vertex);
-                indices.push_back(indices.size());
-            }
-        }
+        indices = {
+                0, 1, 2, 2, 3, 0
+        };
     }
+
+//    void loadModel()
+//    {
+//        tinyobj::attrib_t attrib;
+//        std::vector<tinyobj::shape_t> shapes;
+//        std::vector<tinyobj::material_t> materials;
+//        std::string err;
+//
+//        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, MODEL_PATH.c_str()))
+//        {
+//            throw std::runtime_error(err);
+//        }
+//
+//        for (const auto& shape : shapes)
+//        {
+//            for (const auto& index : shape.mesh.indices)
+//            {
+//                Vertex vertex{};
+//                vertex.pos = {
+//                        attrib.vertices[3 * index.vertex_index + 0], // x
+//                        attrib.vertices[3 * index.vertex_index + 1], // y
+//                        attrib.vertices[3 * index.vertex_index + 2]  // z
+//                };
+//
+//                vertex.texCoord = {
+//                        attrib.texcoords[2 * index.texcoord_index + 0], // u
+//                        1.0f - attrib.texcoords[2 * index.texcoord_index + 1]  // v
+//                };
+//
+//                vertex.color = Color::WHITE;
+//
+//                vertices.push_back(vertex);
+//                indices.push_back(indices.size());
+//            }
+//        }
+//    }
 
     void createVertexBuffer()
     {
@@ -1536,11 +1555,10 @@ private:
         float time = std::chrono::duration<float, std::chrono::seconds::period> (currentTime - startTime).count();
 
         UniformBufferObject ubo{};
-        ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-//        ubo.model = glm::mat4(1);
-        ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+//        ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.model = glm::mat4(1);
+        ubo.view = glm::lookAt(glm::vec3(0.0f, 0.0f, 1.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         ubo.proj = glm::perspective(glm::radians(45.0f), (float) swapChainExtent.width / (float) swapChainExtent.height, 0.1f, 10.0f);
-        ubo.proj[1][1] *= -1; // flip the image (vulkan renders the opposite as OpenGL)
 
         void* data;
         vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
@@ -1656,7 +1674,7 @@ private:
             renderPassInfo.renderArea.extent = swapChainExtent;
 
             std::array<VkClearValue, 2> clearValues{}; // this order should be identical to the order of the attachments
-            clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f }; // black color to clear
+            clearValues[0].color = { 0.42f, 0.36f, 0.9f, 1.0f }; // color to clear
             clearValues[1].depthStencil = { 1.0f, 0}; // 0.0 -> near view plane | 1.0 -> far view plane
 
             renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
@@ -1723,6 +1741,8 @@ private:
 
     void mainLoop()
     {
+        loadAssets();
+
         while (!glfwWindowShouldClose(window))
         {
             glfwPollEvents();
