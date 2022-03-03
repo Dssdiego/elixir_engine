@@ -134,12 +134,14 @@ class VulkanApplication
 public:
     void run() {
         initWindow();
+        loadCustomCursor();
         initVulkan();
         mainLoop();
         cleanup();
     }
 
 private:
+    GLFWcursor* cursor;
     GLFWwindow* window;
     VkInstance instance;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE; // physical device
@@ -183,8 +185,31 @@ private:
     VkDeviceMemory depthImageMemory;
     VkImageView depthImageView;
 
-    // TODO: Implement mipmaps for images:
-    //  https://vulkan-tutorial.com/Generating_Mipmaps
+    void loadCustomCursor()
+    {
+        int cursorImgWidth, cursorImgHeight, cursorImgChannels;
+        stbi_uc* pixels = stbi_load("../../textures/cursor2.png", &cursorImgWidth, &cursorImgHeight, &cursorImgChannels, STBI_rgb_alpha);
+
+        if (!pixels)
+        {
+            throw std::runtime_error("failed to load cursor image");
+        }
+
+        GLFWimage cursorImage;
+        cursorImage.width = cursorImgWidth;
+        cursorImage.height = cursorImgHeight;
+        cursorImage.pixels = pixels;
+
+        cursor = glfwCreateCursor(&cursorImage, 4, 4);
+        if (cursor == nullptr)
+        {
+            throw std::runtime_error("failed to create custom cursor");
+        }
+
+        stbi_image_free(pixels);
+
+        glfwSetCursor(window, cursor);
+    }
 
     void initWindow()
     {
@@ -195,6 +220,7 @@ private:
         glfwSetWindowUserPointer(window, this);
         glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
         glfwSetWindowSizeLimits(window, 480, 320, GLFW_DONT_CARE, GLFW_DONT_CARE);
+        glfwSetCursor(window, cursor);
     }
 
     static void framebufferResizeCallback(GLFWwindow* window, int width, int height)
@@ -1901,6 +1927,7 @@ private:
         vkDestroyInstance(instance, nullptr);
 
         glfwDestroyWindow(window);
+        glfwDestroyCursor(cursor);
         glfwTerminate();
 
         // NOTE: descriptor sets will be automatically freed when the descriptor pool is destroyed
