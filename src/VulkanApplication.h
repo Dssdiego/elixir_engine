@@ -189,7 +189,7 @@ private:
     void loadCustomCursor()
     {
         int cursorImgWidth, cursorImgHeight, cursorImgChannels;
-        stbi_uc* pixels = stbi_load("../../assets/textures/cursor2.png", &cursorImgWidth, &cursorImgHeight, &cursorImgChannels, STBI_rgb_alpha);
+        stbi_uc* pixels = stbi_load("../../assets/cursors/cursor2.png", &cursorImgWidth, &cursorImgHeight, &cursorImgChannels, STBI_rgb_alpha);
 
         if (!pixels)
         {
