@@ -136,6 +136,7 @@ public:
     void run() {
         initWindow();
         loadCustomCursor();
+        loadWindowIcon();
         initVulkan();
         mainLoop();
         cleanup();
@@ -212,16 +213,30 @@ private:
         glfwSetCursor(window, cursor);
     }
 
+    void loadWindowIcon()
+    {
+        GLFWimage icons[1];
+        icons[0].pixels = stbi_load("../../assets/icons/icon.png", &icons[0].width, &icons[0].height, nullptr, STBI_rgb_alpha);
+
+        if (!icons[0].pixels)
+        {
+            throw std::runtime_error("failed to load icon image");
+        }
+
+        glfwSetWindowIcon(window, 1, icons);
+
+        stbi_image_free(icons[0].pixels);
+    }
+
     void initWindow()
     {
         glfwInit();
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // tell GLFW to not create a OpenGL context
 
-        window = glfwCreateWindow(WIDTH, HEIGHT, "Game Engine (Vulkan)", nullptr, nullptr);
+        window = glfwCreateWindow(WIDTH, HEIGHT, "Elixir Game Engine (Vulkan)", nullptr, nullptr);
         glfwSetWindowUserPointer(window, this);
         glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
         glfwSetWindowSizeLimits(window, 480, 320, GLFW_DONT_CARE, GLFW_DONT_CARE);
-        glfwSetCursor(window, cursor);
     }
 
     static void framebufferResizeCallback(GLFWwindow* window, int width, int height)
