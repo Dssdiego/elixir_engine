@@ -33,6 +33,7 @@
 #include <array>
 #include <chrono>
 #include "CardGame.h"
+#include "AudioEngine.h"
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -1783,16 +1784,23 @@ private:
 
     void mainLoop()
     {
+        CAudioEngine::Init();
+        CAudioEngine engine;
+        engine.PlaySoundFile("../../assets/audio/test_audio.mp3", Vector3{0.0f, 00.0f, 0.0f}, engine.VolumeTodB(0.07f));
         loadAssets();
 
         while (!glfwWindowShouldClose(window))
         {
             glfwPollEvents();
             drawFrame();
+
+            CAudioEngine::Update();
         }
 
         // waiting for the logical device to finish operations before exiting and destroying the window
         vkDeviceWaitIdle(device);
+
+        CAudioEngine::Shutdown();
     }
 
     void drawFrame()
