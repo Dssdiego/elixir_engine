@@ -21,10 +21,10 @@ struct Vector3
 };
 
 // using the pimpl idiom
-struct Implementation
+struct CAudioEngineImpl
 {
-    Implementation();
-    ~Implementation();
+    CAudioEngineImpl();
+    ~CAudioEngineImpl();
 
     void Update();
 

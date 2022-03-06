@@ -4,9 +4,9 @@
 
 #include "AudioEngine.h"
 
-Implementation* mImplementation = nullptr;
+CAudioEngineImpl* mImplementation = nullptr;
 
-Implementation::Implementation()
+CAudioEngineImpl::CAudioEngineImpl()
 {
     mStudioSystem = nullptr;
     CAudioEngine::ErrorCheck(FMOD::Studio::System::create(&mStudioSystem));
@@ -19,13 +19,13 @@ Implementation::Implementation()
     CAudioEngine::ErrorCheck(mStudioSystem->getCoreSystem(&mSystem));
 }
 
-Implementation::~Implementation()
+CAudioEngineImpl::~CAudioEngineImpl()
 {
     CAudioEngine::ErrorCheck(mStudioSystem->unloadAll());
     CAudioEngine::ErrorCheck(mStudioSystem->release());
 }
 
-void Implementation::Update()
+void CAudioEngineImpl::Update()
 {
     // check the current sound to see if any sounds are stopped
     std::vector<ChannelMap::iterator> vStoppedChannels;
@@ -51,7 +51,7 @@ void Implementation::Update()
 
 void CAudioEngine::Init()
 {
-    mImplementation = new Implementation;
+    mImplementation = new CAudioEngineImpl;
 }
 
 void CAudioEngine::Update()
