@@ -34,6 +34,7 @@
 #include <chrono>
 #include "CardGame.h"
 #include "AudioEngine.h"
+#include "Input.h"
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -238,12 +239,20 @@ private:
         glfwSetWindowUserPointer(window, this);
         glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
         glfwSetWindowSizeLimits(window, 480, 320, GLFW_DONT_CARE, GLFW_DONT_CARE);
+        glfwSetKeyCallback(window, keyCallback);
     }
 
     static void framebufferResizeCallback(GLFWwindow* window, int width, int height)
     {
         auto app = reinterpret_cast<VulkanApplication*>(glfwGetWindowUserPointer(window));
         app->framebufferResized = true;
+    }
+
+    static void keyCallback(GLFWwindow* pWindow, int nKey, int nScancode, int nAction, int nMods)
+    {
+        // TODO: Abstract this
+        std::cout << "Key pressed: " << nKey << " | Scancode: " << nScancode
+                  << " | Action: " << nAction << " | Mods: " << nMods << std::endl;
     }
 
     void initVulkan()
@@ -1785,12 +1794,12 @@ private:
     void mainLoop()
     {
         CAudioEngine::Init();
+        CInput::Init();
         CAudioEngine engine;
 //        engine.PlaySoundFile("../../assets/audio/test_audio.mp3", Vector3{0.0f, 0.0f, 0.0f}, engine.VolumeTodB(1.0f));
         engine.LoadBank("../../assets/audio/Master.bank", NULL);
         engine.LoadBank("../../assets/audio/Master.strings.bank", NULL);
         engine.PlayEvent("event:/Event1");
-        loadAssets();
 
         while (!glfwWindowShouldClose(window))
         {
@@ -1804,6 +1813,7 @@ private:
         vkDeviceWaitIdle(device);
 
         CAudioEngine::Shutdown();
+        CInput::Shutdown();
     }
 
     void drawFrame()
