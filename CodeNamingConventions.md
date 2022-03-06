@@ -1,4 +1,4 @@
-# Code Naming Conventions
+# Coding Naming Conventions
 
 ## General
 
@@ -14,7 +14,17 @@
 ## Methods/Functions
 
 - All functions that return a bool should ask a true/false question, such as ```IsVisible()``` or ```ShouldClearBuffer()```.
+- Functions/methods parameters should be prefixed by its type
 
+```c++
+    (String) sFileName
+    (Vector) vPosition
+    (Enum) eMode
+    (int) nChannelId
+    (float) fValue
+    (bool) bImmediate
+    (others) pSomething
+```
 
 ## Variables
 
