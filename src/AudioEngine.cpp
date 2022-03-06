@@ -147,6 +147,131 @@ int CAudioEngine::PlaySoundFile(const std::string &sSoundName, const Vector3 &vP
     return channelId;
 }
 
+void CAudioEngine::SetChannel3dPosition(int nChannelId, const Vector3 &vPosition)
+{
+    auto foundIt = mImplementation->mChannels.find(nChannelId);
+    if (foundIt == mImplementation->mChannels.end())
+        return;
+
+    FMOD_VECTOR position = VectorToFmod(vPosition);
+    CAudioEngine::ErrorCheck(foundIt->second->set3DAttributes(&position, nullptr));
+}
+
+void CAudioEngine::SetChannelVolume(int nChannelId, float fVolumedB)
+{
+    auto foundIt = mImplementation->mChannels.find(nChannelId);
+    if (foundIt == mImplementation->mChannels.end())
+        return;
+
+    CAudioEngine::ErrorCheck(foundIt->second->setVolume(fVolumedB));
+}
+
+// banks are what stores all the sounds and informations for each FMOD event
+void CAudioEngine::LoadBank(const std::string &sBankName, FMOD_STUDIO_LOAD_BANK_FLAGS pflags)
+{
+    // check if the bank is loaded
+    auto foundIt = mImplementation->mBanks.find(sBankName);
+    if (foundIt != mImplementation->mBanks.end())
+        return;
+
+    // load the bank
+    FMOD::Studio::Bank* bank;
+    CAudioEngine::ErrorCheck(mImplementation->mStudioSystem->loadBankFile(
+            sBankName.c_str(), pflags, &bank));
+    if (bank)
+    {
+        mImplementation->mBanks[sBankName] = bank;
+    }
+}
+
+// FMOD events have a description and an instance
+//   the description is the information and the instance is what actually plays the sound
+void CAudioEngine::LoadEvent(const std::string &sEventName)
+{
+    // check if the event is loaded
+    auto foundIt = mImplementation->mEvents.find(sEventName);
+    if (foundIt != mImplementation->mEvents.end())
+        return;
+
+    FMOD::Studio::EventDescription* eventDescription = nullptr;
+    CAudioEngine::ErrorCheck(mImplementation->mStudioSystem->getEvent(sEventName.c_str(), &eventDescription));
+
+    if (eventDescription)
+    {
+        FMOD::Studio::EventInstance* eventInstance = nullptr;
+        CAudioEngine::ErrorCheck(eventDescription->createInstance(&eventInstance));
+        if (eventInstance)
+        {
+            mImplementation->mEvents[sEventName] = eventInstance;
+        }
+    }
+}
+
+void CAudioEngine::PlayEvent(const std::string &sEventName)
+{
+    // check if the event is loaded
+    auto foundIt = mImplementation->mEvents.find(sEventName);
+
+    // the sound is not loaded, so we load it
+    if (foundIt == mImplementation->mEvents.end())
+    {
+        LoadEvent(sEventName);
+        foundIt = mImplementation->mEvents.find(sEventName);
+        if (foundIt == mImplementation->mEvents.end())
+            return;
+    }
+
+    // play the event
+    foundIt->second->start();
+}
+
+void CAudioEngine::StopEvent(const std::string &sEventName, bool bImmediate)
+{
+    // check if the event is loaded
+    auto foundIt = mImplementation->mEvents.find(sEventName);
+    if (foundIt == mImplementation->mEvents.end())
+        return;
+
+    // stop the event
+    FMOD_STUDIO_STOP_MODE mode;
+    mode = bImmediate ? FMOD_STUDIO_STOP_IMMEDIATE : FMOD_STUDIO_STOP_ALLOWFADEOUT;
+    CAudioEngine::ErrorCheck(foundIt->second->stop(mode));
+}
+
+bool CAudioEngine::IsEventPlaying(const std::string &sEventName)
+{
+    // check is the event is loaded
+    auto foundIt = mImplementation->mEvents.find(sEventName);
+    if (foundIt == mImplementation->mEvents.end())
+        return false;
+
+    FMOD_STUDIO_PLAYBACK_STATE* state = nullptr;
+    if (foundIt->second->getPlaybackState(state) == FMOD_STUDIO_PLAYBACK_PLAYING)
+    {
+        return true;
+    }
+    return false;
+}
+
+void CAudioEngine::GetEventParameter(const std::string &sEventName, const std::string &sEventParameter, float *fParameter)
+{
+    // check if the event is loaded
+    auto foundIt = mImplementation->mEvents.find(sEventName);
+    if (foundIt == mImplementation->mEvents.end())
+        return;
+
+    CAudioEngine::ErrorCheck(foundIt->second->getParameterByName(sEventName.c_str(), fParameter, nullptr));
+}
+
+void CAudioEngine::SetEventParameter(const std::string &sEventName, const std::string &sParameterName, float fValue)
+{
+    auto foundIt = mImplementation->mEvents.find(sEventName);
+    if (foundIt == mImplementation->mEvents.end())
+        return;
+
+    CAudioEngine::ErrorCheck(foundIt->second->setParameterByName(sEventName.c_str(), fValue));
+}
+
 float CAudioEngine::dbToVolume(float fdB)
 {
     return powf(10.0f, 0.05f * fdB);
@@ -157,16 +282,11 @@ float CAudioEngine::VolumeTodB(float fVolume)
     return 20.0f * log10f(fVolume);
 }
 
-// TODO: continuar aqui: https://codyclaborn.me/tutorials/making-a-basic-fmod-audio-engine-in-c/
 FMOD_VECTOR CAudioEngine::VectorToFmod(const Vector3 &vPosition)
 {
-//    FMOD_VECTOR fmodVector{
-//        vPosition.x,
-//        vPosition.y,
-//        vPosition.z,
-//    };
-//    fmodVector.x = vPosition.x;
-//    fmodVector.y = vPosition.y;
-//    fmodVector.z = vPosition.z;
-    return FMOD_VECTOR{ vPosition.x, vPosition.y, vPosition.z };
+    return FMOD_VECTOR{
+            vPosition.x,
+            vPosition.y,
+            vPosition.z
+    };
 }

@@ -1785,8 +1785,10 @@ private:
     void mainLoop()
     {
         CAudioEngine::Init();
-        CAudioEngine engine;
-        engine.PlaySoundFile("../../assets/audio/test_audio.mp3", Vector3{0.0f, 00.0f, 0.0f}, engine.VolumeTodB(0.07f));
+//        CAudioEngine engine;
+//        engine.PlaySoundFile("../../assets/audio/test_audio.mp3", Vector3{0.0f, 0.0f, 0.0f}, engine.VolumeTodB(1.0f));
+//        engine.LoadBank("../../assets/audio/Master.bank", NULL);
+//        engine.PlayEvent("TimelineTestSound");
         loadAssets();
 
         while (!glfwWindowShouldClose(window))

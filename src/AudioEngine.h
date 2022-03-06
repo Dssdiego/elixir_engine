@@ -55,19 +55,24 @@ public:
     void LoadSound(const std::string& sSoundName, bool b3d = false, bool bLooping = false, bool bStream = false);
     void UnLoadSound(const std::string& sSoundName);
     int PlaySoundFile(const std::string& sSoundName, const Vector3& vPosition = Vector3{0,0,0}, float fVolumedB = 0.0f);
-    void LoadBank(const std::string& sBankName, FMOD_STUDIO_LOAD_BANK_FLAGS flags);
-    void LoadEvent(const std::string& sEventName);
-    void Set3dListenerAndOrientation(const Vector3& vPos = Vector3{0,0,0}, float fVolumedB = 0.0f);
-    void PlayEvent(const std::string& sEventName);
-    void StopChannel(int nChannelId);
-    void StopEvent(const std::string& sEventName, bool bImmediate = false);
-    void GetEventParameter(const std::string& sEventName, const std::string& sEventParameter, float* fParameter);
-    void SetEventParameter(const std::string& sEventName, const std::string& sParameterName, float fValue);
-    void StopAllChannels();
+    bool IsPlaying(int nChannelId);
+
     void SetChannel3dPosition(int nChannelId, const Vector3& vPosition);
     void SetChannelVolume(int nChannelId, float fVolumedB);
-    bool IsPlaying(int nChannelId);
+
+    void LoadBank(const std::string& sBankName, FMOD_STUDIO_LOAD_BANK_FLAGS pflags);
+
+    void LoadEvent(const std::string& sEventName);
+    void PlayEvent(const std::string& sEventName);
+    void StopEvent(const std::string& sEventName, bool bImmediate = false);
     bool IsEventPlaying(const std::string& sEventName);
+    void GetEventParameter(const std::string& sEventName, const std::string& sEventParameter, float* fParameter);
+    void SetEventParameter(const std::string& sEventName, const std::string& sParameterName, float fValue);
+
+    void Set3dListenerAndOrientation(const Vector3& vPos = Vector3{0,0,0}, float fVolumedB = 0.0f);
+    void StopChannel(int nChannelId);
+    void StopAllChannels();
+
     float dbToVolume(float fdB);
     float VolumeTodB(float fVolume);
     FMOD_VECTOR VectorToFmod(const Vector3& vPosition);
