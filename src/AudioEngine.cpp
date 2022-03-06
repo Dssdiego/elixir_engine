@@ -68,7 +68,8 @@ int CAudioEngine::ErrorCheck(FMOD_RESULT result)
 {
     if (result != FMOD_OK)
     {
-        throw std::runtime_error(&"FMOD ERROR: " [result]);
+        std::cout << "FMOD error: " << result << std::endl;
+        throw std::runtime_error("FMOD error");
     }
 
     return 0;
@@ -186,6 +187,7 @@ void CAudioEngine::LoadBank(const std::string &sBankName, FMOD_STUDIO_LOAD_BANK_
 
 // FMOD events have a description and an instance
 //   the description is the information and the instance is what actually plays the sound
+// FIXME: Only works with the GUID for now
 void CAudioEngine::LoadEvent(const std::string &sEventName)
 {
     // check if the event is loaded
@@ -207,6 +209,7 @@ void CAudioEngine::LoadEvent(const std::string &sEventName)
     }
 }
 
+// FIXME: Only works with the GUID for now
 void CAudioEngine::PlayEvent(const std::string &sEventName)
 {
     // check if the event is loaded
