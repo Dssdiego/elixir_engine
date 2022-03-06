@@ -1796,11 +1796,11 @@ private:
     {
         CAudioEngine::Init();
         CInput::Init();
-        CAudioEngine engine;
+//        CAudioEngine engine;
 //        engine.PlaySoundFile("../../assets/audio/test_audio.mp3", Vector3{0.0f, 0.0f, 0.0f}, engine.VolumeTodB(1.0f));
-        engine.LoadBank("../../assets/audio/Master.bank", NULL);
-        engine.LoadBank("../../assets/audio/Master.strings.bank", NULL);
-        engine.PlayEvent("event:/Event1");
+//        engine.LoadBank("../../assets/audio/Master.bank", NULL);
+//        engine.LoadBank("../../assets/audio/Master.strings.bank", NULL);
+//        engine.PlayEvent("event:/Event1");
 
         while (!glfwWindowShouldClose(window))
         {

@@ -39,7 +39,6 @@ message(OPENGL_LIBRARIES: ${OPENGL_LIBRARIES})
 include_directories(
         thirdparty
         ${FMOD_INCLUDE_DIR}
-        thirdparty/tracy
 )
 
 # load source and header files
