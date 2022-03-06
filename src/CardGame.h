@@ -5,7 +5,7 @@
 #ifndef VULKAN_ENGINE_CARDGAME_H
 #define VULKAN_ENGINE_CARDGAME_H
 
-enum Suit {
+enum ESuit {
     CLUBS, // ♣
     DIAMONDS, // ♦
     HEARTS, // ♥
@@ -14,7 +14,7 @@ enum Suit {
 
 struct Card {
     uint32_t value;
-    Suit suit;
+    ESuit suit;
     std::string textureName;
 };
 
@@ -54,15 +54,5 @@ std::array<std::string, 3> backs = {
        "back_blue.png",
        "back_red.png",
 };
-
-void loadAssets()
-{
-//    std::cout << "Play Game: " << cards.data() << std::endl;
-}
-
-void loadCards()
-{
-
-}
 
 #endif //VULKAN_ENGINE_CARDGAME_H
