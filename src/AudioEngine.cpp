@@ -3,6 +3,7 @@
 //
 
 #include "AudioEngine.h"
+#include "Profiler.h"
 
 CAudioEngineImpl* mImplementation = nullptr;
 
@@ -51,16 +52,19 @@ void CAudioEngineImpl::Update()
 
 void CAudioEngine::Init()
 {
+    PROFILE_FUNCTION();
     mImplementation = new CAudioEngineImpl;
 }
 
 void CAudioEngine::Update()
 {
+    PROFILE_FUNCTION();
     mImplementation->Update();
 }
 
 void CAudioEngine::Shutdown()
 {
+    PROFILE_FUNCTION();
     delete mImplementation;
 }
 

@@ -3,6 +3,7 @@
 //
 
 #include "Input.h"
+#include "Profiler.h"
 
 CInputImpl* mImplementation = nullptr;
 
@@ -18,10 +19,12 @@ CInputImpl::~CInputImpl()
 
 void CInput::Init()
 {
+    PROFILE_FUNCTION();
     mImplementation = new CInputImpl;
 }
 
 void CInput::Shutdown()
 {
+    PROFILE_FUNCTION();
     delete mImplementation;
 }

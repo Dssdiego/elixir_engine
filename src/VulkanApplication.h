@@ -36,6 +36,7 @@
 #include "CardGame.h"
 #include "AudioEngine.h"
 #include "Input.h"
+#include "Profiler.h"
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -137,12 +138,14 @@ class VulkanApplication
 {
 public:
     void run() {
+        PROFILE_BEGIN_SESSION("sample sessions", "../../profiling/profile.json");
         initWindow();
         loadCustomCursor();
         loadWindowIcon();
         initVulkan();
         mainLoop();
         cleanup();
+        PROFILE_END_SESSION();
     }
 
 private:
@@ -1794,6 +1797,7 @@ private:
 
     void mainLoop()
     {
+        PROFILE_FUNCTION();
         CAudioEngine::Init();
         CInput::Init();
 //        CAudioEngine engine;
@@ -1804,6 +1808,7 @@ private:
 
         while (!glfwWindowShouldClose(window))
         {
+            PROFILE_SCOPE("Frame");
             glfwPollEvents();
             drawFrame();
 
@@ -1819,6 +1824,7 @@ private:
 
     void drawFrame()
     {
+        PROFILE_FUNCTION();
         // waiting for fence synchronization (CPU <-> GPU)
         vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
