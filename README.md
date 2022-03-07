@@ -9,6 +9,7 @@ Game Engine being created in C++ from scratch using Vulkan, GLFW, ImGUI and FMOD
   - [X] 3D object (mesh)
   - [ ] Batch 2D rendering
   - [ ] 2D Atlas support
+  - [ ] Text (truetype fonts)
 - [ ] Audio Engine (FMOD)
   - [X] 3D audio
   - [X] 2D audio
