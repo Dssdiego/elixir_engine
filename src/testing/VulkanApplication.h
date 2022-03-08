@@ -34,9 +34,9 @@
 #include <chrono>
 
 #include "CardGame.h"
-#include "AudioEngine.h"
-#include "Input.h"
-#include "Profiler.h"
+#include "../audio/AudioEngine.h"
+#include "../input/Input.h"
+#include "../profiling/Profiler.h"
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;

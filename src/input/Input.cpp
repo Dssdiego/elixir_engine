@@ -3,7 +3,7 @@
 //
 
 #include "Input.h"
-#include "Profiler.h"
+#include "../profiling/Profiler.h"
 
 CInputImpl* mImplementation = nullptr;
 

@@ -5,7 +5,7 @@
 //#include "DirectXApplication.h"
 //#include "OpenGLApplication.h"
 //#include "LuaApplication.h"
-#include "VulkanApplication.h"
+#include "testing/VulkanApplication.h"
 
 int main()
 {
