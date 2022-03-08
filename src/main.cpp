@@ -3,14 +3,14 @@
 #include <windows.h>
 #include <exception>
 #include <iostream>
-#include "core/VulkanEngine.h"
+#include "core/GameEngine.h"
 
 #endif
 
 int main()
 {
-    CVulkanEngine engine;
-    EngineConfig config {
+    CGameEngine engine;
+    SEngineConfig config {
         "Elixir Game Engine",
         {800, 600},
         {320, 240},
