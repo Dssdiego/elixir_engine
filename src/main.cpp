@@ -1,20 +1,24 @@
 #ifdef WIN32
 #define NOMINMAX
 #include <windows.h>
+#include <exception>
+#include <iostream>
+#include "core/VulkanEngine.h"
+
 #endif
-//#include "DirectXApplication.h"
-//#include "OpenGLApplication.h"
-//#include "LuaApplication.h"
-#include "testing/VulkanApplication.h"
 
 int main()
 {
-//    LuaApplication app{};
-    VulkanApplication app{};
-//    OpenGLApplication app{};
-//    DirectXApplication app{};
+    CVulkanEngine engine;
+    EngineConfig config {
+        "Elixir Game Engine",
+        {800, 600},
+        {320, 240},
+    };
     try {
-        app.run();
+        engine.Init(&config);
+        engine.Run();
+        engine.Cleanup();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;
