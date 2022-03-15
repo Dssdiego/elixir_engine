@@ -6,6 +6,7 @@
 #include "../audio/AudioEngine.h"
 #include "../input/Input.h"
 #include "../rendering/Window.h"
+#include "../rendering/Renderer.h"
 
 void CGameEngine::Init(SEngineConfig* pConfig)
 {
@@ -13,6 +14,7 @@ void CGameEngine::Init(SEngineConfig* pConfig)
     CWindow::Init(pConfig);
     CAudioEngine::Init();
     CInput::Init();
+    CRenderer::Init(SBackend::DIRECTX);
 }
 
 void CGameEngine::Run()
@@ -30,14 +32,15 @@ void CGameEngine::Run()
 
 void CGameEngine::Draw()
 {
-
+    CRenderer::Draw();
 }
 
 void CGameEngine::Cleanup()
 {
     // destroy engine systems
-    CAudioEngine::Shutdown();
+    CRenderer::Shutdown();
     CInput::Shutdown();
+    CAudioEngine::Shutdown();
     CWindow::Shutdown();
 }
 

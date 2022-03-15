@@ -3,6 +3,7 @@
 //
 
 #include "Window.h"
+#include "../profiling/Logger.h"
 
 SWindowImpl* mImplementation = nullptr;
 
@@ -33,6 +34,7 @@ bool CWindow::ShouldCloseWindow()
 
 void CWindow::Init(SEngineConfig* pConfig)
 {
+    CLogger::Info("Initializing window");
     mImplementation = new SWindowImpl(pConfig);
 }
 
@@ -43,6 +45,7 @@ void CWindow::Update()
 
 void CWindow::Shutdown()
 {
+    CLogger::Info("Shutting down window");
     delete mImplementation;
 }
 

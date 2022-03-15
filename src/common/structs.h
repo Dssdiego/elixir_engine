@@ -18,6 +18,7 @@ struct SEngineConfig
     std::string gameTitle;
     SWindowSize windowSize;
     SWindowSize minWindowSize;
+    bool saveLogToFile;
 };
 
 #endif //VULKAN_ENGINE_STRUCTS_H

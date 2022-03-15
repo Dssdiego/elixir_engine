@@ -4,6 +4,7 @@
 
 #include "AudioEngine.h"
 #include "../profiling/Profiler.h"
+#include "../profiling/Logger.h"
 
 CAudioEngineImpl* mImplementation = nullptr;
 
@@ -52,6 +53,7 @@ void CAudioEngineImpl::Update()
 
 void CAudioEngine::Init()
 {
+    CLogger::Info("Initializing audio engine");
     PROFILE_FUNCTION();
     mImplementation = new CAudioEngineImpl;
 }
@@ -64,6 +66,7 @@ void CAudioEngine::Update()
 
 void CAudioEngine::Shutdown()
 {
+    CLogger::Info("Shutting down audio engine");
     PROFILE_FUNCTION();
     delete mImplementation;
 }
@@ -72,7 +75,7 @@ int CAudioEngine::ErrorCheck(FMOD_RESULT result)
 {
     if (result != FMOD_OK)
     {
-        std::cout << "FMOD error: " << result << std::endl;
+        CLogger::Error("FMOD Error", (char *) result);
         throw std::runtime_error("FMOD error");
     }
 
