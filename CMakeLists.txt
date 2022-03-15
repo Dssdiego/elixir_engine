@@ -46,7 +46,7 @@ file(GLOB_RECURSE SOURCE_FILES
         "src/*.h"
         "src/*.cpp")
 
-add_executable(${PROJECT_NAME} WIN32
+add_executable(${PROJECT_NAME}
         ${SOURCE_FILES}
         thirdparty/glad/glad.c
         )

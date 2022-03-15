@@ -14,6 +14,7 @@ int main()
         "Elixir Game Engine",
         {800, 600},
         {320, 240},
+        true
     };
     try {
         engine.Init(&config);
@@ -26,11 +27,11 @@ int main()
     return EXIT_SUCCESS;
 }
 
-#ifdef WIN32
-int APIENTRY WinMain(HINSTANCE hInstance,
-HINSTANCE hPrevInstance,
-        LPSTR lpCmdLine, int nCmdShow)
-{
-return main();
-}
-#endif
+//#ifdef WIN32
+//int APIENTRY WinMain(HINSTANCE hInstance,
+//HINSTANCE hPrevInstance,
+//        LPSTR lpCmdLine, int nCmdShow)
+//{
+//return main();
+//}
+//#endif
