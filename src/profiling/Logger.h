@@ -5,6 +5,8 @@
 #ifndef VULKAN_ENGINE_LOGGER_H
 #define VULKAN_ENGINE_LOGGER_H
 
+#define SHOW_CONSOLE
+
 #include <iostream>
 #include <fstream>
 
@@ -53,7 +55,7 @@ class CLogger
 public:
     static void Info(std::string msg)
     {
-#ifndef NDEBUG
+#ifdef SHOW_CONSOLE
 #if UNIX || __APPLE__
         std::cout << COLOR_BLUE << INFO_STR << msg << RESET << std::endl;
 #else
@@ -67,7 +69,7 @@ public:
 
     static void Warn(std::string msg)
     {
-#ifndef NDEBUG
+#ifdef SHOW_CONSOLE
 #if UNIX || __APPLE__
         std::cout << COLOR_YELLOW << WARN_STR << msg << RESET << std::endl;
 #else
@@ -81,7 +83,7 @@ public:
 
     static void Error(std::string errMsg, char* errParam)
     {
-#ifndef NDEBUG
+#ifdef SHOW_CONSOLE
 #if UNIX || __APPLE__
         std::cout << COLOR_RED << ERROR_STR << errMsg << " -> " << errParam << RESET << std::endl;
 #else
@@ -95,7 +97,7 @@ public:
 
     static void Debug(std::string msg)
     {
-#ifndef NDEBUG
+#ifdef SHOW_CONSOLE
 #if UNIX || __APPLE__
         std::cout << COLOR_PURPLE << DEBUG_STR << msg << RESET << std::endl;
 #else
