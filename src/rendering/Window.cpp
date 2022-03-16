@@ -19,6 +19,9 @@ SWindowImpl::SWindowImpl(SEngineConfig* pConfig)
 //    glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 //    glfwSetWindowSizeLimits(window, 480, 320, GLFW_DONT_CARE, GLFW_DONT_CARE);
 //    glfwSetKeyCallback(window, keyCallback);
+
+    mWidth = pConfig->windowSize.width;
+    mHeight = pConfig->windowSize.height;
 }
 
 SWindowImpl::~SWindowImpl()
@@ -47,6 +50,15 @@ void CWindow::Shutdown()
 {
     CLogger::Info("Shutting down window");
     delete mImplementation;
+}
+
+SWindowSize CWindow::GetSize()
+{
+    return SWindowSize
+            {
+                mImplementation->mWidth,
+                mImplementation->mHeight
+            };
 }
 
 

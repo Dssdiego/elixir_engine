@@ -15,6 +15,8 @@ struct SWindowImpl
     ~SWindowImpl();
 
     GLFWwindow* window;
+
+    uint32_t mWidth, mHeight;
 };
 
 class CWindow
@@ -25,10 +27,12 @@ public:
     static void Shutdown();
 
     static bool ShouldCloseWindow();
+    static SWindowSize GetSize();
 
 private:
     void LoadCusor();
     void Resize();
+
 };
 
 #endif //VULKAN_ENGINE_WINDOW_H
