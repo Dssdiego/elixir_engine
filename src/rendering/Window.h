@@ -17,6 +17,8 @@ struct SWindowImpl
     GLFWwindow* window;
 
     uint32_t mWidth, mHeight;
+
+    void loadIcon();
 };
 
 class CWindow
