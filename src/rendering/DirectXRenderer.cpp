@@ -23,6 +23,13 @@ void CDirectXRenderer::Shutdown()
 
 CDirectXRendererImpl::CDirectXRendererImpl()
 {
+#ifndef NDEBUG
+    if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&mDebugController))))
+    {
+        mDebugController->EnableDebugLayer();
+    }
+#endif
+
     CreateFactory();
     CreateAdapter();
     CreateDevice();
@@ -32,16 +39,15 @@ CDirectXRendererImpl::CDirectXRendererImpl()
 //    CreateBarrierPrimitive();
 //    CreateSwapchain();
 
-//#ifndef NDEBUG
-//    CreateDebugDevice();
-//#endif
+#ifndef NDEBUG
+    CreateDebugDevice();
+#endif
 }
 
 CDirectXRendererImpl::~CDirectXRendererImpl()
 {
     // NOTE: Using smart pointers will deprecate this code, as we
     //  won't need to worry about releasing memory
-    // destruction
     mFactory->Release();
     mAdapter->Release();
     mDevice->Release();
