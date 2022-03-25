@@ -47,7 +47,7 @@ CDirectXRendererImpl::~CDirectXRendererImpl()
     mDevice->Release();
     mCommandQueue->Release();
     mCommandAllocator->Release();
-    mFencePrimitive.fence->Release();
+    mFence->Release();
 //    mCommandList->Release(); // barrier code
 //    mSwapchain->Release();
 }
@@ -157,7 +157,7 @@ void CDirectXRendererImpl::CreateCommandAllocator()
 void CDirectXRendererImpl::CreateFencePrimitive()
 {
     CLogger::Info("DIRECTX::CreateFencePrimitive");
-    if (FAILED(mDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFencePrimitive.fence))))
+    if (FAILED(mDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence))))
     {
         throw std::runtime_error("DIRECTX::Failed to create fence primitive");
     }
@@ -198,6 +198,7 @@ void CDirectXRendererImpl::CreateSwapchain()
     mViewport.MinDepth = 0.1f;
     mViewport.MaxDepth = 1000.0f;
 
+    // REVIEW
 //    if (mSwapchain != nullptr)
 //    {
 //        // Create render target attachments from swapchain
