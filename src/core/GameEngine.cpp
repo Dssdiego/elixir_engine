@@ -14,7 +14,7 @@ void CGameEngine::Init(SEngineConfig* pConfig)
     CWindow::Init(pConfig);
     CAudioEngine::Init();
     CInput::Init();
-    CRenderer::Init(SBackend::DIRECTX);
+    CRenderer::Init(SBackend::VULKAN);
 }
 
 void CGameEngine::Run()

@@ -212,8 +212,30 @@ void CDirectXRendererImpl::CreateSwapchain()
 //
 //    }
 
-    DXGI_SWAP_CHAIN_DESC1 swapchainDesc = {};
+    // NOTE: Using DXGI_SWAP_CHAIN_DESC instead o DXGI_SWAP_CHAIN_DESC1 here
+    DXGI_SWAP_CHAIN_DESC swapchainDesc = {};
     swapchainDesc.BufferCount = mBackbufferCount;
+    swapchainDesc.BufferDesc.Width = 800; // FIXME
+    swapchainDesc.BufferDesc.Height = 600; // FIXME
+    swapchainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    swapchainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+    swapchainDesc.SampleDesc.Count = 1;
+    swapchainDesc.OutputWindow = nullptr;
 
-    // TODO: Continue creating swap chain here...
+    IDXGISwapChain* newSwapchain;
+//    mFactory->CreateSwapChainForHwnd() // TODO: Try this
+    if (FAILED(mFactory->CreateSwapChain(mCommandQueue, &swapchainDesc, &newSwapchain)))
+    {
+        throw std::runtime_error("DIRECTX::Failed to create swapchain");
+    }
+
+//    if SUCCEEDED(mSwapchain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)&newSwapchain))
+//    {
+//        mSwapchain = (IDXGISwapChain3*) newSwapchain;
+//    }
+
+//    mFrameIndex = mSwapchain->GetCurrentBackBufferIndex();
+
+    // Describe and create a render target view (RTV) descriptor heap
 }

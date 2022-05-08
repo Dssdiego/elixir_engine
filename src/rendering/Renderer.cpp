@@ -5,25 +5,27 @@
 #include "Renderer.h"
 #include "DirectXRenderer.h"
 #include "../profiling/Logger.h"
+#include "VulkanRenderer.h"
 
-// TODO: Make possibility to change backends
+// TODO: Allow to change backends
 
 void CRenderer::Init(SBackend backend)
 {
     CLogger::Info("Initializing renderer");
-    CDirectXRenderer::Init();
 
-//    switch (backend)
-//    {
-//        case VULKAN:
-//            break;
-//
-//        case DIRECTX:
+    switch (backend)
+    {
+        case VULKAN:
+            CVulkanRenderer::Init();
+            break;
+
+        case DIRECTX:
+            break;
 //            CDirectXRenderer::Init();
-//
-//        case OPENGL:
-//            break;
-//    }
+
+        case OPENGL:
+            break;
+    }
 }
 
 void CRenderer::Draw()
