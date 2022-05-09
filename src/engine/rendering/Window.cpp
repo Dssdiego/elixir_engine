@@ -14,7 +14,7 @@ SWindowImpl::SWindowImpl(SEngineConfig* pConfig)
 {
     window = nullptr;
     glfwInit();
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // tell GLFW to not create a OpenGL context
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // tell GLFW to not create a OpenGL context (because we might use Vulkan/DirectX)
 
     // TODO: Pass engine config here
     window = glfwCreateWindow(pConfig->windowSize.width, pConfig->windowSize.height, pConfig->gameTitle.c_str(), nullptr, nullptr);
@@ -38,7 +38,7 @@ SWindowImpl::~SWindowImpl()
 void SWindowImpl::loadIcon()
 {
     GLFWimage icons[1];
-    icons[0].pixels = stbi_load("../../assets/icons/icon.png", &icons[0].width, &icons[0].height, nullptr, STBI_rgb_alpha);
+    icons[0].pixels = stbi_load("../../src/engine/assets/icons/icon.png", &icons[0].width, &icons[0].height, nullptr, STBI_rgb_alpha);
 
     if (!icons[0].pixels)
     {

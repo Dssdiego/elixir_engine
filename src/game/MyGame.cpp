@@ -1,25 +1,29 @@
+//
+// Created by Diego S. Seabra on 09/05/22.
+//
+
 #ifdef WIN32
 #define NOMINMAX
 #include <windows.h>
 #include <exception>
 #include <iostream>
-#include "core/GameEngine.h"
+#include "../engine/api/Game.h"
 
 #endif
 
 int main()
 {
-    CGameEngine engine;
+    CGame game;
     SEngineConfig config {
-        "Elixir Game Engine",
-        {800, 600},
-        {320, 240},
-        true
+            "My Game",
+            {800, 600},
+            {320, 240},
+            true
     };
     try {
-        engine.Init(&config);
-        engine.Run();
-        engine.Cleanup();
+        game.Init(&config);
+        game.Run();
+        game.Cleanup();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;

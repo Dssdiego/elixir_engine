@@ -13,7 +13,7 @@
 #include <iomanip>
 #include <ctime>
 #include <sstream>
-#include <windows.h>
+#include <Windows.h>
 
 #if UNIX || __APPLE__
 #define RESET "\e[0m"

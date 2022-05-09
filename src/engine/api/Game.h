@@ -2,13 +2,13 @@
 // Created by Diego S. Seabra on 08/03/22.
 //
 
-#ifndef VULKAN_ENGINE_GAMEENGINE_H
-#define VULKAN_ENGINE_GAMEENGINE_H
+#ifndef VULKAN_ENGINE_GAME_H
+#define VULKAN_ENGINE_GAME_H
 
 #include <string>
 #include "../common/structs.h"
 
-class CGameEngine
+class CGame
 {
 public:
     void Init(SEngineConfig* pConfig); // initializes everything in the engine
@@ -21,4 +21,4 @@ private:
 };
 
 
-#endif //VULKAN_ENGINE_GAMEENGINE_H
+#endif //VULKAN_ENGINE_GAME_H

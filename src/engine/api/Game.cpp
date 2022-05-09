@@ -2,13 +2,13 @@
 // Created by Diego S. Seabra on 08/03/22.
 //
 
-#include "GameEngine.h"
+#include "Game.h"
 #include "../audio/AudioEngine.h"
 #include "../input/Input.h"
 #include "../rendering/Window.h"
 #include "../rendering/Renderer.h"
 
-void CGameEngine::Init(SEngineConfig* pConfig)
+void CGame::Init(SEngineConfig* pConfig)
 {
     // init engine systems
     CWindow::Init(pConfig);
@@ -17,7 +17,7 @@ void CGameEngine::Init(SEngineConfig* pConfig)
     CRenderer::Init(SBackend::VULKAN);
 }
 
-void CGameEngine::Run()
+void CGame::Run()
 {
     while(!CWindow::ShouldCloseWindow())
     {
@@ -30,12 +30,12 @@ void CGameEngine::Run()
     }
 }
 
-void CGameEngine::Draw()
+void CGame::Draw()
 {
     CRenderer::Draw();
 }
 
-void CGameEngine::Cleanup()
+void CGame::Cleanup()
 {
     // destroy engine systems
     CRenderer::Shutdown();
