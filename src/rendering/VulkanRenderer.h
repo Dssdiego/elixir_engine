@@ -9,6 +9,24 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
+#include <optional>
+#include <set>
+
+struct QueueFamilyIndices {
+    std::optional<uint32_t> graphicsFamily;
+    std::optional<uint32_t> presentFamily;
+
+    bool isComplete() const
+    {
+        return graphicsFamily.has_value() && presentFamily.has_value();
+    }
+};
+
+struct SwapChainSupportDetails {
+    VkSurfaceCapabilitiesKHR capabilities;
+    std::vector<VkSurfaceFormatKHR> formats;
+    std::vector<VkPresentModeKHR> presentModes;
+};
 
 struct CVulkanRendererImpl
 {
@@ -21,11 +39,21 @@ struct CVulkanRendererImpl
             "VK_LAYER_KHRONOS_validation"
     };
 
+    const std::vector<const char*> deviceExtensions = {
+            VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    };
+
     // Variables
     VkInstance vkInstance;
+    VkSurfaceKHR vkSurface;
+    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE; // physical device
 
     // Auxiliary Methods
     bool CheckValidationLayerSupport();
+    bool IsDeviceSuitable(VkPhysicalDevice device);
+    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
+    bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
+    SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
 
     // Methods
     void CreateInstance();

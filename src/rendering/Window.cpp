@@ -81,5 +81,10 @@ SWindowSize CWindow::GetSize()
             };
 }
 
+GLFWwindow *CWindow::GetWindow()
+{
+    return mImplementation->window;
+}
+
 
 

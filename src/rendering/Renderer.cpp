@@ -20,8 +20,7 @@ void CRenderer::Init(SBackend backend)
             break;
 
         case DIRECTX:
-            break;
-//            CDirectXRenderer::Init();
+            CDirectXRenderer::Init();
 
         case OPENGL:
             break;
@@ -30,11 +29,13 @@ void CRenderer::Init(SBackend backend)
 
 void CRenderer::Draw()
 {
-
+    // FIXME: Using vulkan as default backend for now. This should be dynamic and follow the current backend
+    CVulkanRenderer::Draw();
 }
 
 void CRenderer::Shutdown()
 {
     CLogger::Info("Shutting down renderer");
-    CDirectXRenderer::Shutdown();
+    // FIXME: Using vulkan as default backend for now. This should be dynamic and follow the current backend
+    CVulkanRenderer::Shutdown();
 }

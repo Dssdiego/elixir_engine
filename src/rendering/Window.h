@@ -30,6 +30,7 @@ public:
 
     static bool ShouldCloseWindow();
     static SWindowSize GetSize();
+    static GLFWwindow* GetWindow();
 
 private:
     void LoadCusor();

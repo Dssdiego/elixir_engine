@@ -3,6 +3,8 @@
 //
 
 #include "VulkanRenderer.h"
+#include "Window.h"
+#include "../profiling/Logger.h"
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -20,6 +22,11 @@ CVulkanRendererImpl* mImplementation = nullptr;
 void CVulkanRenderer::Init()
 {
     mImplementation = new CVulkanRendererImpl;
+}
+
+void CVulkanRenderer::Draw()
+{
+    // TODO: Implement drawing
 }
 
 void CVulkanRenderer::Shutdown()
@@ -62,6 +69,7 @@ CVulkanRendererImpl::CVulkanRendererImpl()
  */
 CVulkanRendererImpl::~CVulkanRendererImpl()
 {
+    vkDestroySurfaceKHR(vkInstance, vkSurface, nullptr);
     vkDestroyInstance(vkInstance, nullptr);
 }
 
@@ -98,6 +106,108 @@ bool CVulkanRendererImpl::CheckValidationLayerSupport()
     return true;
 }
 
+QueueFamilyIndices CVulkanRendererImpl::FindQueueFamilies(VkPhysicalDevice device)
+{
+    QueueFamilyIndices indices{};
+
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+    int i = 0;
+    for (const auto& queueFamily: queueFamilies)
+    {
+        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            indices.graphicsFamily = i;
+
+        // look for a queue family that has the capability of presenting to our window surface
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, vkSurface, &presentSupport);
+
+        if (presentSupport)
+            indices.presentFamily = i;
+
+        if (indices.isComplete())
+            break;
+
+        i++;
+    }
+
+    // Assign index to queue families that could be found
+    return indices;
+}
+
+bool CVulkanRendererImpl::CheckDeviceExtensionSupport(VkPhysicalDevice device)
+{
+    uint32_t extensionsCount;
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsCount, nullptr);
+
+    std::vector<VkExtensionProperties> availableExtensions(extensionsCount);
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsCount, availableExtensions.data());
+
+    std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+    for (const auto& extension : availableExtensions)
+    {
+        requiredExtensions.erase(extension.extensionName);
+    }
+
+    return requiredExtensions.empty();
+}
+
+SwapChainSupportDetails CVulkanRendererImpl::QuerySwapChainSupport(VkPhysicalDevice device)
+{
+    // querying basic surface capabilities
+    SwapChainSupportDetails details;
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, vkSurface, &details.capabilities);
+
+    // querying the supported surface formats
+    uint32_t formatCount;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, vkSurface, &formatCount, nullptr);
+
+    if (formatCount != 0)
+    {
+        // resize to hold all the available formats
+        std::cout << "# of available formats: " << formatCount << std::endl;
+        details.formats.resize(formatCount);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(device, vkSurface, &formatCount, details.formats.data());
+    }
+
+    // querying the supported presentation modes
+    uint32_t presentModeCount;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(device, vkSurface, &presentModeCount, nullptr);
+
+    if (presentModeCount != 0)
+    {
+        // resize to hold all the available present modes
+        std::cout << "# of present modes: " << presentModeCount << std::endl;
+        details.presentModes.resize(presentModeCount);
+        vkGetPhysicalDeviceSurfacePresentModesKHR(device, vkSurface, &presentModeCount, details.presentModes.data());
+    }
+
+    return details;
+}
+
+bool CVulkanRendererImpl::IsDeviceSuitable(VkPhysicalDevice device)
+{
+    QueueFamilyIndices indices = FindQueueFamilies(device);
+    bool extensionsSupported = CheckDeviceExtensionSupport(device);
+    bool swapChainAdequate = false;
+
+    // we only check for swap chain support AFTER checking that the extension is available
+    if (extensionsSupported)
+    {
+        SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(device);
+        swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+    }
+
+    VkPhysicalDeviceFeatures supportedFeatures;
+    vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
+
+    return indices.isComplete() && extensionsSupported &&
+           swapChainAdequate && supportedFeatures.samplerAnisotropy;
+}
 /*
  * Methods
  */
@@ -163,12 +273,47 @@ void CVulkanRendererImpl::SetupDebugMessenger()
 
 void CVulkanRendererImpl::CreateSurface()
 {
-
+    if (glfwCreateWindowSurface(vkInstance, CWindow::GetWindow(), nullptr, &vkSurface) != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed to create window surface");
+    }
 }
 
 void CVulkanRendererImpl::PickPhysicalDevice()
 {
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(vkInstance, &deviceCount, nullptr);
 
+    if (deviceCount == 0)
+    {
+        throw std::runtime_error("failed to find GPU's with Vulkan support");
+    }
+
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+    vkEnumeratePhysicalDevices(vkInstance, &deviceCount, devices.data());
+
+    for (const auto& device: devices)
+    {
+        if (IsDeviceSuitable(device))
+        {
+            physicalDevice = device;
+            break;
+        }
+    }
+
+    if (physicalDevice == VK_NULL_HANDLE)
+    {
+        throw std::runtime_error("failed to find a suitable GPU");
+    }
+
+    VkPhysicalDeviceProperties props;
+    vkGetPhysicalDeviceProperties(physicalDevice, &props);
+
+    uint32_t vulkanVersion = props.apiVersion;
+
+    std::cout << "GPU: " << props.deviceName << std::endl;
+    std::cout << "Vulkan Version: " << VK_API_VERSION_MAJOR(vulkanVersion) << "." <<
+              VK_API_VERSION_MINOR(vulkanVersion) << "." << VK_API_VERSION_PATCH(vulkanVersion) << std::endl;
 }
 
 void CVulkanRendererImpl::CreateLogicalDevice()
