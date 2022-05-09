@@ -2,6 +2,11 @@
 // Created by Diego S. Seabra on 14/03/22.
 //
 
+#ifdef WIN32
+#define NOMINMAX
+#include <windows.h>
+#endif
+
 #include "VulkanRenderer.h"
 #include "Window.h"
 #include "../profiling/Logger.h"
@@ -69,6 +74,8 @@ CVulkanRendererImpl::CVulkanRendererImpl()
  */
 CVulkanRendererImpl::~CVulkanRendererImpl()
 {
+    CleanupSwapChain();
+
     vkDestroyDevice(vkLogicalDevice, nullptr);
 
     vkDestroySurfaceKHR(vkInstance, vkSurface, nullptr);
@@ -210,6 +217,65 @@ bool CVulkanRendererImpl::IsDeviceSuitable(VkPhysicalDevice device)
     return indices.isComplete() && extensionsSupported &&
            swapChainAdequate && supportedFeatures.samplerAnisotropy;
 }
+
+VkSurfaceFormatKHR CVulkanRendererImpl::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
+{
+    // using SRGB color format
+    for (const auto& availableFormat : availableFormats)
+    {
+        if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
+            availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+            return availableFormat;
+        }
+    }
+
+    return availableFormats[0];
+}
+
+VkPresentModeKHR CVulkanRendererImpl::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes)
+{
+    // checking if triple buffering is available
+    for (const auto& availablePresentMode: availablePresentModes)
+    {
+        if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+        {
+            return availablePresentMode;
+        }
+    }
+
+    // if triple buffering is not available, use Vulkan's default swap chain queue (aka VSync)
+    return VK_PRESENT_MODE_FIFO_KHR;
+}
+
+// Swap Extent = resolution of the swap chain images
+VkExtent2D CVulkanRendererImpl::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
+{
+    if (capabilities.currentExtent.width != UINT32_MAX)
+    {
+        return capabilities.currentExtent;
+    } else {
+        int width, height;
+        glfwGetFramebufferSize(CWindow::GetWindow(), &width, &height);
+
+        VkExtent2D actualExtent = {
+                static_cast<uint32_t>(width),
+                static_cast<uint32_t>(height)
+        };
+
+        actualExtent.width =
+                std::max(capabilities.minImageExtent.width,
+                         std::min(capabilities.maxImageExtent.width,
+                                  actualExtent.width));
+
+        actualExtent.height =
+                std::max(capabilities.minImageExtent.height,
+                         std::min(capabilities.maxImageExtent.height,
+                                  actualExtent.height));
+
+        return actualExtent;
+    }
+}
+
 /*
  * Methods
  */
@@ -375,7 +441,71 @@ void CVulkanRendererImpl::CreateLogicalDevice()
 
 void CVulkanRendererImpl::CreateSwapChain()
 {
+    SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(vkPhysicalDevice);
 
+    VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
+    VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
+    VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities);
+
+    uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1; // one more image to have "room" for more processing
+    if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount)
+    {
+        // making sure we don't exceed the maximum number of images in the swap chain
+        imageCount = swapChainSupport.capabilities.maxImageCount;
+    }
+    std::cout << "Minimum image count in the swap chain: " << imageCount << std::endl;
+
+    VkSwapchainCreateInfoKHR createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    createInfo.surface = vkSurface; // tying our surface to the swap chain
+    createInfo.minImageCount = imageCount;
+    createInfo.imageFormat = surfaceFormat.format;
+    createInfo.imageColorSpace = surfaceFormat.colorSpace;
+    createInfo.imageExtent = extent;
+    createInfo.imageArrayLayers = 1; // the amount of layers each image consists of (always 1 unless we are developing a stereoscopic 3D app)
+    createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT; // image operations, like color attachment (our case), post-processing, etc
+
+    QueueFamilyIndices indices = FindQueueFamilies(vkPhysicalDevice);
+    uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+
+    // specifying how to handle swap chain images that will be used across multiple queue families (graphics and presentation)
+    // in our case, we'll be drawing on the images in the swap chain from the graphics queue and then
+    //    submitting them on the presentation queue
+    if (indices.graphicsFamily != indices.presentFamily)
+    {
+        createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+        createInfo.queueFamilyIndexCount = 2;
+        createInfo.pQueueFamilyIndices = queueFamilyIndices;
+    } else {
+        createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        createInfo.queueFamilyIndexCount = 0; // optional
+        createInfo.pQueueFamilyIndices = nullptr; // optional
+    }
+
+    // we don't want any pre-transformation on the images for now
+    createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+
+    // compositeAlpha = blending with other windows in the window system. So we will ignore the alpha channel (aka opaque)
+    createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+
+    createInfo.presentMode = presentMode;
+    createInfo.clipped = VK_TRUE; // we don't care for pixels that are obscured (ex.: another window in front of our own)
+    createInfo.oldSwapchain = VK_NULL_HANDLE; // for now we assume that we'll be creating only one swap chain.
+    // NOTE: Only one swap chain is not the best option because we'd like the screen to be resized, so in the future we'll probably recreate the swap chain ;)
+
+    // effectively creating the swap chain
+    if (vkCreateSwapchainKHR(vkLogicalDevice, &createInfo, nullptr, &vkSwapChain) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create the swap chain");
+    }
+
+    // retrieve swap chain images
+    vkGetSwapchainImagesKHR(vkLogicalDevice, vkSwapChain, &imageCount, nullptr);
+    vkSwapChainImages.resize(imageCount);
+    vkGetSwapchainImagesKHR(vkLogicalDevice, vkSwapChain, &imageCount, vkSwapChainImages.data());
+
+    vkSwapChainImageFormat = surfaceFormat.format;
+    vkSwapChainExtent = extent;
 }
 
 void CVulkanRendererImpl::CreateImageViews()
@@ -461,6 +591,16 @@ void CVulkanRendererImpl::CreateCommandBuffers()
 void CVulkanRendererImpl::CreateSyncObjects()
 {
 
+}
+
+void CVulkanRendererImpl::CleanupSwapChain()
+{
+//    for (auto imageView : swapChainImageViews)
+//    {
+//        vkDestroyImageView(vkLogicalDevice, imageView, nullptr);
+//    }
+
+    vkDestroySwapchainKHR(vkLogicalDevice, vkSwapChain, nullptr);
 }
 
 

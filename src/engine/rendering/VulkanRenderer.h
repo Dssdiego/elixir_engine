@@ -53,12 +53,20 @@ struct CVulkanRendererImpl
     VkQueue vkGraphicsQueue;
     VkQueue vkPresentQueue;
 
+    VkSwapchainKHR vkSwapChain;
+    std::vector<VkImage> vkSwapChainImages;
+    VkFormat vkSwapChainImageFormat;
+    VkExtent2D vkSwapChainExtent;
+
     // Auxiliary Methods
     bool CheckValidationLayerSupport();
     bool IsDeviceSuitable(VkPhysicalDevice device);
     QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
     bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
+    VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+    VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+    VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
     // Methods
     void CreateInstance();
@@ -85,6 +93,7 @@ struct CVulkanRendererImpl
     void CreateCommandBuffers();
     void CreateSyncObjects();
 
+    void CleanupSwapChain();
 };
 
 

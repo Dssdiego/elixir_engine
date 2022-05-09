@@ -2,14 +2,9 @@
 // Created by Diego S. Seabra on 09/05/22.
 //
 
-#ifdef WIN32
-#define NOMINMAX
-#include <windows.h>
 #include <exception>
 #include <iostream>
 #include "../engine/api/Game.h"
-
-#endif
 
 int main()
 {
