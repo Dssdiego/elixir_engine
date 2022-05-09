@@ -46,7 +46,12 @@ struct CVulkanRendererImpl
     // Variables
     VkInstance vkInstance;
     VkSurfaceKHR vkSurface;
-    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE; // physical device
+
+    VkPhysicalDevice vkPhysicalDevice = VK_NULL_HANDLE; // physical device
+    VkDevice vkLogicalDevice; // logical device
+
+    VkQueue vkGraphicsQueue;
+    VkQueue vkPresentQueue;
 
     // Auxiliary Methods
     bool CheckValidationLayerSupport();

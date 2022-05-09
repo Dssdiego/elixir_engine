@@ -69,6 +69,8 @@ CVulkanRendererImpl::CVulkanRendererImpl()
  */
 CVulkanRendererImpl::~CVulkanRendererImpl()
 {
+    vkDestroyDevice(vkLogicalDevice, nullptr);
+
     vkDestroySurfaceKHR(vkInstance, vkSurface, nullptr);
     vkDestroyInstance(vkInstance, nullptr);
 }
@@ -296,18 +298,18 @@ void CVulkanRendererImpl::PickPhysicalDevice()
     {
         if (IsDeviceSuitable(device))
         {
-            physicalDevice = device;
+            vkPhysicalDevice = device;
             break;
         }
     }
 
-    if (physicalDevice == VK_NULL_HANDLE)
+    if (vkPhysicalDevice == VK_NULL_HANDLE)
     {
         throw std::runtime_error("failed to find a suitable GPU");
     }
 
     VkPhysicalDeviceProperties props;
-    vkGetPhysicalDeviceProperties(physicalDevice, &props);
+    vkGetPhysicalDeviceProperties(vkPhysicalDevice, &props);
 
     uint32_t vulkanVersion = props.apiVersion;
 
@@ -318,7 +320,57 @@ void CVulkanRendererImpl::PickPhysicalDevice()
 
 void CVulkanRendererImpl::CreateLogicalDevice()
 {
+    QueueFamilyIndices indices = FindQueueFamilies(vkPhysicalDevice);
 
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::set<uint32_t> uniqueQueueFamilies = {
+            indices.graphicsFamily.value(), indices.presentFamily.value()
+    };
+
+    // assigning a priority queue (0.0f -> 1.0f)
+    float queuePriority = 1.0f;
+    for (uint32_t queueFamily: uniqueQueueFamilies)
+    {
+        VkDeviceQueueCreateInfo queueCreateInfo{};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = queueFamily;
+        queueCreateInfo.queueCount = 1;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
+        queueCreateInfos.push_back(queueCreateInfo);
+    }
+
+    VkPhysicalDeviceFeatures deviceFeatures{};
+    deviceFeatures.samplerAnisotropy = VK_TRUE;
+
+    // creating the logical device
+    VkDeviceCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+    createInfo.pQueueCreateInfos = queueCreateInfos.data();
+
+    createInfo.pEnabledFeatures = &deviceFeatures;
+
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+    createInfo.ppEnabledExtensionNames = deviceExtensions.data();
+
+    // retro compatibility with older implementations
+    if (enableValidationLayers)
+    {
+        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+        createInfo.ppEnabledLayerNames = validationLayers.data();
+    } else
+    {
+        createInfo.enabledLayerCount = 0;
+    }
+
+    // we're now ready to instantiate the logical device
+    if (vkCreateDevice(vkPhysicalDevice, &createInfo, nullptr, &vkLogicalDevice) != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed to create logical device");
+    }
+
+    vkGetDeviceQueue(vkLogicalDevice, indices.graphicsFamily.value(), 0, &vkGraphicsQueue);
+    vkGetDeviceQueue(vkLogicalDevice, indices.presentFamily.value(), 0, &vkPresentQueue);
 }
 
 void CVulkanRendererImpl::CreateSwapChain()
