@@ -106,6 +106,11 @@ public:
     static void Init();
     static void Draw();
     static void Shutdown();
+
+    // External
+    static VkInstance GetInstance();
+    static VkPhysicalDevice GetPhysicalDevice();
+    static VkDevice GetLogicalDevice();
 };
 
 

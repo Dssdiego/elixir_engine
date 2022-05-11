@@ -7,6 +7,7 @@
 #include "../input/Input.h"
 #include "../rendering/Window.h"
 #include "../rendering/Renderer.h"
+#include "../gui/EditorInterface.h"
 
 void CGame::Init(SEngineConfig* pConfig)
 {
@@ -15,6 +16,7 @@ void CGame::Init(SEngineConfig* pConfig)
     CAudioEngine::Init();
     CInput::Init();
     CRenderer::Init(SBackend::VULKAN);
+    CEditorInterface::Init();
 }
 
 void CGame::Run()
@@ -33,12 +35,14 @@ void CGame::Run()
 void CGame::Draw()
 {
     CRenderer::Draw();
+    CEditorInterface::Draw();
 }
 
 void CGame::Cleanup()
 {
     // destroy engine systems
     CRenderer::Shutdown();
+    CEditorInterface::Shutdown();
     CInput::Shutdown();
     CAudioEngine::Shutdown();
     CWindow::Shutdown();

@@ -39,6 +39,21 @@ void CVulkanRenderer::Shutdown()
     delete mImplementation;
 }
 
+VkInstance CVulkanRenderer::GetInstance()
+{
+    return mImplementation->vkInstance;
+}
+
+VkPhysicalDevice CVulkanRenderer::GetPhysicalDevice()
+{
+    return mImplementation->vkPhysicalDevice;
+}
+
+VkDevice CVulkanRenderer::GetLogicalDevice()
+{
+    return mImplementation->vkLogicalDevice;
+}
+
 /*
  * Constructor
  */

@@ -16,13 +16,16 @@ void CRenderer::Init(SBackend backend)
     switch (backend)
     {
         case VULKAN:
+            CLogger::Info("Renderer is using VULKAN");
             CVulkanRenderer::Init();
             break;
 
         case DIRECTX:
+            CLogger::Info("Renderer is using DIRECTX");
             CDirectXRenderer::Init();
 
         case OPENGL:
+            CLogger::Info("Renderer is using OPENGL");
             break;
     }
 }
