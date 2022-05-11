@@ -276,6 +276,28 @@ VkExtent2D CVulkanRendererImpl::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR&
     }
 }
 
+VkImageView CVulkanRendererImpl::CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags)
+{
+    VkImageViewCreateInfo viewInfo{};
+    viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    viewInfo.image = image;
+    viewInfo.format = format;
+    viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    viewInfo.subresourceRange.aspectMask = aspectFlags;
+    viewInfo.subresourceRange.baseMipLevel = 0;
+    viewInfo.subresourceRange.levelCount = 1;
+    viewInfo.subresourceRange.baseArrayLayer = 0;
+    viewInfo.subresourceRange.layerCount = 1;
+
+    VkImageView imageView;
+    if (vkCreateImageView(vkLogicalDevice, &viewInfo, nullptr, &imageView) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create texture image view");
+    }
+
+    return imageView;
+}
+
 /*
  * Methods
  */
@@ -510,7 +532,15 @@ void CVulkanRendererImpl::CreateSwapChain()
 
 void CVulkanRendererImpl::CreateImageViews()
 {
+    // resizing the list to fit all of the image views
+    vkSwapChainImageViews.resize(vkSwapChainImages.size());
 
+    for (size_t i = 0; i < vkSwapChainImages.size(); i++)
+    {
+        vkSwapChainImageViews[i] = CreateImageView(vkSwapChainImages[i], vkSwapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
+    }
+
+    std::cout << "# of image views created: " << vkSwapChainImageViews.size() << std::endl;
 }
 
 void CVulkanRendererImpl::CreateRenderPass()
@@ -595,10 +625,10 @@ void CVulkanRendererImpl::CreateSyncObjects()
 
 void CVulkanRendererImpl::CleanupSwapChain()
 {
-//    for (auto imageView : swapChainImageViews)
-//    {
-//        vkDestroyImageView(vkLogicalDevice, imageView, nullptr);
-//    }
+    for (auto imageView : vkSwapChainImageViews)
+    {
+        vkDestroyImageView(vkLogicalDevice, imageView, nullptr);
+    }
 
     vkDestroySwapchainKHR(vkLogicalDevice, vkSwapChain, nullptr);
 }

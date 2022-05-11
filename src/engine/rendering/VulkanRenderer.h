@@ -58,6 +58,8 @@ struct CVulkanRendererImpl
     VkFormat vkSwapChainImageFormat;
     VkExtent2D vkSwapChainExtent;
 
+    std::vector<VkImageView> vkSwapChainImageViews;
+
     // Auxiliary Methods
     bool CheckValidationLayerSupport();
     bool IsDeviceSuitable(VkPhysicalDevice device);
@@ -67,6 +69,7 @@ struct CVulkanRendererImpl
     VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
     VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
     VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+    VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 
     // Methods
     void CreateInstance();
