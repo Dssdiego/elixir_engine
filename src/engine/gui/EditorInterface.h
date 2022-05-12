@@ -5,15 +5,22 @@
 #ifndef VULKAN_ENGINE_EDITORINTERFACE_H
 #define VULKAN_ENGINE_EDITORINTERFACE_H
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_vulkan.h>
+
 struct CEditorInterfaceImpl
 {
     // Constructor/Destructor
     CEditorInterfaceImpl();
     ~CEditorInterfaceImpl();
 
+    // Variables
+    VkDescriptorPool imguiPool;
+
     // Auxiliary Methods
-    void CreateImGuiContext();
-    void BindImGuiToVulkan();
+    void CreateDescriptorPool();
+    void InitializeImGui();
 };
 
 class CEditorInterface

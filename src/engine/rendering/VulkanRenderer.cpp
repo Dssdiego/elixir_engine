@@ -54,6 +54,17 @@ VkDevice CVulkanRenderer::GetLogicalDevice()
     return mImplementation->vkLogicalDevice;
 }
 
+VkQueue CVulkanRenderer::GetGraphicsQueue()
+{
+    return mImplementation->vkGraphicsQueue;
+}
+
+VkRenderPass CVulkanRenderer::GetRenderPass()
+{
+    // TODO: Implement
+    return nullptr;
+}
+
 /*
  * Constructor
  */

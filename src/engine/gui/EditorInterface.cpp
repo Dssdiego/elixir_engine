@@ -2,9 +2,6 @@
 // Created by Diego S. Seabra on 10/05/22.
 //
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_vulkan.h>
 #include "EditorInterface.h"
 #include "../profiling/Logger.h"
 #include "../rendering/Window.h"
@@ -33,14 +30,15 @@ CEditorInterfaceImpl::CEditorInterfaceImpl()
 {
     CLogger::Info("Initializing editor interface");
 
-    CreateImGuiContext();
-    BindImGuiToVulkan();
-
+    CreateDescriptorPool();
+    InitializeImGui();
 }
 
 CEditorInterfaceImpl::~CEditorInterfaceImpl()
 {
     CLogger::Info("Shutting down editor interface");
+
+    vkDestroyDescriptorPool(CVulkanRenderer::GetLogicalDevice(), imguiPool, nullptr);
 
     // TODO: Enable imgui-vulkan binding shutdown
 //    ImGui_ImplVulkan_Shutdown();
@@ -48,24 +46,55 @@ CEditorInterfaceImpl::~CEditorInterfaceImpl()
     ImGui::DestroyContext();
 }
 
-void CEditorInterfaceImpl::CreateImGuiContext()
+void CEditorInterfaceImpl::CreateDescriptorPool()
 {
+    VkDescriptorPoolSize poolSizes[] = {
+            { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
+            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
+            { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
+    };
+
+    VkDescriptorPoolCreateInfo poolInfo{};
+    poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+    poolInfo.maxSets = 1000;
+    poolInfo.poolSizeCount = std::size(poolSizes);
+    poolInfo.pPoolSizes = poolSizes;
+
+    if (vkCreateDescriptorPool(CVulkanRenderer::GetLogicalDevice(), &poolInfo, nullptr, &imguiPool) != VK_SUCCESS)
+    {
+        throw std::runtime_error("Unable to create ImGui descriptor pool");
+    }
+}
+
+void CEditorInterfaceImpl::InitializeImGui()
+{
+    // Create ImGui context
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void) io;
     ImGui_ImplGlfw_InitForVulkan(CWindow::GetWindow(), true);
-}
 
-void CEditorInterfaceImpl::BindImGuiToVulkan()
-{
+    // Setup Vulkan init info
     ImGui_ImplVulkan_InitInfo imguiInfo{};
     imguiInfo.Instance = CVulkanRenderer::GetInstance();
     imguiInfo.PhysicalDevice = CVulkanRenderer::GetPhysicalDevice();
     imguiInfo.Device = CVulkanRenderer::GetLogicalDevice();
-    imguiInfo.Allocator = nullptr; // not using an allocator right now
-    imguiInfo.Subpass = 0; // REVIEW: Do we need a subpass here?
-    imguiInfo.MinImageCount = 2;
+    imguiInfo.Queue = CVulkanRenderer::GetGraphicsQueue();
+    imguiInfo.DescriptorPool = imguiPool;
+    imguiInfo.MinImageCount = 3;
     imguiInfo.ImageCount = 3;
+    imguiInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+    imguiInfo.Allocator = nullptr; // not using an allocator right now
 
-    // TODO: Implement initialization of ImGui inside vulkan
-//    ImGui_ImplVulkan_Init(&imguiInfo, nullptr);
+    // Init ImGui for Vulkan
+    // TODO: Implement
+//    ImGui_ImplVulkan_Init(&imguiInfo, CVulkanRenderer::GetRenderPass());
 }

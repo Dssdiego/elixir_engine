@@ -41,8 +41,8 @@ void CGame::Draw()
 void CGame::Cleanup()
 {
     // destroy engine systems
-    CRenderer::Shutdown();
     CEditorInterface::Shutdown();
+    CRenderer::Shutdown();
     CInput::Shutdown();
     CAudioEngine::Shutdown();
     CWindow::Shutdown();

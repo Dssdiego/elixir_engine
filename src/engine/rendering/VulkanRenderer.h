@@ -111,6 +111,8 @@ public:
     static VkInstance GetInstance();
     static VkPhysicalDevice GetPhysicalDevice();
     static VkDevice GetLogicalDevice();
+    static VkQueue GetGraphicsQueue();
+    static VkRenderPass GetRenderPass();
 };
 
 
