@@ -86,7 +86,6 @@ struct CVulkanRendererImpl
     void CreateDepthResources();
     void CreateFramebuffers();
     void CreateTextureImage();
-    void CreateImageView();
     void CreateTextureSampler();
     void CreateVertexBuffer();
     void CreateIndexBuffer();

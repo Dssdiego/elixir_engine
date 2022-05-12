@@ -84,7 +84,6 @@ CVulkanRendererImpl::CVulkanRendererImpl()
     CreateDepthResources();
     CreateFramebuffers();
     CreateTextureImage();
-    CreateImageView();
     CreateTextureSampler();
     CreateVertexBuffer();
     CreateIndexBuffer();
@@ -600,11 +599,6 @@ void CVulkanRendererImpl::CreateFramebuffers()
 }
 
 void CVulkanRendererImpl::CreateTextureImage()
-{
-
-}
-
-void CVulkanRendererImpl::CreateImageView()
 {
 
 }
