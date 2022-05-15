@@ -65,6 +65,11 @@ VkRenderPass CVulkanRenderer::GetRenderPass()
     return nullptr;
 }
 
+VkDescriptorPool CVulkanRenderer::GetDescriptorPool()
+{
+    return mImplementation->vkDescriptorPool;
+}
+
 /*
  * Constructor
  */
@@ -625,7 +630,50 @@ void CVulkanRendererImpl::CreateUniformBuffers()
 
 void CVulkanRendererImpl::CreateDescriptorPool()
 {
+    // descriptor pool to hold our drawings as well as ImGui's drawings
+    VkDescriptorPoolSize poolSizes[] = {
+            { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
+            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
+            { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
+    };
 
+    VkDescriptorPoolCreateInfo poolInfo{};
+    poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+    poolInfo.maxSets = 1000;
+    poolInfo.poolSizeCount = std::size(poolSizes);
+    poolInfo.pPoolSizes = poolSizes;
+
+    if (vkCreateDescriptorPool(vkLogicalDevice, &poolInfo, nullptr, &vkDescriptorPool) != VK_SUCCESS)
+    {
+        throw std::runtime_error("Unable to create descriptor pool");
+    }
+
+    // vulkan-tutorial's "original" code
+//    std::array<VkDescriptorPoolSize, 2> poolSizes{};
+//    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+//    poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+//    poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+//    poolSizes[1].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+//
+//    VkDescriptorPoolCreateInfo poolInfo{};
+//    poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+//    poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+//    poolInfo.pPoolSizes = poolSizes.data();
+//    poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size()); // maximum number of descriptors that may be allocated
+//
+//    if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
+//    {
+//        throw std::runtime_error("failed to create descriptor pool");
+//    }
 }
 
 void CVulkanRendererImpl::CreateDescriptorSets()
@@ -651,6 +699,8 @@ void CVulkanRendererImpl::CleanupSwapChain()
     }
 
     vkDestroySwapchainKHR(vkLogicalDevice, vkSwapChain, nullptr);
+
+    vkDestroyDescriptorPool(vkLogicalDevice, vkDescriptorPool, nullptr);
 }
 
 

@@ -34,8 +34,9 @@ void CGame::Run()
 
 void CGame::Draw()
 {
-    CRenderer::Draw();
+    // REVIEW: Does the editor draws BEFORE or AFTER the gamne?
     CEditorInterface::Draw();
+    CRenderer::Draw();
 }
 
 void CGame::Cleanup()

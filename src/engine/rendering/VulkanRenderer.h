@@ -60,6 +60,8 @@ struct CVulkanRendererImpl
 
     std::vector<VkImageView> vkSwapChainImageViews;
 
+    VkDescriptorPool vkDescriptorPool;
+
     // Auxiliary Methods
     bool CheckValidationLayerSupport();
     bool IsDeviceSuitable(VkPhysicalDevice device);
@@ -112,6 +114,7 @@ public:
     static VkDevice GetLogicalDevice();
     static VkQueue GetGraphicsQueue();
     static VkRenderPass GetRenderPass();
+    static VkDescriptorPool GetDescriptorPool();
 };
 
 

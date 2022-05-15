@@ -19,7 +19,6 @@ struct CEditorInterfaceImpl
     VkDescriptorPool imguiPool;
 
     // Auxiliary Methods
-    void CreateDescriptorPool();
     void InitializeImGui();
 };
 
