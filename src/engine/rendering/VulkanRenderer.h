@@ -55,6 +55,7 @@ struct CVulkanRendererImpl
 
     VkSwapchainKHR vkSwapChain;
     std::vector<VkImage> vkSwapChainImages;
+    uint32_t swapChainImageCount;
     VkFormat vkSwapChainImageFormat;
     VkExtent2D vkSwapChainExtent;
 
@@ -115,6 +116,7 @@ public:
     static VkQueue GetGraphicsQueue();
     static VkRenderPass GetRenderPass();
     static VkDescriptorPool GetDescriptorPool();
+    static uint32_t GetSwapChainImageCount();
 };
 
 

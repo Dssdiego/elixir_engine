@@ -64,11 +64,11 @@ void CEditorInterfaceImpl::InitializeImGui()
     imguiInfo.Instance = CVulkanRenderer::GetInstance();
     imguiInfo.PhysicalDevice = CVulkanRenderer::GetPhysicalDevice();
     imguiInfo.Device = CVulkanRenderer::GetLogicalDevice();
-//    imguiInfo.QueueFamily = 0; // REVIEW: Do we need a queuefamily to be passed here?
+    imguiInfo.QueueFamily = 0; // REVIEW: Is the graphics queue always the first one (aka index 0)?
     imguiInfo.Queue = CVulkanRenderer::GetGraphicsQueue();
     imguiInfo.DescriptorPool = CVulkanRenderer::GetDescriptorPool();
-    imguiInfo.MinImageCount = 3; // FIXME: This should come from our own vulkan renderer
-    imguiInfo.ImageCount = 3; // FIXME: This should come from our own vulkan renderer
+    imguiInfo.MinImageCount = CVulkanRenderer::GetSwapChainImageCount();
+    imguiInfo.ImageCount = CVulkanRenderer::GetSwapChainImageCount();
     imguiInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
     imguiInfo.Allocator = nullptr; // not using an allocator right now
 

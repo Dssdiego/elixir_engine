@@ -70,6 +70,11 @@ VkDescriptorPool CVulkanRenderer::GetDescriptorPool()
     return mImplementation->vkDescriptorPool;
 }
 
+uint32_t CVulkanRenderer::GetSwapChainImageCount()
+{
+    return mImplementation->swapChainImageCount;
+}
+
 /*
  * Constructor
  */
@@ -499,18 +504,18 @@ void CVulkanRendererImpl::CreateSwapChain()
     VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
     VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities);
 
-    uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1; // one more image to have "room" for more processing
-    if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount)
+    swapChainImageCount = swapChainSupport.capabilities.minImageCount + 1; // one more image to have "room" for more processing
+    if (swapChainSupport.capabilities.maxImageCount > 0 && swapChainImageCount > swapChainSupport.capabilities.maxImageCount)
     {
         // making sure we don't exceed the maximum number of images in the swap chain
-        imageCount = swapChainSupport.capabilities.maxImageCount;
+        swapChainImageCount = swapChainSupport.capabilities.maxImageCount;
     }
-    std::cout << "Minimum image count in the swap chain: " << imageCount << std::endl;
+    std::cout << "Minimum image count in the swap chain: " << swapChainImageCount << std::endl;
 
     VkSwapchainCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     createInfo.surface = vkSurface; // tying our surface to the swap chain
-    createInfo.minImageCount = imageCount;
+    createInfo.minImageCount = swapChainImageCount;
     createInfo.imageFormat = surfaceFormat.format;
     createInfo.imageColorSpace = surfaceFormat.colorSpace;
     createInfo.imageExtent = extent;
@@ -552,9 +557,9 @@ void CVulkanRendererImpl::CreateSwapChain()
     }
 
     // retrieve swap chain images
-    vkGetSwapchainImagesKHR(vkLogicalDevice, vkSwapChain, &imageCount, nullptr);
-    vkSwapChainImages.resize(imageCount);
-    vkGetSwapchainImagesKHR(vkLogicalDevice, vkSwapChain, &imageCount, vkSwapChainImages.data());
+    vkGetSwapchainImagesKHR(vkLogicalDevice, vkSwapChain, &swapChainImageCount, nullptr);
+    vkSwapChainImages.resize(swapChainImageCount);
+    vkGetSwapchainImagesKHR(vkLogicalDevice, vkSwapChain, &swapChainImageCount, vkSwapChainImages.data());
 
     vkSwapChainImageFormat = surfaceFormat.format;
     vkSwapChainExtent = extent;
