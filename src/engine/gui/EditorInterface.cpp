@@ -74,7 +74,7 @@ void CEditorInterfaceImpl::InitializeImGui()
 
     // Init ImGui for Vulkan
     // TODO: Implement
-//    ImGui_ImplVulkan_Init(&imguiInfo, CVulkanRenderer::GetRenderPass());
+    ImGui_ImplVulkan_Init(&imguiInfo, CVulkanRenderer::GetRenderPass());
 
     // TODO: Allocate a command buffer
     // TODO: Record the command buffer

@@ -61,6 +61,8 @@ struct CVulkanRendererImpl
 
     std::vector<VkImageView> vkSwapChainImageViews;
 
+    VkRenderPass vkRenderPass;
+
     VkDescriptorPool vkDescriptorPool;
 
     // Auxiliary Methods
@@ -73,6 +75,8 @@ struct CVulkanRendererImpl
     VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
     VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
     VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+    VkFormat FindDepthFormat();
+    VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 
     // Methods
     void CreateInstance();

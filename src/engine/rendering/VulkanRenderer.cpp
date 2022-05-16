@@ -5,6 +5,8 @@
 #ifdef WIN32
 #define NOMINMAX
 #include <windows.h>
+#include <array>
+
 #endif
 
 #include "VulkanRenderer.h"
@@ -61,8 +63,7 @@ VkQueue CVulkanRenderer::GetGraphicsQueue()
 
 VkRenderPass CVulkanRenderer::GetRenderPass()
 {
-    // TODO: Implement
-    return nullptr;
+    return mImplementation->vkRenderPass;
 }
 
 VkDescriptorPool CVulkanRenderer::GetDescriptorPool()
@@ -333,6 +334,34 @@ VkImageView CVulkanRendererImpl::CreateImageView(VkImage image, VkFormat format,
     return imageView;
 }
 
+VkFormat CVulkanRendererImpl::FindDepthFormat()
+{
+    return FindSupportedFormat(
+            { VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
+            VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
+    );
+}
+
+VkFormat CVulkanRendererImpl::FindSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling,
+                                                  VkFormatFeatureFlags features)
+{
+    for (VkFormat format : candidates)
+    {
+        VkFormatProperties props;
+        vkGetPhysicalDeviceFormatProperties(vkPhysicalDevice, format, &props);
+
+        if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features)
+        {
+            return format;
+        } else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features)
+        {
+            return format;
+        }
+    }
+
+    throw std::runtime_error("failed to find supported format");
+}
+
 /*
  * Methods
  */
@@ -580,7 +609,68 @@ void CVulkanRendererImpl::CreateImageViews()
 
 void CVulkanRendererImpl::CreateRenderPass()
 {
+    // for now, just a single color buffer attachment represented by one of the images from the swap chain
+    VkAttachmentDescription colorAttachment{};
+    colorAttachment.format = vkSwapChainImageFormat; // matching the format of the swap chain images
+    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT; // matching the format of the swap chain images
+    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR; // clear the framebuffer before drawing a new frame
+    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE; // rendered contents will be stored in memory
+    colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE; // doing nothing with stencil buffers for now, so we don't care what is in the buffer
+    colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE; // doing nothing with stencil buffers for now, so we don't care what is in the buffer
+    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED; // layout of the image before the render pass begins
+    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR; // layout to automatically transition the image to when the render pass finishes
 
+    // we'll stick to a single subpass for now (so index 0)
+    VkAttachmentReference colorAttachmentRef{};
+    colorAttachmentRef.attachment = 0;
+    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    // depth
+    VkAttachmentDescription depthAttachment{};
+    depthAttachment.format = FindDepthFormat();
+    depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+    VkAttachmentReference depthAttachmentRef{};
+    depthAttachmentRef.attachment = 1;
+    depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+    // subpass
+    VkSubpassDescription subpass{};
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments = &colorAttachmentRef;
+    subpass.pDepthStencilAttachment = &depthAttachmentRef;
+
+    VkSubpassDependency dependency{};
+    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+    dependency.dstSubpass = 0;
+    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT; // wait for the swap chain to finish reading before we can access it
+    dependency.srcAccessMask = 0;
+    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+    std::array<VkAttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };
+
+    VkRenderPassCreateInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+    renderPassInfo.pAttachments = attachments.data();
+    renderPassInfo.subpassCount = 1;
+    renderPassInfo.pSubpasses = &subpass;
+    renderPassInfo.dependencyCount = 1;
+    renderPassInfo.pDependencies = &dependency;
+
+    // effectively creating the render pass
+    if (vkCreateRenderPass(vkLogicalDevice, &renderPassInfo, nullptr, &vkRenderPass) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create render pass");
+    }
 }
 
 void CVulkanRendererImpl::CreateDescriptorSetLayout()
@@ -698,6 +788,8 @@ void CVulkanRendererImpl::CreateSyncObjects()
 
 void CVulkanRendererImpl::CleanupSwapChain()
 {
+    vkDestroyRenderPass(vkLogicalDevice, vkRenderPass, nullptr);
+
     for (auto imageView : vkSwapChainImageViews)
     {
         vkDestroyImageView(vkLogicalDevice, imageView, nullptr);
@@ -707,5 +799,7 @@ void CVulkanRendererImpl::CleanupSwapChain()
 
     vkDestroyDescriptorPool(vkLogicalDevice, vkDescriptorPool, nullptr);
 }
+
+
 
 
