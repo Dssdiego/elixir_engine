@@ -65,6 +65,8 @@ struct CVulkanRendererImpl
 
     VkDescriptorPool vkDescriptorPool;
 
+    VkDescriptorSetLayout vkDescriptorSetLayout;
+
     // Auxiliary Methods
     bool CheckValidationLayerSupport();
     bool IsDeviceSuitable(VkPhysicalDevice device);
