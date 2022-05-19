@@ -12,6 +12,8 @@
 #include "VulkanRenderer.h"
 #include "Window.h"
 #include "../profiling/Logger.h"
+#include "Vertex.h"
+#include "Shader.h"
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -366,6 +368,22 @@ VkFormat CVulkanRendererImpl::FindSupportedFormat(const std::vector<VkFormat> &c
     throw std::runtime_error("failed to find supported format");
 }
 
+VkShaderModule CVulkanRendererImpl::CreateShaderModule(const std::vector<char> &code)
+{
+    VkShaderModuleCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    createInfo.codeSize = code.size();
+    createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+
+    VkShaderModule shaderModule;
+    if (vkCreateShaderModule(vkLogicalDevice, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create shader module");
+    }
+
+    return shaderModule;
+}
+
 /*
  * Methods
  */
@@ -708,7 +726,185 @@ void CVulkanRendererImpl::CreateDescriptorSetLayout()
 
 void CVulkanRendererImpl::CreateGraphicsPipeline()
 {
+    // SECTION: 1. Shaders
+    auto vertShaderCode = CShader::ReadFile("../../src/engine/assets/shaders/vert.spv");
+    auto fragShaderCode = CShader::ReadFile("../../src/engine/assets/shaders/frag.spv");
 
+    // creating shader module
+    VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
+    VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
+
+    // assigning shaders to a pipeline stage
+    // vertex
+    VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
+    vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+    vertShaderStageInfo.module = vertShaderModule;
+    vertShaderStageInfo.pName = "main"; // this allows us to combine multiple shaders in a single shader module (using multiple entry points)
+
+    // fragment
+    VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
+    fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    fragShaderStageInfo.module = fragShaderModule;
+    fragShaderStageInfo.pName = "main";
+
+    VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
+
+    // SECTION: 2. Vertex Input and Assembly
+    VkPipelineVertexInputStateCreateInfo vertexInputInfo{}; // type of vertex data that will be passed to the vertex shader
+    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+
+    auto bindingDescription = Vertex::getBindingDescription();
+    auto attributeDescriptions = Vertex::getAttributeDescriptions();
+
+    // bindings: spacing between data and whether the data is per-vertex or per-instance
+    vertexInputInfo.vertexBindingDescriptionCount = 1;
+    vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+
+    // attribute descriptions: type of attributes passed to the vertex shader, which binding and at which offset
+    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+
+    // vertex input assembly
+    VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
+    inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST; // because we want to draw a triangle for now
+    inputAssembly.primitiveRestartEnable = VK_FALSE;
+
+    // SECTION: 3. Viewport
+    //  region of the framebuffer that the output will be rendered to
+    // will probably be always from (0,0) to (width, height)
+    // NOTE: the size of the swap chain and its images may differ from the width and height of the window
+    VkViewport viewport{};
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = (float) vkSwapChainExtent.width;
+    viewport.height = (float) vkSwapChainExtent.height;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+
+    // SECTION: 4. Scissor
+    //   scissor rectangles define in which regions pixels will actually be stored
+    //   any pyxel outside will be discarded by the rasterizer (it's like a filter)
+    // for now, the scissor rectangle will be the size of the viewport
+    VkRect2D scissor{};
+    scissor.offset = {0, 0};
+    scissor.extent = vkSwapChainExtent;
+
+    VkPipelineViewportStateCreateInfo viewportState{};
+    viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    viewportState.viewportCount = 1; // REVIEW: More than one viewport makes a split screen game?
+    viewportState.pViewports = &viewport;
+    viewportState.scissorCount = 1;
+    viewportState.pScissors = &scissor;
+
+    // SECTION: 5. Rasterizer
+    //  takes the geometry that is shaped by the vertices from the vertex shader and turns it into fragments to be
+    //  colored by the fragment shader
+    VkPipelineRasterizationStateCreateInfo rasterizer{};
+    rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rasterizer.depthClampEnable = VK_FALSE;
+    rasterizer.rasterizerDiscardEnable = VK_FALSE; // setting this to VK_TRUE disabled any output to the framebuffer
+
+    // polygonMode: determines how fragments are generated for geometry, in this case it will fill the area of the polygon with fragments
+    // NOTE: if we wanted to draw wireframes, for example, this would be changed to VK_POLYGON_MODE_LINE (making this will require enabling a GPU feature)
+    rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+    rasterizer.lineWidth = 1.0f;
+    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT; // for now, we'll always cull the back face
+    rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE; // order for faces to be considered front-facing (in our case is counter clockwise because of MVP Y-flip in the shader)
+    rasterizer.depthBiasEnable = VK_FALSE;
+    rasterizer.depthBiasConstantFactor = 0.0f; // optional
+    rasterizer.depthBiasClamp = 0.0f; // optional
+    rasterizer.depthBiasSlopeFactor = 0.0f; // optional
+
+    // SECTION: 6. Multisampling
+    //  one of the ways to perform anti-aliasing
+    //  for now, multisampling will be kept DISABLED
+    VkPipelineMultisampleStateCreateInfo multisampling{};
+    multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    multisampling.sampleShadingEnable = VK_FALSE;
+    multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    multisampling.minSampleShading = 1.0f; // optional
+    multisampling.pSampleMask = nullptr; // optional
+    multisampling.alphaToCoverageEnable = VK_FALSE; // optional
+    multisampling.alphaToOneEnable = VK_FALSE; // optional
+
+    // SECTION: 7. Depth and stencil testing
+    VkPipelineDepthStencilStateCreateInfo depthStencil{};
+    depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    depthStencil.depthTestEnable = VK_TRUE; // if the depth of new fragments should be compared to the depth buffer (to check if they should be discarded)
+    depthStencil.depthWriteEnable = VK_TRUE; // if the new depth of fragments that pass the depth test should actually be written to the depth buffer (useful for drawing transparent objects)
+    depthStencil.depthCompareOp = VK_COMPARE_OP_LESS; // right now, lower depth = closer
+    depthStencil.depthBoundsTestEnable = VK_FALSE;
+//        depthStencil.minDepthBounds = 0.0f; // optional
+//        depthStencil.maxDepthBounds = 1.0f; // optional
+    depthStencil.stencilTestEnable = VK_FALSE;
+
+    // SECTION: 8. Color Blending
+    //  combines the color returned from the fragment shader to the framebuffer color
+    VkPipelineColorBlendAttachmentState colorBlendAttachment{};
+    colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    colorBlendAttachment.blendEnable = VK_TRUE;
+    colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+    colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
+    colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+    colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_SUBTRACT;
+
+    VkPipelineColorBlendStateCreateInfo colorBlending{};
+    colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    colorBlending.logicOpEnable = VK_FALSE;
+    colorBlending.logicOp = VK_LOGIC_OP_COPY; // optional
+    colorBlending.attachmentCount = 1;
+    colorBlending.pAttachments = &colorBlendAttachment;
+    colorBlending.blendConstants[0] = 0.0f; // optional
+    colorBlending.blendConstants[1] = 0.0f; // optional
+    colorBlending.blendConstants[2] = 0.0f; // optional
+    colorBlending.blendConstants[3] = 0.0f; // optional
+
+    // SECTION: 9. Pipeline Layout
+    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipelineLayoutInfo.setLayoutCount = 1;
+    pipelineLayoutInfo.pSetLayouts = &vkDescriptorSetLayout;
+    pipelineLayoutInfo.pushConstantRangeCount= 0; // optional
+    pipelineLayoutInfo.pPushConstantRanges = nullptr; // optional
+
+    if (vkCreatePipelineLayout(vkLogicalDevice, &pipelineLayoutInfo, nullptr, &vkPipelineLayout) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create pipeline layout");
+    }
+
+    // SECTION: 10. Graphics Pipeline Creation
+    VkGraphicsPipelineCreateInfo pipelineInfo{};
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipelineInfo.stageCount = 2;
+    pipelineInfo.pStages = shaderStages;
+    pipelineInfo.pVertexInputState = &vertexInputInfo;
+    pipelineInfo.pInputAssemblyState = &inputAssembly;
+    pipelineInfo.pViewportState = &viewportState;
+    pipelineInfo.pRasterizationState = &rasterizer;
+    pipelineInfo.pMultisampleState = &multisampling;
+    pipelineInfo.pDepthStencilState = &depthStencil;
+    pipelineInfo.pColorBlendState = &colorBlending;
+    pipelineInfo.pDynamicState = nullptr; // optional
+    pipelineInfo.layout = vkPipelineLayout;
+    pipelineInfo.renderPass = vkRenderPass;
+    pipelineInfo.subpass = 0; // not using subpasses for now
+    pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // optional
+    pipelineInfo.basePipelineIndex = -1; // optional
+
+    if (vkCreateGraphicsPipelines(vkLogicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &vkGraphicsPipeline) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create graphics pipeline");
+    }
+
+    // SECTION: 11. Cleaning up
+    // shaders are assigned to a pipeline stage, so we can destroy the shader modules
+    vkDestroyShaderModule(vkLogicalDevice, vertShaderModule, nullptr);
+    vkDestroyShaderModule(vkLogicalDevice, fragShaderModule, nullptr);
 }
 
 void CVulkanRendererImpl::CreateCommandPool()
@@ -818,6 +1014,9 @@ void CVulkanRendererImpl::CleanupSwapChain()
 {
     CLogger::Debug("cleaning up swap chain...");
 
+    vkDestroyPipeline(vkLogicalDevice, vkGraphicsPipeline, nullptr);
+    vkDestroyPipelineLayout(vkLogicalDevice, vkPipelineLayout, nullptr);
+
     vkDestroyRenderPass(vkLogicalDevice, vkRenderPass, nullptr);
 
     for (auto imageView : vkSwapChainImageViews)
@@ -829,6 +1028,8 @@ void CVulkanRendererImpl::CleanupSwapChain()
 
     vkDestroyDescriptorPool(vkLogicalDevice, vkDescriptorPool, nullptr);
 }
+
+
 
 
 

@@ -67,6 +67,9 @@ struct CVulkanRendererImpl
 
     VkDescriptorSetLayout vkDescriptorSetLayout;
 
+    VkPipeline vkGraphicsPipeline;
+    VkPipelineLayout vkPipelineLayout;
+
     // Auxiliary Methods
     bool CheckValidationLayerSupport();
     bool IsDeviceSuitable(VkPhysicalDevice device);
@@ -79,6 +82,7 @@ struct CVulkanRendererImpl
     VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
     VkFormat FindDepthFormat();
     VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+    VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
     // Methods
     void CreateInstance();
