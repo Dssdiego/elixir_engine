@@ -112,6 +112,8 @@ CVulkanRendererImpl::~CVulkanRendererImpl()
 {
     CleanupSwapChain();
 
+    CLogger::Debug("vulkan renderer destructor, cleaning...");
+
     vkDestroyDevice(vkLogicalDevice, nullptr);
 
     vkDestroySurfaceKHR(vkInstance, vkSurface, nullptr);
@@ -788,6 +790,8 @@ void CVulkanRendererImpl::CreateSyncObjects()
 
 void CVulkanRendererImpl::CleanupSwapChain()
 {
+    CLogger::Debug("cleaning up swap chain...");
+
     vkDestroyRenderPass(vkLogicalDevice, vkRenderPass, nullptr);
 
     for (auto imageView : vkSwapChainImageViews)
