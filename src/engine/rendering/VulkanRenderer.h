@@ -70,6 +70,8 @@ struct CVulkanRendererImpl
     VkPipeline vkGraphicsPipeline;
     VkPipelineLayout vkPipelineLayout;
 
+    VkCommandPool vkCommandPool;
+
     // Auxiliary Methods
     bool CheckValidationLayerSupport();
     bool IsDeviceSuitable(VkPhysicalDevice device);

@@ -15,9 +15,6 @@ struct CEditorInterfaceImpl
     CEditorInterfaceImpl();
     ~CEditorInterfaceImpl();
 
-    // Variables
-    VkDescriptorPool imguiPool;
-
     // Auxiliary Methods
     void InitializeImGui();
 };

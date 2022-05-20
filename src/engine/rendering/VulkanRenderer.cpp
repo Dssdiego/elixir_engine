@@ -118,6 +118,8 @@ CVulkanRendererImpl::~CVulkanRendererImpl()
 
     vkDestroyDescriptorSetLayout(vkLogicalDevice, vkDescriptorSetLayout, nullptr);
 
+    vkDestroyCommandPool(vkLogicalDevice, vkCommandPool, nullptr);
+
     vkDestroyDevice(vkLogicalDevice, nullptr);
 
     vkDestroySurfaceKHR(vkInstance, vkSurface, nullptr);
@@ -909,7 +911,17 @@ void CVulkanRendererImpl::CreateGraphicsPipeline()
 
 void CVulkanRendererImpl::CreateCommandPool()
 {
+    QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(vkPhysicalDevice);
 
+    VkCommandPoolCreateInfo poolInfo{};
+    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value(); // since we want to record the commands for drawing, we must use the graphics queue family
+    poolInfo.flags = 0; // optional
+
+    if (vkCreateCommandPool(vkLogicalDevice, &poolInfo, nullptr, &vkCommandPool) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create command pool");
+    }
 }
 
 void CVulkanRendererImpl::CreateDepthResources()
