@@ -110,9 +110,9 @@ CVulkanRendererImpl::CVulkanRendererImpl()
     PickPhysicalDevice();
 
     // Create logical device and queues
-    CreateLogicalDevice();
+    CreateLogicalDeviceAndQueues();
 
-    // Create semaphores
+    // Create semaphores and fences
     CreateSyncObjects();
 
     // Create command pool
@@ -522,7 +522,7 @@ void CVulkanRendererImpl::PickPhysicalDevice()
               VK_API_VERSION_MINOR(vulkanVersion) << "." << VK_API_VERSION_PATCH(vulkanVersion) << std::endl;
 }
 
-void CVulkanRendererImpl::CreateLogicalDevice()
+void CVulkanRendererImpl::CreateLogicalDeviceAndQueues()
 {
     QueueFamilyIndices indices = FindQueueFamilies(vkPhysicalDevice);
 
@@ -568,10 +568,7 @@ void CVulkanRendererImpl::CreateLogicalDevice()
     }
 
     // we're now ready to instantiate the logical device
-    if (vkCreateDevice(vkPhysicalDevice, &createInfo, nullptr, &vkLogicalDevice) != VK_SUCCESS)
-    {
-        throw std::runtime_error("Failed to create logical device");
-    }
+    VK_CHECK(vkCreateDevice(vkPhysicalDevice, &createInfo, nullptr, &vkLogicalDevice));
 
     vkGetDeviceQueue(vkLogicalDevice, indices.graphicsFamily.value(), 0, &vkGraphicsQueue);
     vkGetDeviceQueue(vkLogicalDevice, indices.presentFamily.value(), 0, &vkPresentQueue);

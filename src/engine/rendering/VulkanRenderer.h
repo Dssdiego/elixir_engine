@@ -91,7 +91,7 @@ struct CVulkanRendererImpl
     void SetupDebugMessenger();
     void CreateSurface();
     void PickPhysicalDevice();
-    void CreateLogicalDevice();
+    void CreateLogicalDeviceAndQueues();
     void CreateSwapChain();
     void CreateImageViews();
     void CreateRenderPass();
