@@ -42,8 +42,7 @@ CEditorInterfaceImpl::~CEditorInterfaceImpl()
 {
     CLogger::Info("Shutting down editor interface");
 
-    // TODO: Enable imgui-vulkan binding shutdown
-//    ImGui_ImplVulkan_Shutdown();
+    ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
@@ -73,7 +72,6 @@ void CEditorInterfaceImpl::InitializeImGui()
     imguiInfo.Allocator = nullptr; // not using an allocator right now
 
     // Init ImGui for Vulkan
-    // TODO: Implement
     ImGui_ImplVulkan_Init(&imguiInfo, CVulkanRenderer::GetRenderPass());
 
     // TODO: Allocate a command buffer
