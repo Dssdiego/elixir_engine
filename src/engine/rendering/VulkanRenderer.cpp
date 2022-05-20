@@ -21,6 +21,18 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
+#define VK_CHECK(x)                                                 \
+	do                                                              \
+	{                                                               \
+		VkResult err = x;                                           \
+		if (err)                                                    \
+		{                                                                 \
+			std::cout << "Detected Vulkan error: " << err << std::endl; \
+			abort();                                                \
+		}                                                           \
+	} while (0)
+
+
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
 CVulkanRendererImpl* mImplementation = nullptr;
@@ -83,19 +95,51 @@ uint32_t CVulkanRenderer::GetSwapChainImageCount()
  */
 CVulkanRendererImpl::CVulkanRendererImpl()
 {
+    // Create the instance
     CreateInstance();
+
+    // Set up debugger
     SetupDebugMessenger();
+
+    // Create the presentation surface
     CreateSurface();
+
+//    EnumeratePhysicalDevices();
+
+    // Find queue family/indices supporting graphics and present
     PickPhysicalDevice();
+
+    // Create logical device and queues
     CreateLogicalDevice();
+
+    // Create semaphores
+    CreateSyncObjects();
+
+    // Create command pool
+    CreateCommandPool();
+
+    // Create command buffer
+    CreateCommandBuffers(); // REVIEW: Do we need more than one command buffer?
+
+    // Create swap chain
     CreateSwapChain();
-    CreateImageViews();
+
+    // Create render pass
     CreateRenderPass();
+
+    // Create render targets
+//    CreateRenderTargets();
+
+    // Create pipeline cache
+//    CreatePipelineCache();
+
+    // Create frame buffers
+    CreateFramebuffers();
+
+    CreateImageViews();
     CreateDescriptorSetLayout();
     CreateGraphicsPipeline();
-    CreateCommandPool();
     CreateDepthResources();
-    CreateFramebuffers();
     CreateTextureImage();
     CreateTextureSampler();
     CreateVertexBuffer();
@@ -103,8 +147,6 @@ CVulkanRendererImpl::CVulkanRendererImpl()
     CreateUniformBuffers();
     CreateDescriptorPool();
     CreateDescriptorSets();
-    CreateCommandBuffers();
-    CreateSyncObjects();
 }
 
 /*
@@ -113,8 +155,6 @@ CVulkanRendererImpl::CVulkanRendererImpl()
 CVulkanRendererImpl::~CVulkanRendererImpl()
 {
     CleanupSwapChain();
-
-    CLogger::Debug("vulkan renderer destructor, cleaning...");
 
     vkDestroyDescriptorSetLayout(vkLogicalDevice, vkDescriptorSetLayout, nullptr);
 
@@ -334,10 +374,7 @@ VkImageView CVulkanRendererImpl::CreateImageView(VkImage image, VkFormat format,
     viewInfo.subresourceRange.layerCount = 1;
 
     VkImageView imageView;
-    if (vkCreateImageView(vkLogicalDevice, &viewInfo, nullptr, &imageView) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create texture image view");
-    }
+    VK_CHECK(vkCreateImageView(vkLogicalDevice, &viewInfo, nullptr, &imageView));
 
     return imageView;
 }
@@ -378,10 +415,7 @@ VkShaderModule CVulkanRendererImpl::CreateShaderModule(const std::vector<char> &
     createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
     VkShaderModule shaderModule;
-    if (vkCreateShaderModule(vkLogicalDevice, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create shader module");
-    }
+    VK_CHECK(vkCreateShaderModule(vkLogicalDevice, &createInfo, nullptr, &shaderModule));
 
     return shaderModule;
 }
@@ -393,11 +427,11 @@ void CVulkanRendererImpl::CreateInstance()
 {
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName = "Elixir Game Engine";
+    appInfo.pApplicationName = "Elixir Game Engine"; // TODO: Game name should go here!
     appInfo.applicationVersion = VK_MAKE_VERSION(0, 0, 1);
     appInfo.pEngineName = "Elixir Game Engine";
     appInfo.engineVersion = VK_MAKE_VERSION(0, 0 ,1);
-    appInfo.apiVersion = VK_API_VERSION_1_0;
+    appInfo.apiVersion = VK_MAKE_VERSION(1, 0, VK_HEADER_VERSION);
 
     VkInstanceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -438,23 +472,17 @@ void CVulkanRendererImpl::CreateInstance()
         std::cout << "\t" << extension.extensionName << std::endl;
     }
 
-    if (vkCreateInstance(&createInfo, nullptr, &vkInstance) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create Vulkan instance");
-    }
+    VK_CHECK(vkCreateInstance(&createInfo, nullptr, &vkInstance));
 }
 
 void CVulkanRendererImpl::SetupDebugMessenger()
 {
-
+    // TODO: Implement debug messenger
 }
 
 void CVulkanRendererImpl::CreateSurface()
 {
-    if (glfwCreateWindowSurface(vkInstance, CWindow::GetWindow(), nullptr, &vkSurface) != VK_SUCCESS)
-    {
-        throw std::runtime_error("Failed to create window surface");
-    }
+    VK_CHECK(glfwCreateWindowSurface(vkInstance, CWindow::GetWindow(), nullptr, &vkSurface));
 }
 
 void CVulkanRendererImpl::PickPhysicalDevice()
@@ -691,10 +719,7 @@ void CVulkanRendererImpl::CreateRenderPass()
     renderPassInfo.pDependencies = &dependency;
 
     // effectively creating the render pass
-    if (vkCreateRenderPass(vkLogicalDevice, &renderPassInfo, nullptr, &vkRenderPass) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create render pass");
-    }
+    VK_CHECK(vkCreateRenderPass(vkLogicalDevice, &renderPassInfo, nullptr, &vkRenderPass));
 }
 
 void CVulkanRendererImpl::CreateDescriptorSetLayout()
@@ -720,10 +745,7 @@ void CVulkanRendererImpl::CreateDescriptorSetLayout()
     layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
     layoutInfo.pBindings = bindings.data();
 
-    if (vkCreateDescriptorSetLayout(vkLogicalDevice, &layoutInfo, nullptr, &vkDescriptorSetLayout) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create descriptor set layout");
-    }
+    VK_CHECK(vkCreateDescriptorSetLayout(vkLogicalDevice, &layoutInfo, nullptr, &vkDescriptorSetLayout));
 }
 
 void CVulkanRendererImpl::CreateGraphicsPipeline()
@@ -898,10 +920,7 @@ void CVulkanRendererImpl::CreateGraphicsPipeline()
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // optional
     pipelineInfo.basePipelineIndex = -1; // optional
 
-    if (vkCreateGraphicsPipelines(vkLogicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &vkGraphicsPipeline) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create graphics pipeline");
-    }
+    VK_CHECK(vkCreateGraphicsPipelines(vkLogicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &vkGraphicsPipeline));
 
     // SECTION: 11. Cleaning up
     // shaders are assigned to a pipeline stage, so we can destroy the shader modules
@@ -918,15 +937,21 @@ void CVulkanRendererImpl::CreateCommandPool()
     poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value(); // since we want to record the commands for drawing, we must use the graphics queue family
     poolInfo.flags = 0; // optional
 
-    if (vkCreateCommandPool(vkLogicalDevice, &poolInfo, nullptr, &vkCommandPool) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create command pool");
-    }
+    VK_CHECK(vkCreateCommandPool(vkLogicalDevice, &poolInfo, nullptr, &vkCommandPool));
 }
 
 void CVulkanRendererImpl::CreateDepthResources()
 {
-
+    // TODO: Implement
+//    VkFormat depthFormat = FindDepthFormat();
+//
+//    createImage(vkSwapChainExtent.width, vkSwapChainExtent.height,
+//                depthFormat, VK_IMAGE_TILING_OPTIMAL,
+//                VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+//                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage,
+//                depthImageMemory);
+//
+//    depthImageView = createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 }
 
 void CVulkanRendererImpl::CreateFramebuffers()
@@ -1024,8 +1049,6 @@ void CVulkanRendererImpl::CreateSyncObjects()
 
 void CVulkanRendererImpl::CleanupSwapChain()
 {
-    CLogger::Debug("cleaning up swap chain...");
-
     vkDestroyPipeline(vkLogicalDevice, vkGraphicsPipeline, nullptr);
     vkDestroyPipelineLayout(vkLogicalDevice, vkPipelineLayout, nullptr);
 
