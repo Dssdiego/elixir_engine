@@ -43,6 +43,8 @@ struct CVulkanRendererImpl
             VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
 
+    const int MAX_FRAMES_IN_FLIGHT = 2; // double buffering
+
     // Variables
     VkInstance vkInstance;
     VkSurfaceKHR vkSurface;
@@ -71,6 +73,11 @@ struct CVulkanRendererImpl
     VkPipelineLayout vkPipelineLayout;
 
     VkCommandPool vkCommandPool;
+
+    std::vector<VkSemaphore> imageAvailableSemaphores;
+    std::vector<VkSemaphore> renderFinishedSemaphores;
+    std::vector<VkFence> inFlightFences;
+    std::vector<VkFence> imagesInFlight;
 
     // Auxiliary Methods
     bool CheckValidationLayerSupport();
