@@ -18,7 +18,7 @@
 #include <Windows.h>
 #endif
 
-#if UNIX || __APPLE__
+#if __linux__ || __APPLE__
 #define RESET "\e[0m"
 #define COLOR_BLACK "\e[0;30m"
 #define COLOR_GRAY "\e[0;37m"
@@ -59,7 +59,7 @@ public:
     static void Info(std::string msg)
     {
 #ifdef SHOW_CONSOLE
-#if UNIX || __APPLE__
+#if __linux__ || __APPLE__
         std::cout << COLOR_BLUE << INFO_STR << msg << RESET << std::endl;
 #else
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), COLOR_BLUE);
@@ -73,7 +73,7 @@ public:
     static void Warn(std::string msg)
     {
 #ifdef SHOW_CONSOLE
-#if UNIX || __APPLE__
+#if __linux__ || __APPLE__
         std::cout << COLOR_YELLOW << WARN_STR << msg << RESET << std::endl;
 #else
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), COLOR_YELLOW);
@@ -87,7 +87,7 @@ public:
     static void Error(std::string errMsg, char* errParam)
     {
 #ifdef SHOW_CONSOLE
-#if UNIX || __APPLE__
+#if __linux__ || __APPLE__
         std::cout << COLOR_RED << ERROR_STR << errMsg << " -> " << errParam << RESET << std::endl;
 #else
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), COLOR_RED);
@@ -101,7 +101,7 @@ public:
     static void Debug(std::string msg)
     {
 #ifdef SHOW_CONSOLE
-#if UNIX || __APPLE__
+#if __linux__ || __APPLE__
         std::cout << COLOR_PURPLE << DEBUG_STR << msg << RESET << std::endl;
 #else
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), COLOR_PURPLE);

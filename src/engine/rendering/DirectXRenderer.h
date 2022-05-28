@@ -5,8 +5,10 @@
 #ifndef VULKAN_ENGINE_DIRECTXRENDERER_H
 #define VULKAN_ENGINE_DIRECTXRENDERER_H
 
+#ifdef _WIN32
 #include <d3d12.h>
 #include <dxgi1_4.h>
+
 
 #include <stdexcept>
 #include <iostream>
@@ -65,5 +67,6 @@ public:
     static void Shutdown();
 };
 
+#endif
 
 #endif //VULKAN_ENGINE_DIRECTXRENDERER_H

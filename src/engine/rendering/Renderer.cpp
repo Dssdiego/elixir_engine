@@ -20,9 +20,11 @@ void CRenderer::Init(SBackend backend)
             CVulkanRenderer::Init();
             break;
 
+#ifdef _WIN32
         case DIRECTX:
             CLogger::Info("Renderer is using DIRECTX");
             CDirectXRenderer::Init();
+#endif
 
         case OPENGL:
             CLogger::Info("Renderer is using OPENGL");

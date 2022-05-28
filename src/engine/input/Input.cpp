@@ -6,7 +6,7 @@
 #include "../profiling/Profiler.h"
 #include "../profiling/Logger.h"
 
-CInputImpl* mImplementation = nullptr;
+CInputImpl* mInputImpl = nullptr;
 
 CInputImpl::CInputImpl()
 {
@@ -22,12 +22,12 @@ void CInput::Init()
 {
     CLogger::Info("Initializing input system");
     PROFILE_FUNCTION();
-    mImplementation = new CInputImpl;
+    mInputImpl = new CInputImpl;
 }
 
 void CInput::Shutdown()
 {
     CLogger::Info("Shutting down input system");
     PROFILE_FUNCTION();
-    delete mImplementation;
+    delete mInputImpl;
 }

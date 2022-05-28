@@ -19,6 +19,8 @@ find_package(OpenGL REQUIRED)
 
 # FMOD
 set(FMOD_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/thirdparty/fmod/inc")
+
+if(WIN32)
 set(FMOD_LIBRARY
         "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/fmod_vc.lib" # for production use
         "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/fmodstudio_vc.lib" # for production use
@@ -29,12 +31,26 @@ file(COPY
         "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/fmodstudio.dll" # for production use
         #            "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/fmodstudioL.dll" # for debug use
         DESTINATION ${CMAKE_BINARY_DIR})
+else()
+    set(FMOD_LIBRARY
+            "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/libfmod.so" # for production use
+            "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/libfmodstudio.so" # for production use
+            #            "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/fmodstudioL_vc.lib" # for debug use
+            )
+#    file(COPY
+#            "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/fmod.dll" # for production use
+#            "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/fmodstudio.dll" # for production use
+#            #            "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/fmodstudioL.dll" # for debug use
+#            DESTINATION ${CMAKE_BINARY_DIR})
+
+endif()
 
 # Messages
 message("Libraries:")
 message(VULKAN_INCLUDE_DIRS: ${Vulkan_INCLUDE_DIRS})
 message(VULKAN_LIB: ${Vulkan_LIBRARIES})
 message(OPENGL_LIBRARIES: ${OPENGL_LIBRARIES})
+message(FMOD LIBRARY: ${FMOD_LIBRARY})
 
 # include directories
 include_directories(
@@ -69,6 +85,9 @@ else()
             glfw
             Vulkan::Vulkan
             OpenGL::GL
+            lua_lib
+            imgui
+            ${FMOD_LIBRARY}
     )
 endif()
 

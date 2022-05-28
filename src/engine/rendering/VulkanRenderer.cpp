@@ -9,6 +9,7 @@
 
 #endif
 
+#include <cstring>
 #include "VulkanRenderer.h"
 #include "Window.h"
 #include "../profiling/Logger.h"
@@ -35,14 +36,14 @@ const bool enableValidationLayers = true;
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
-CVulkanRendererImpl* mImplementation = nullptr;
+CVulkanRendererImpl* mVulkanRendererImpl = nullptr;
 
 /*
  * Pointer to Implementation
  */
 void CVulkanRenderer::Init()
 {
-    mImplementation = new CVulkanRendererImpl;
+    mVulkanRendererImpl = new CVulkanRendererImpl;
 }
 
 void CVulkanRenderer::Draw()
@@ -52,42 +53,42 @@ void CVulkanRenderer::Draw()
 
 void CVulkanRenderer::Shutdown()
 {
-    delete mImplementation;
+    delete mVulkanRendererImpl;
 }
 
 VkInstance CVulkanRenderer::GetInstance()
 {
-    return mImplementation->vkInstance;
+    return mVulkanRendererImpl->vkInstance;
 }
 
 VkPhysicalDevice CVulkanRenderer::GetPhysicalDevice()
 {
-    return mImplementation->vkPhysicalDevice;
+    return mVulkanRendererImpl->vkPhysicalDevice;
 }
 
 VkDevice CVulkanRenderer::GetLogicalDevice()
 {
-    return mImplementation->vkLogicalDevice;
+    return mVulkanRendererImpl->vkLogicalDevice;
 }
 
 VkQueue CVulkanRenderer::GetGraphicsQueue()
 {
-    return mImplementation->vkGraphicsQueue;
+    return mVulkanRendererImpl->vkGraphicsQueue;
 }
 
 VkRenderPass CVulkanRenderer::GetRenderPass()
 {
-    return mImplementation->vkRenderPass;
+    return mVulkanRendererImpl->vkRenderPass;
 }
 
 VkDescriptorPool CVulkanRenderer::GetDescriptorPool()
 {
-    return mImplementation->vkDescriptorPool;
+    return mVulkanRendererImpl->vkDescriptorPool;
 }
 
 uint32_t CVulkanRenderer::GetSwapChainImageCount()
 {
-    return mImplementation->swapChainImageCount;
+    return mVulkanRendererImpl->swapChainImageCount;
 }
 
 /*

@@ -9,11 +9,11 @@
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
-CEditorInterfaceImpl* mImplementation = nullptr;
+CEditorInterfaceImpl* mEditorInterfaceImpl = nullptr;
 
 void CEditorInterface::Init()
 {
-    mImplementation = new CEditorInterfaceImpl;
+    mEditorInterfaceImpl = new CEditorInterfaceImpl;
 }
 
 void CEditorInterface::Draw()
@@ -28,7 +28,7 @@ void CEditorInterface::Draw()
 
 void CEditorInterface::Shutdown()
 {
-    delete mImplementation;
+    delete mEditorInterfaceImpl;
 }
 
 CEditorInterfaceImpl::CEditorInterfaceImpl()

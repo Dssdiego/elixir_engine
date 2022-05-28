@@ -2,6 +2,7 @@
 // Created by Diego S. Seabra on 14/03/22.
 //
 
+#ifdef _WIN32
 #include "DirectXRenderer.h"
 #include "../profiling/Logger.h"
 #include "Window.h"
@@ -239,3 +240,5 @@ void CDirectXRendererImpl::CreateSwapchain()
 
     // Describe and create a render target view (RTV) descriptor heap
 }
+
+#endif

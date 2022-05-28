@@ -8,7 +8,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-SWindowImpl* mImplementation = nullptr;
+SWindowImpl* mWindowImpl = nullptr;
 
 SWindowImpl::SWindowImpl(SEngineConfig* pConfig)
 {
@@ -31,7 +31,7 @@ SWindowImpl::SWindowImpl(SEngineConfig* pConfig)
 
 SWindowImpl::~SWindowImpl()
 {
-    glfwDestroyWindow(mImplementation->window);
+    glfwDestroyWindow(mWindowImpl->window);
     glfwTerminate();
 }
 
@@ -52,13 +52,13 @@ void SWindowImpl::loadIcon()
 
 bool CWindow::ShouldCloseWindow()
 {
-    return glfwWindowShouldClose(mImplementation->window);
+    return glfwWindowShouldClose(mWindowImpl->window);
 }
 
 void CWindow::Init(SEngineConfig* pConfig)
 {
     CLogger::Info("Initializing window");
-    mImplementation = new SWindowImpl(pConfig);
+    mWindowImpl = new SWindowImpl(pConfig);
 }
 
 void CWindow::Update()
@@ -69,21 +69,21 @@ void CWindow::Update()
 void CWindow::Shutdown()
 {
     CLogger::Info("Shutting down window");
-    delete mImplementation;
+    delete mWindowImpl;
 }
 
 SWindowSize CWindow::GetSize()
 {
     return SWindowSize
             {
-                mImplementation->mWidth,
-                mImplementation->mHeight
+        mWindowImpl->mWidth,
+        mWindowImpl->mHeight
             };
 }
 
 GLFWwindow *CWindow::GetWindow()
 {
-    return mImplementation->window;
+    return mWindowImpl->window;
 }
 
 
