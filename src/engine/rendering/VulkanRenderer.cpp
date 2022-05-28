@@ -1048,6 +1048,9 @@ void CVulkanRendererImpl::CreateCommandBuffers()
 
 void CVulkanRendererImpl::CreateSemaphores()
 {
+    imageAvailableSemaphores.resize(NUM_FRAME_DATA);
+    renderFinishedSemaphores.resize(NUM_FRAME_DATA);
+
     VkSemaphoreCreateInfo semaphoreInfo{};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
