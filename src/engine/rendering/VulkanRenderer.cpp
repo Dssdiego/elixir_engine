@@ -2,11 +2,10 @@
 // Created by Diego S. Seabra on 14/03/22.
 //
 
-#ifdef WIN32
+#ifdef _WIN32
 #define NOMINMAX
-#include <windows.h>
+#include <Windows.h>
 #include <array>
-
 #endif
 
 #include <cstring>
@@ -15,6 +14,7 @@
 #include "../profiling/Logger.h"
 #include "Vertex.h"
 #include "Shader.h"
+#include "VulkanContext.h"
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -33,6 +33,8 @@ const bool enableValidationLayers = true;
 		}                                                           \
 	} while (0)
 
+
+SVulkanContext vkContext;
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
@@ -54,41 +56,6 @@ void CVulkanRenderer::Draw()
 void CVulkanRenderer::Shutdown()
 {
     delete mVulkanRendererImpl;
-}
-
-VkInstance CVulkanRenderer::GetInstance()
-{
-    return mVulkanRendererImpl->vkInstance;
-}
-
-VkPhysicalDevice CVulkanRenderer::GetPhysicalDevice()
-{
-    return mVulkanRendererImpl->vkPhysicalDevice;
-}
-
-VkDevice CVulkanRenderer::GetLogicalDevice()
-{
-    return mVulkanRendererImpl->vkLogicalDevice;
-}
-
-VkQueue CVulkanRenderer::GetGraphicsQueue()
-{
-    return mVulkanRendererImpl->vkGraphicsQueue;
-}
-
-VkRenderPass CVulkanRenderer::GetRenderPass()
-{
-    return mVulkanRendererImpl->vkRenderPass;
-}
-
-VkDescriptorPool CVulkanRenderer::GetDescriptorPool()
-{
-    return mVulkanRendererImpl->vkDescriptorPool;
-}
-
-uint32_t CVulkanRenderer::GetSwapChainImageCount()
-{
-    return mVulkanRendererImpl->swapChainImageCount;
 }
 
 /*
@@ -157,20 +124,20 @@ CVulkanRendererImpl::~CVulkanRendererImpl()
 {
     CleanupSwapChain();
 
-    vkDestroyDescriptorSetLayout(vkLogicalDevice, vkDescriptorSetLayout, nullptr);
+    vkDestroyDescriptorSetLayout(vkContext.logicalDevice, vkDescriptorSetLayout, nullptr);
 
     for (size_t i = 0; i < NUM_FRAME_DATA; i++)
     {
-        vkDestroySemaphore(vkLogicalDevice, renderFinishedSemaphores[i], nullptr);
-        vkDestroySemaphore(vkLogicalDevice, imageAvailableSemaphores[i], nullptr);
+        vkDestroySemaphore(vkContext.logicalDevice, renderFinishedSemaphores[i], nullptr);
+        vkDestroySemaphore(vkContext.logicalDevice, imageAvailableSemaphores[i], nullptr);
     }
 
-    vkDestroyCommandPool(vkLogicalDevice, vkCommandPool, nullptr);
+    vkDestroyCommandPool(vkContext.logicalDevice, vkCommandPool, nullptr);
 
-    vkDestroyDevice(vkLogicalDevice, nullptr);
+    vkDestroyDevice(vkContext.logicalDevice, nullptr);
 
-    vkDestroySurfaceKHR(vkInstance, vkSurface, nullptr);
-    vkDestroyInstance(vkInstance, nullptr);
+    vkDestroySurfaceKHR(vkContext.instance, vkSurface, nullptr);
+    vkDestroyInstance(vkContext.instance, nullptr);
 }
 
 /*
@@ -208,6 +175,7 @@ bool CVulkanRendererImpl::CheckValidationLayerSupport()
 
 QueueFamilyIndices CVulkanRendererImpl::FindQueueFamilies(VkPhysicalDevice device)
 {
+    // TODO: Use the vkContext struct (?)
     QueueFamilyIndices indices{};
 
     uint32_t queueFamilyCount = 0;
@@ -381,7 +349,7 @@ VkImageView CVulkanRendererImpl::CreateImageView(VkImage image, VkFormat format,
     viewInfo.subresourceRange.layerCount = 1;
 
     VkImageView imageView;
-    VK_CHECK(vkCreateImageView(vkLogicalDevice, &viewInfo, nullptr, &imageView));
+    VK_CHECK(vkCreateImageView(vkContext.logicalDevice, &viewInfo, nullptr, &imageView));
 
     return imageView;
 }
@@ -400,7 +368,7 @@ VkFormat CVulkanRendererImpl::FindSupportedFormat(const std::vector<VkFormat> &c
     for (VkFormat format : candidates)
     {
         VkFormatProperties props;
-        vkGetPhysicalDeviceFormatProperties(vkPhysicalDevice, format, &props);
+        vkGetPhysicalDeviceFormatProperties(vkContext.physicalDevice, format, &props);
 
         if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features)
         {
@@ -422,7 +390,7 @@ VkShaderModule CVulkanRendererImpl::CreateShaderModule(const std::vector<char> &
     createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
     VkShaderModule shaderModule;
-    VK_CHECK(vkCreateShaderModule(vkLogicalDevice, &createInfo, nullptr, &shaderModule));
+    VK_CHECK(vkCreateShaderModule(vkContext.logicalDevice, &createInfo, nullptr, &shaderModule));
 
     return shaderModule;
 }
@@ -479,7 +447,9 @@ void CVulkanRendererImpl::CreateInstance()
         std::cout << "\t" << extension.extensionName << std::endl;
     }
 
-    VK_CHECK(vkCreateInstance(&createInfo, nullptr, &vkInstance));
+    VK_CHECK(vkCreateInstance(&createInfo, nullptr, &vkContext.instance));
+
+    CLogger::Debug("Instance created");
 }
 
 void CVulkanRendererImpl::SetupDebugMessenger()
@@ -489,13 +459,15 @@ void CVulkanRendererImpl::SetupDebugMessenger()
 
 void CVulkanRendererImpl::CreateSurface()
 {
-    VK_CHECK(glfwCreateWindowSurface(vkInstance, CWindow::GetWindow(), nullptr, &vkSurface));
+    VK_CHECK(glfwCreateWindowSurface(vkContext.instance, CWindow::GetWindow(), nullptr, &vkSurface));
+
+    CLogger::Debug("Surface created");
 }
 
 void CVulkanRendererImpl::PickPhysicalDevice()
 {
     uint32_t deviceCount = 0;
-    vkEnumeratePhysicalDevices(vkInstance, &deviceCount, nullptr);
+    vkEnumeratePhysicalDevices(vkContext.instance, &deviceCount, nullptr);
 
     if (deviceCount == 0)
     {
@@ -503,35 +475,37 @@ void CVulkanRendererImpl::PickPhysicalDevice()
     }
 
     std::vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(vkInstance, &deviceCount, devices.data());
+    vkEnumeratePhysicalDevices(vkContext.instance, &deviceCount, devices.data());
 
     for (const auto& device: devices)
     {
         if (IsDeviceSuitable(device))
         {
-            vkPhysicalDevice = device;
+            vkContext.physicalDevice = device;
             break;
         }
     }
 
-    if (vkPhysicalDevice == VK_NULL_HANDLE)
+    if (vkContext.physicalDevice == VK_NULL_HANDLE)
     {
         throw std::runtime_error("failed to find a suitable GPU");
     }
 
     VkPhysicalDeviceProperties props;
-    vkGetPhysicalDeviceProperties(vkPhysicalDevice, &props);
+    vkGetPhysicalDeviceProperties(vkContext.physicalDevice, &props);
 
     uint32_t vulkanVersion = props.apiVersion;
 
     std::cout << "GPU: " << props.deviceName << std::endl;
     std::cout << "Vulkan Version: " << VK_API_VERSION_MAJOR(vulkanVersion) << "." <<
               VK_API_VERSION_MINOR(vulkanVersion) << "." << VK_API_VERSION_PATCH(vulkanVersion) << std::endl;
+
+    CLogger::Debug("Picked physical device");
 }
 
 void CVulkanRendererImpl::CreateLogicalDeviceAndQueues()
 {
-    QueueFamilyIndices indices = FindQueueFamilies(vkPhysicalDevice);
+    QueueFamilyIndices indices = FindQueueFamilies(vkContext.physicalDevice);
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     std::set<uint32_t> uniqueQueueFamilies = {
@@ -575,39 +549,43 @@ void CVulkanRendererImpl::CreateLogicalDeviceAndQueues()
     }
 
     // we're now ready to instantiate the logical device
-    VK_CHECK(vkCreateDevice(vkPhysicalDevice, &createInfo, nullptr, &vkLogicalDevice));
+    VK_CHECK(vkCreateDevice(vkContext.physicalDevice, &createInfo, nullptr, &vkContext.logicalDevice));
 
-    vkGetDeviceQueue(vkLogicalDevice, indices.graphicsFamily.value(), 0, &vkGraphicsQueue);
-    vkGetDeviceQueue(vkLogicalDevice, indices.presentFamily.value(), 0, &vkPresentQueue);
+    // TODO: Change to use vkContext.graphicsIdx and presentIdx and queue as well
+    vkGetDeviceQueue(vkContext.logicalDevice, vkContext.graphicsFamilyIdx, 0, &vkContext.graphicsQueue);
+    vkGetDeviceQueue(vkContext.logicalDevice, vkContext.presentFamilyIdx, 0, &vkContext.presentQueue);
+
+    CLogger::Debug("Created logical device and queues");
 }
 
 void CVulkanRendererImpl::CreateSwapChain()
 {
-    SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(vkPhysicalDevice);
+    SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(vkContext.physicalDevice);
 
     VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
     VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
     VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities);
 
-    swapChainImageCount = swapChainSupport.capabilities.minImageCount + 1; // one more image to have "room" for more processing
-    if (swapChainSupport.capabilities.maxImageCount > 0 && swapChainImageCount > swapChainSupport.capabilities.maxImageCount)
+    vkContext.swapChainImageCount = swapChainSupport.capabilities.minImageCount + 1; // one more image to have "room" for more processing
+    if (swapChainSupport.capabilities.maxImageCount > 0 && vkContext.swapChainImageCount > swapChainSupport.capabilities.maxImageCount)
     {
         // making sure we don't exceed the maximum number of images in the swap chain
-        swapChainImageCount = swapChainSupport.capabilities.maxImageCount;
+        vkContext.swapChainImageCount = swapChainSupport.capabilities.maxImageCount;
     }
-    std::cout << "Minimum image count in the swap chain: " << swapChainImageCount << std::endl;
+    std::cout << "Minimum image count in the swap chain: " << vkContext.swapChainImageCount << std::endl;
 
     VkSwapchainCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     createInfo.surface = vkSurface; // tying our surface to the swap chain
-    createInfo.minImageCount = swapChainImageCount;
+    createInfo.minImageCount = vkContext.swapChainImageCount;
     createInfo.imageFormat = surfaceFormat.format;
     createInfo.imageColorSpace = surfaceFormat.colorSpace;
     createInfo.imageExtent = extent;
     createInfo.imageArrayLayers = 1; // the amount of layers each image consists of (always 1 unless we are developing a stereoscopic 3D app)
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT; // image operations, like color attachment (our case), post-processing, etc
 
-    QueueFamilyIndices indices = FindQueueFamilies(vkPhysicalDevice);
+    // TODO: Change to use the index stored in the vkContext struct
+    QueueFamilyIndices indices = FindQueueFamilies(vkContext.physicalDevice);
     uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
     // specifying how to handle swap chain images that will be used across multiple queue families (graphics and presentation)
@@ -636,18 +614,17 @@ void CVulkanRendererImpl::CreateSwapChain()
     // NOTE: Only one swap chain is not the best option because we'd like the screen to be resized, so in the future we'll probably recreate the swap chain ;)
 
     // effectively creating the swap chain
-    if (vkCreateSwapchainKHR(vkLogicalDevice, &createInfo, nullptr, &vkSwapChain) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create the swap chain");
-    }
+    VK_CHECK(vkCreateSwapchainKHR(vkContext.logicalDevice, &createInfo, nullptr, &vkSwapChain));
 
     // retrieve swap chain images
-    vkGetSwapchainImagesKHR(vkLogicalDevice, vkSwapChain, &swapChainImageCount, nullptr);
-    vkSwapChainImages.resize(swapChainImageCount);
-    vkGetSwapchainImagesKHR(vkLogicalDevice, vkSwapChain, &swapChainImageCount, vkSwapChainImages.data());
+    vkGetSwapchainImagesKHR(vkContext.logicalDevice, vkSwapChain, &vkContext.swapChainImageCount, nullptr);
+    vkSwapChainImages.resize(vkContext.swapChainImageCount);
+    vkGetSwapchainImagesKHR(vkContext.logicalDevice, vkSwapChain, &vkContext.swapChainImageCount, vkSwapChainImages.data());
 
     vkSwapChainImageFormat = surfaceFormat.format;
     vkSwapChainExtent = extent;
+
+    CLogger::Debug("Swap chain created");
 }
 
 void CVulkanRendererImpl::CreateImageViews()
@@ -723,7 +700,9 @@ void CVulkanRendererImpl::CreateRenderPass()
     renderPassInfo.pDependencies = &dependency;
 
     // effectively creating the render pass
-    VK_CHECK(vkCreateRenderPass(vkLogicalDevice, &renderPassInfo, nullptr, &vkRenderPass));
+    VK_CHECK(vkCreateRenderPass(vkContext.logicalDevice, &renderPassInfo, nullptr, &vkContext.renderPass));
+
+    CLogger::Debug("Render pass created");
 }
 
 void CVulkanRendererImpl::CreateDescriptorSetLayout()
@@ -749,7 +728,9 @@ void CVulkanRendererImpl::CreateDescriptorSetLayout()
     layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
     layoutInfo.pBindings = bindings.data();
 
-    VK_CHECK(vkCreateDescriptorSetLayout(vkLogicalDevice, &layoutInfo, nullptr, &vkDescriptorSetLayout));
+    VK_CHECK(vkCreateDescriptorSetLayout(vkContext.logicalDevice, &layoutInfo, nullptr, &vkDescriptorSetLayout));
+
+    CLogger::Debug("Descriptor set layout created");
 }
 
 void CVulkanRendererImpl::CreateGraphicsPipeline()
@@ -900,10 +881,7 @@ void CVulkanRendererImpl::CreateGraphicsPipeline()
     pipelineLayoutInfo.pushConstantRangeCount= 0; // optional
     pipelineLayoutInfo.pPushConstantRanges = nullptr; // optional
 
-    if (vkCreatePipelineLayout(vkLogicalDevice, &pipelineLayoutInfo, nullptr, &vkPipelineLayout) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create pipeline layout");
-    }
+    VK_CHECK(vkCreatePipelineLayout(vkContext.logicalDevice, &pipelineLayoutInfo, nullptr, &vkPipelineLayout));
 
     // SECTION: 10. Graphics Pipeline Creation
     VkGraphicsPipelineCreateInfo pipelineInfo{};
@@ -919,29 +897,33 @@ void CVulkanRendererImpl::CreateGraphicsPipeline()
     pipelineInfo.pColorBlendState = &colorBlending;
     pipelineInfo.pDynamicState = nullptr; // optional
     pipelineInfo.layout = vkPipelineLayout;
-    pipelineInfo.renderPass = vkRenderPass;
+    pipelineInfo.renderPass = vkContext.renderPass;
     pipelineInfo.subpass = 0; // not using subpasses for now
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // optional
     pipelineInfo.basePipelineIndex = -1; // optional
 
-    VK_CHECK(vkCreateGraphicsPipelines(vkLogicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &vkGraphicsPipeline));
+    VK_CHECK(vkCreateGraphicsPipelines(vkContext.logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &vkGraphicsPipeline));
 
     // SECTION: 11. Cleaning up
     // shaders are assigned to a pipeline stage, so we can destroy the shader modules
-    vkDestroyShaderModule(vkLogicalDevice, vertShaderModule, nullptr);
-    vkDestroyShaderModule(vkLogicalDevice, fragShaderModule, nullptr);
+    vkDestroyShaderModule(vkContext.logicalDevice, vertShaderModule, nullptr);
+    vkDestroyShaderModule(vkContext.logicalDevice, fragShaderModule, nullptr);
+
+    CLogger::Debug("Graphics pipeline created");
 }
 
 void CVulkanRendererImpl::CreateCommandPool()
 {
-    QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(vkPhysicalDevice);
+    QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(vkContext.physicalDevice);
 
     VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // this allows the command buffer to be implicitly reset when 'vkBeginCommandBuffer' is called
     poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value(); // since we want to record the commands for drawing, we must use the graphics queue family
 
-    VK_CHECK(vkCreateCommandPool(vkLogicalDevice, &poolInfo, nullptr, &vkCommandPool));
+    VK_CHECK(vkCreateCommandPool(vkContext.logicalDevice, &poolInfo, nullptr, &vkCommandPool));
+
+    CLogger::Debug("Command pool created");
 }
 
 void CVulkanRendererImpl::CreateDepthResources()
@@ -1012,10 +994,9 @@ void CVulkanRendererImpl::CreateDescriptorPool()
     poolInfo.poolSizeCount = std::size(poolSizes);
     poolInfo.pPoolSizes = poolSizes;
 
-    if (vkCreateDescriptorPool(vkLogicalDevice, &poolInfo, nullptr, &vkDescriptorPool) != VK_SUCCESS)
-    {
-        throw std::runtime_error("Unable to create descriptor pool");
-    }
+    VK_CHECK(vkCreateDescriptorPool(vkContext.logicalDevice, &poolInfo, nullptr, &vkContext.descriptorPool));
+
+    CLogger::Debug("Descriptor pool created");
 
     // vulkan-tutorial's "original" code
 //    std::array<VkDescriptorPoolSize, 2> poolSizes{};
@@ -1056,26 +1037,26 @@ void CVulkanRendererImpl::CreateSemaphores()
 
     for (size_t i = 0; i < NUM_FRAME_DATA; i++)
     {
-        VK_CHECK(vkCreateSemaphore(vkLogicalDevice, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]));
-        VK_CHECK(vkCreateSemaphore(vkLogicalDevice, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]));
+        VK_CHECK(vkCreateSemaphore(vkContext.logicalDevice, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]));
+        VK_CHECK(vkCreateSemaphore(vkContext.logicalDevice, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]));
     }
 }
 
 void CVulkanRendererImpl::CleanupSwapChain()
 {
-    vkDestroyPipeline(vkLogicalDevice, vkGraphicsPipeline, nullptr);
-    vkDestroyPipelineLayout(vkLogicalDevice, vkPipelineLayout, nullptr);
+    vkDestroyPipeline(vkContext.logicalDevice, vkGraphicsPipeline, nullptr);
+    vkDestroyPipelineLayout(vkContext.logicalDevice, vkPipelineLayout, nullptr);
 
-    vkDestroyRenderPass(vkLogicalDevice, vkRenderPass, nullptr);
+    vkDestroyRenderPass(vkContext.logicalDevice, vkContext.renderPass, nullptr);
 
     for (auto imageView : vkSwapChainImageViews)
     {
-        vkDestroyImageView(vkLogicalDevice, imageView, nullptr);
+        vkDestroyImageView(vkContext.logicalDevice, imageView, nullptr);
     }
 
-    vkDestroySwapchainKHR(vkLogicalDevice, vkSwapChain, nullptr);
+    vkDestroySwapchainKHR(vkContext.logicalDevice, vkSwapChain, nullptr);
 
-    vkDestroyDescriptorPool(vkLogicalDevice, vkDescriptorPool, nullptr);
+    vkDestroyDescriptorPool(vkContext.logicalDevice, vkContext.descriptorPool, nullptr);
 }
 
 

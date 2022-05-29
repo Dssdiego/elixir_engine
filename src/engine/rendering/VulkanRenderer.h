@@ -46,26 +46,14 @@ struct CVulkanRendererImpl
     const int NUM_FRAME_DATA = 2; // double buffering
 
     // Variables
-    VkInstance vkInstance;
     VkSurfaceKHR vkSurface;
-
-    VkPhysicalDevice vkPhysicalDevice = VK_NULL_HANDLE; // physical device
-    VkDevice vkLogicalDevice; // logical device
-
-    VkQueue vkGraphicsQueue;
-    VkQueue vkPresentQueue;
 
     VkSwapchainKHR vkSwapChain;
     std::vector<VkImage> vkSwapChainImages;
-    uint32_t swapChainImageCount;
     VkFormat vkSwapChainImageFormat;
     VkExtent2D vkSwapChainExtent;
 
     std::vector<VkImageView> vkSwapChainImageViews;
-
-    VkRenderPass vkRenderPass;
-
-    VkDescriptorPool vkDescriptorPool;
 
     VkDescriptorSetLayout vkDescriptorSetLayout;
 
@@ -125,15 +113,6 @@ public:
     static void Init();
     static void Draw();
     static void Shutdown();
-
-    // External
-    static VkInstance GetInstance();
-    static VkPhysicalDevice GetPhysicalDevice();
-    static VkDevice GetLogicalDevice();
-    static VkQueue GetGraphicsQueue();
-    static VkRenderPass GetRenderPass();
-    static VkDescriptorPool GetDescriptorPool();
-    static uint32_t GetSwapChainImageCount();
 };
 
 

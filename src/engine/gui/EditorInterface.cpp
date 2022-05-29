@@ -6,6 +6,7 @@
 #include "../profiling/Logger.h"
 #include "../rendering/Window.h"
 #include "../rendering/VulkanRenderer.h"
+#include "../rendering/VulkanContext.h"
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
@@ -60,19 +61,20 @@ void CEditorInterfaceImpl::InitializeImGui()
 
     // Setup Vulkan init info
     ImGui_ImplVulkan_InitInfo imguiInfo{};
-    imguiInfo.Instance = CVulkanRenderer::GetInstance();
-    imguiInfo.PhysicalDevice = CVulkanRenderer::GetPhysicalDevice();
-    imguiInfo.Device = CVulkanRenderer::GetLogicalDevice();
-    imguiInfo.QueueFamily = 0; // REVIEW: Is the graphics queue always the first one (aka index 0)?
-    imguiInfo.Queue = CVulkanRenderer::GetGraphicsQueue();
-    imguiInfo.DescriptorPool = CVulkanRenderer::GetDescriptorPool();
-    imguiInfo.MinImageCount = CVulkanRenderer::GetSwapChainImageCount();
-    imguiInfo.ImageCount = CVulkanRenderer::GetSwapChainImageCount();
+    imguiInfo.Instance = vkContext.instance;
+    imguiInfo.PhysicalDevice = vkContext.physicalDevice;
+    imguiInfo.Device = vkContext.logicalDevice;
+    imguiInfo.QueueFamily = vkContext.graphicsFamilyIdx;
+    imguiInfo.Queue = vkContext.graphicsQueue;
+    imguiInfo.DescriptorPool = vkContext.descriptorPool;
+    imguiInfo.MinImageCount = vkContext.swapChainImageCount;
+    imguiInfo.ImageCount = vkContext.swapChainImageCount;
     imguiInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
     imguiInfo.Allocator = nullptr; // not using an allocator right now
 
     // Init ImGui for Vulkan
-    ImGui_ImplVulkan_Init(&imguiInfo, CVulkanRenderer::GetRenderPass());
+    ImGui_ImplVulkan_Init(&imguiInfo, vkContext.renderPass);
+    CLogger::Debug("Initialized imgui for vulkan");
 
     // TODO: Allocate a command buffer
     // TODO: Record the command buffer
