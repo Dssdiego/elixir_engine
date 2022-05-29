@@ -15,6 +15,7 @@
 #include "Vertex.h"
 #include "Shader.h"
 #include "VulkanContext.h"
+#include "../common/Constants.h"
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -34,6 +35,7 @@ const bool enableValidationLayers = true;
 	} while (0)
 
 
+// Vulkan context
 SVulkanContext vkContext;
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
@@ -402,10 +404,10 @@ void CVulkanRendererImpl::CreateInstance()
 {
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName = "Elixir Game Engine"; // TODO: Game name should go here!
+    appInfo.pApplicationName = engineName.c_str(); // TODO: Game name should go here!
     appInfo.applicationVersion = VK_MAKE_VERSION(0, 0, 1);
-    appInfo.pEngineName = "Elixir Game Engine";
-    appInfo.engineVersion = VK_MAKE_VERSION(0, 0 ,1);
+    appInfo.pEngineName = engineName.c_str();
+    appInfo.engineVersion = VK_MAKE_VERSION(vMajor, vMinor, vPatch);
     appInfo.apiVersion = VK_MAKE_VERSION(1, 0, VK_HEADER_VERSION);
 
     VkInstanceCreateInfo createInfo{};
@@ -494,11 +496,17 @@ void CVulkanRendererImpl::PickPhysicalDevice()
     VkPhysicalDeviceProperties props;
     vkGetPhysicalDeviceProperties(vkContext.physicalDevice, &props);
 
+    // getting vulkan version
     uint32_t vulkanVersion = props.apiVersion;
+    uint32_t vulkanVMajor = VK_API_VERSION_MAJOR(vulkanVersion);
+    uint32_t vulkanVMinor = VK_API_VERSION_MINOR(vulkanVersion);
+    uint32_t vulkanVPatch = VK_API_VERSION_PATCH(vulkanVersion);
 
-    std::cout << "GPU: " << props.deviceName << std::endl;
-    std::cout << "Vulkan Version: " << VK_API_VERSION_MAJOR(vulkanVersion) << "." <<
-              VK_API_VERSION_MINOR(vulkanVersion) << "." << VK_API_VERSION_PATCH(vulkanVersion) << std::endl;
+    std::stringstream ssVulkanVersion;
+    ssVulkanVersion << "Vulkan Version: " << vulkanVMajor << "." << vulkanVMinor << "." << vulkanVPatch;
+
+    CLogger::Info("GPU: " + std::string(props.deviceName));
+    CLogger::Info(ssVulkanVersion.str());
 
     CLogger::Debug("Picked physical device");
 }

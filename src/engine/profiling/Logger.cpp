@@ -3,6 +3,31 @@
 //
 
 #include "Logger.h"
+#include "../common/Constants.h"
+
+/*
+ * INITIALIZATION
+ */
+void CLogger::Init()
+{
+    // REVIEW: This could be leaking memory!
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
+
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%Y_%m_%d");
+    auto dateStr = oss.str();
+
+    std::string buf(engineName);
+    buf.append(" ");
+    buf.append(engineVersion);
+    buf.append(" - by Diego S. Seabra");
+
+    std::ofstream logFile;
+    logFile.open("elixir_" + dateStr + std::string(".log"));
+    logFile.clear();
+    logFile << buf << "\n\n";
+}
 
 /*
  * INFO
@@ -99,4 +124,3 @@ void CLogger::WriteToLogFile(std::string type, std::string msg)
     logFile.open("elixir_" + dateStr + std::string(".log"), std::ios_base::app);
     logFile << buf << "\n";
 }
-

@@ -48,6 +48,8 @@ const std::string DEBUG_STR = "DEBUG::";
 class CLogger
 {
 public:
+    static void Init();
+
     static void Info(std::string msg);
     static void Warn(std::string msg);
     static void Error(std::string errMsg, char* errParam);
