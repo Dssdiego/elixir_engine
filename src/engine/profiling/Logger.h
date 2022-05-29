@@ -45,72 +45,16 @@ const std::string WARN_STR = "WARN::";
 const std::string ERROR_STR = "ERROR::";
 const std::string DEBUG_STR = "DEBUG::";
 
-struct CLoggerImpl
-{
-//    CLoggerImpl();
-//    ~CLoggerImpl();
-};
-
-// TODO: Save log to file (when enabled by the engine)
-
 class CLogger
 {
 public:
-    static void Info(std::string msg)
-    {
-#ifdef SHOW_CONSOLE
-#if __linux__ || __APPLE__
-        std::cout << COLOR_BLUE << INFO_STR << msg << RESET << std::endl;
-#else
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), COLOR_BLUE);
-        std::cout << INFO_STR << msg << std::endl;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), COLOR_WHITE);
-#endif
-//        WriteToLogFile(INFO_STR, msg);
-#endif
-    }
+    static void Info(std::string msg);
+    static void Warn(std::string msg);
+    static void Error(std::string errMsg, char* errParam);
+    static void Debug(std::string msg);
 
-    static void Warn(std::string msg)
-    {
-#ifdef SHOW_CONSOLE
-#if __linux__ || __APPLE__
-        std::cout << COLOR_YELLOW << WARN_STR << msg << RESET << std::endl;
-#else
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), COLOR_YELLOW);
-        std::cout << WARN_STR << msg << std::endl;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), COLOR_WHITE);
-#endif
-//        WriteToLogFile(WARN_STR, msg);
-#endif
-    }
-
-    static void Error(std::string errMsg, char* errParam)
-    {
-#ifdef SHOW_CONSOLE
-#if __linux__ || __APPLE__
-        std::cout << COLOR_RED << ERROR_STR << errMsg << " -> " << errParam << RESET << std::endl;
-#else
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), COLOR_RED);
-        std::cout << ERROR_STR << errMsg << " -> " << errParam << std::endl;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), COLOR_WHITE);
-#endif
-//        WriteToLogFile(ERROR_STR, errMsg);
-#endif
-    }
-
-    static void Debug(std::string msg)
-    {
-#ifdef SHOW_CONSOLE
-#if __linux__ || __APPLE__
-        std::cout << COLOR_PURPLE << DEBUG_STR << msg << RESET << std::endl;
-#else
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), COLOR_PURPLE);
-        std::cout << DEBUG_STR << msg << std::endl;
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), COLOR_WHITE);
-#endif
-//        WriteToLogFile(DEBUG_STR, msg);
-#endif
-    }
+private:
+    static void WriteToLogFile(std::string type, std::string msg);
 };
 
 
