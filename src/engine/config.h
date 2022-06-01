@@ -1,0 +1,23 @@
+//
+// Created by Diego S. Seabra on 01/06/22.
+//
+
+#ifndef VULKAN_ENGINE_CONFIG_H
+#define VULKAN_ENGINE_CONFIG_H
+
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+
+#define ENGINE_NAME "Elixir Engine"
+
+#define ENGINE_VERSION_MAJOR 0
+#define ENGINE_VERSION_MINOR 1
+#define ENGINE_VERSION_PATCH 0
+#define RELEASE_TYPE "alpha"
+
+#define ENGINE_VERSION "v" STR(ENGINE_VERSION_MAJOR) \
+    "." STR(ENGINE_VERSION_MINOR) \
+    "." STR(ENGINE_VERSION_PATCH) \
+    "-" RELEASE_TYPE
+
+#endif //VULKAN_ENGINE_CONFIG_H

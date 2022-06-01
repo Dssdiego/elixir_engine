@@ -15,7 +15,7 @@
 #include "Vertex.h"
 #include "Shader.h"
 #include "VulkanContext.h"
-#include "../common/Constants.h"
+#include "../config.h"
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -381,10 +381,10 @@ void CVulkanRendererImpl::CreateInstance()
 {
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName = engineName.c_str(); // TODO: Game name should go here!
+    appInfo.pApplicationName = ENGINE_NAME; // TODO: Game name should go here!
     appInfo.applicationVersion = VK_MAKE_VERSION(0, 0, 1);
-    appInfo.pEngineName = engineName.c_str();
-    appInfo.engineVersion = VK_MAKE_VERSION(vMajor, vMinor, vPatch);
+    appInfo.pEngineName = ENGINE_NAME;
+    appInfo.engineVersion = VK_MAKE_VERSION(ENGINE_VERSION_MAJOR, ENGINE_VERSION_MINOR, ENGINE_VERSION_PATCH);
     appInfo.apiVersion = VK_MAKE_VERSION(1, 0, VK_HEADER_VERSION);
 
     VkInstanceCreateInfo createInfo{};

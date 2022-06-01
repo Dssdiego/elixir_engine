@@ -3,7 +3,7 @@
 //
 
 #include "Logger.h"
-#include "../common/Constants.h"
+#include "../config.h"
 
 /*
  * INITIALIZATION
@@ -18,10 +18,9 @@ void CLogger::Init()
     oss << std::put_time(&tm, "%Y_%m_%d");
     auto dateStr = oss.str();
 
-    std::string buf(engineName);
+    std::string buf(ENGINE_NAME);
     buf.append(" ");
-    buf.append(engineVersion);
-    buf.append(" - by Diego S. Seabra");
+    buf.append(ENGINE_VERSION);
 
     std::ofstream logFile;
     logFile.open("elixir_" + dateStr + std::string(".log"));

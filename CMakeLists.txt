@@ -91,4 +91,7 @@ else()
     )
 endif()
 
+# defining final executable name
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "Elixir Engine")
+
 # TODO: Package project with CPACK

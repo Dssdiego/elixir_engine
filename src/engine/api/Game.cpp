@@ -9,16 +9,7 @@
 #include "../rendering/Renderer.h"
 #include "../gui/EditorInterface.h"
 #include "../profiling/Logger.h"
-
-/*
- * Engine Constants
- */
-uint32_t vMajor = 0;
-uint32_t vMinor = 1;
-uint32_t vPatch = 0;
-
-std::string engineName = "Elixir Engine";
-std::string engineVersion = "v0.1.0-alpha";
+#include "../scenes/SceneSystem.h"
 
 /*
  * Methods
@@ -27,6 +18,7 @@ void CGame::Init(SEngineConfig* pConfig)
 {
     // init engine systems
     CLogger::Init();
+    CSceneSystem::Init();
     CWindow::Init(pConfig);
     CAudioEngine::Init();
     CInput::Init();
@@ -57,6 +49,7 @@ void CGame::Draw()
 void CGame::Cleanup()
 {
     // destroy engine systems
+    CSceneSystem::Shutdown();
     CEditorInterface::Shutdown();
     CRenderer::Shutdown();
     CInput::Shutdown();
