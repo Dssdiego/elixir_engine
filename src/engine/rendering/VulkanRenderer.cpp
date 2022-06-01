@@ -180,29 +180,7 @@ QueueFamilyIndices CVulkanRendererImpl::FindQueueFamilies(VkPhysicalDevice devic
     // TODO: Use the vkContext struct (?)
     QueueFamilyIndices indices{};
 
-    uint32_t queueFamilyCount = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
-    int i = 0;
-    for (const auto& queueFamily: queueFamilies)
-    {
-        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
-            indices.graphicsFamily = i;
-
-        // look for a queue family that has the capability of presenting to our window surface
-        VkBool32 presentSupport = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, vkSurface, &presentSupport);
-
-        if (presentSupport)
-            indices.presentFamily = i;
-
-        if (indices.isComplete())
-            break;
-
-        i++;
-    }
 
     // Assign index to queue families that could be found
     return indices;
@@ -261,7 +239,6 @@ SwapChainSupportDetails CVulkanRendererImpl::QuerySwapChainSupport(VkPhysicalDev
 
 bool CVulkanRendererImpl::IsDeviceSuitable(VkPhysicalDevice device)
 {
-    QueueFamilyIndices indices = FindQueueFamilies(device);
     bool extensionsSupported = CheckDeviceExtensionSupport(device);
     bool swapChainAdequate = false;
 
@@ -275,7 +252,7 @@ bool CVulkanRendererImpl::IsDeviceSuitable(VkPhysicalDevice device)
     VkPhysicalDeviceFeatures supportedFeatures;
     vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
 
-    return indices.isComplete() && extensionsSupported &&
+    return extensionsSupported &&
            swapChainAdequate && supportedFeatures.samplerAnisotropy;
 }
 
@@ -513,11 +490,9 @@ void CVulkanRendererImpl::PickPhysicalDevice()
 
 void CVulkanRendererImpl::CreateLogicalDeviceAndQueues()
 {
-    QueueFamilyIndices indices = FindQueueFamilies(vkContext.physicalDevice);
-
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     std::set<uint32_t> uniqueQueueFamilies = {
-            indices.graphicsFamily.value(), indices.presentFamily.value()
+            &vkContext.graphicsFamilyIdx, &vkContext.presentFamilyIdx
     };
 
     // assigning a priority queue (0.0f -> 1.0f)
@@ -559,7 +534,30 @@ void CVulkanRendererImpl::CreateLogicalDeviceAndQueues()
     // we're now ready to instantiate the logical device
     VK_CHECK(vkCreateDevice(vkContext.physicalDevice, &createInfo, nullptr, &vkContext.logicalDevice));
 
-    // TODO: Change to use vkContext.graphicsIdx and presentIdx and queue as well
+    // get queue families
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(vkContext.physicalDevice, &queueFamilyCount, nullptr);
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(vkContext.physicalDevice, &queueFamilyCount, queueFamilies.data());
+
+    int i = 0;
+    for (const auto& queueFamily: queueFamilies)
+    {
+        // getting the graphics queue family index
+        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            vkContext.graphicsFamilyIdx = i;
+
+        // look for a queue family that has the capability of presenting to our window surface
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(vkContext.physicalDevice, i, vkSurface, &presentSupport);
+
+        // getting the present queue family index
+        if (presentSupport)
+            vkContext.presentFamilyIdx = i;
+
+        i++;
+    }
+
     vkGetDeviceQueue(vkContext.logicalDevice, vkContext.graphicsFamilyIdx, 0, &vkContext.graphicsQueue);
     vkGetDeviceQueue(vkContext.logicalDevice, vkContext.presentFamilyIdx, 0, &vkContext.presentQueue);
 
@@ -592,14 +590,12 @@ void CVulkanRendererImpl::CreateSwapChain()
     createInfo.imageArrayLayers = 1; // the amount of layers each image consists of (always 1 unless we are developing a stereoscopic 3D app)
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT; // image operations, like color attachment (our case), post-processing, etc
 
-    // TODO: Change to use the index stored in the vkContext struct
-    QueueFamilyIndices indices = FindQueueFamilies(vkContext.physicalDevice);
-    uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+    uint32_t queueFamilyIndices[] = {vkContext.graphicsFamilyIdx, vkContext.presentFamilyIdx};
 
     // specifying how to handle swap chain images that will be used across multiple queue families (graphics and presentation)
     // in our case, we'll be drawing on the images in the swap chain from the graphics queue and then
     //    submitting them on the presentation queue
-    if (indices.graphicsFamily != indices.presentFamily)
+    if (vkContext.graphicsFamilyIdx != vkContext.presentFamilyIdx)
     {
         createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
         createInfo.queueFamilyIndexCount = 2;
@@ -922,12 +918,10 @@ void CVulkanRendererImpl::CreateGraphicsPipeline()
 
 void CVulkanRendererImpl::CreateCommandPool()
 {
-    QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(vkContext.physicalDevice);
-
     VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // this allows the command buffer to be implicitly reset when 'vkBeginCommandBuffer' is called
-    poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value(); // since we want to record the commands for drawing, we must use the graphics queue family
+    poolInfo.queueFamilyIndex = vkContext.graphicsFamilyIdx; // since we want to record the commands for drawing, we must use the graphics queue family
 
     VK_CHECK(vkCreateCommandPool(vkContext.logicalDevice, &poolInfo, nullptr, &vkCommandPool));
 

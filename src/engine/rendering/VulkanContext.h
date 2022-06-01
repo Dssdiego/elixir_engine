@@ -15,11 +15,11 @@ struct SVulkanContext {
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkDevice logicalDevice;
 
-    // queues
-    int graphicsFamilyIdx;
-    int presentFamilyIdx;
+    // queues and indices
     VkQueue graphicsQueue;
     VkQueue presentQueue;
+    uint32_t graphicsFamilyIdx;
+    uint32_t presentFamilyIdx;
 
     // format
     VkFormat depthFormat;
