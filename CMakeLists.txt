@@ -63,6 +63,11 @@ file(GLOB_RECURSE SOURCE_FILES
         "src/*.h"
         "src/*.cpp")
 
+# Package project with CPACK
+SET(CPACK_GENERATOR "ZIP")
+SET(CPACK_PACKAGE_NAME "Elixir Engine")
+include(CPack)
+
 add_executable(${PROJECT_NAME}
         ${SOURCE_FILES}
         thirdparty/glad/glad.c
