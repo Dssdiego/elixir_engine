@@ -24,6 +24,7 @@ void CRenderer::Init(SBackend backend)
         case DIRECTX:
             CLogger::Info("Renderer is using DIRECTX");
             CDirectXRenderer::Init();
+            break;
 #endif
 
         case OPENGL:
