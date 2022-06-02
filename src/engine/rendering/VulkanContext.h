@@ -6,6 +6,7 @@
 #define VULKAN_ENGINE_VULKANCONTEXT_H
 
 #include <vulkan/vulkan.h>
+#include <vector>
 
 struct SVulkanContext {
     // instance
@@ -32,6 +33,9 @@ struct SVulkanContext {
 
     // swap chain
     uint32_t swapChainImageCount;
+
+    // command buffer
+    std::vector<VkCommandBuffer> commandBuffers;
 };
 
 extern SVulkanContext vkContext;

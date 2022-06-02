@@ -89,7 +89,7 @@ CVulkanRendererImpl::CVulkanRendererImpl()
     CreateCommandPool();
 
     // Create command buffer
-    CreateCommandBuffers(); // REVIEW: Do we need more than one command buffer?
+    CreateCommandBuffer();
 
     // Create swap chain
     CreateSwapChain();
@@ -132,6 +132,8 @@ CVulkanRendererImpl::~CVulkanRendererImpl()
     {
         vkDestroySemaphore(vkContext.logicalDevice, renderFinishedSemaphores[i], nullptr);
         vkDestroySemaphore(vkContext.logicalDevice, imageAvailableSemaphores[i], nullptr);
+        vkDestroyFence(vkContext.logicalDevice, commandBufferFences[i], nullptr);
+        vkFreeCommandBuffers(vkContext.logicalDevice, vkCommandPool, 1, &vkContext.commandBuffers[i]);
     }
 
     vkDestroyCommandPool(vkContext.logicalDevice, vkCommandPool, nullptr);
@@ -173,17 +175,6 @@ bool CVulkanRendererImpl::CheckValidationLayerSupport()
     }
 
     return true;
-}
-
-QueueFamilyIndices CVulkanRendererImpl::FindQueueFamilies(VkPhysicalDevice device)
-{
-    // TODO: Use the vkContext struct (?)
-    QueueFamilyIndices indices{};
-
-
-
-    // Assign index to queue families that could be found
-    return indices;
 }
 
 bool CVulkanRendererImpl::CheckDeviceExtensionSupport(VkPhysicalDevice device)
@@ -1024,9 +1015,26 @@ void CVulkanRendererImpl::CreateDescriptorSets()
 
 }
 
-void CVulkanRendererImpl::CreateCommandBuffers()
+void CVulkanRendererImpl::CreateCommandBuffer()
 {
+    VkCommandBufferAllocateInfo allocInfo = {};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = vkCommandPool;
+    allocInfo.commandBufferCount = NUM_FRAME_DATA; // 2 command buffers
 
+    vkContext.commandBuffers.resize(NUM_FRAME_DATA);
+    VK_CHECK(vkAllocateCommandBuffers(vkContext.logicalDevice, &allocInfo, vkContext.commandBuffers.data()));
+
+    VkFenceCreateInfo fenceInfo = {};
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+
+    commandBufferFences.resize(NUM_FRAME_DATA);
+    for ( int i = 0; i < NUM_FRAME_DATA; ++i ) {
+        VK_CHECK(vkCreateFence(vkContext.logicalDevice, &fenceInfo, nullptr, &commandBufferFences[i]));
+    }
+
+    CLogger::Debug("Created command buffers");
 }
 
 void CVulkanRendererImpl::CreateSemaphores()

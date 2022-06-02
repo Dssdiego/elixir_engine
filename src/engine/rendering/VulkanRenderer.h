@@ -65,10 +65,11 @@ struct CVulkanRendererImpl
     std::vector<VkSemaphore> imageAvailableSemaphores;
     std::vector<VkSemaphore> renderFinishedSemaphores;
 
+    std::vector<VkFence> commandBufferFences;
+
     // Auxiliary Methods
     bool CheckValidationLayerSupport();
     bool IsDeviceSuitable(VkPhysicalDevice device);
-    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
     bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
     VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
@@ -100,7 +101,7 @@ struct CVulkanRendererImpl
     void CreateUniformBuffers();
     void CreateDescriptorPool();
     void CreateDescriptorSets();
-    void CreateCommandBuffers();
+    void CreateCommandBuffer();
     void CreateSemaphores();
 
     void CleanupSwapChain();
