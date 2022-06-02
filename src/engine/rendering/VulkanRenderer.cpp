@@ -360,6 +360,7 @@ VkFormat CVulkanRendererImpl::FindSupportedFormat(const std::vector<VkFormat> &c
         }
     }
 
+    CLogger::Error("failed to find supported format", "");
     throw std::runtime_error("failed to find supported format");
 }
 
@@ -406,6 +407,7 @@ void CVulkanRendererImpl::CreateInstance()
 
     if (enableValidationLayers && !CheckValidationLayerSupport())
     {
+        CLogger::Error("validation layers requested, but not available", "");
         throw std::runtime_error("validation layers requested, but not available");
     }
 
@@ -452,6 +454,7 @@ void CVulkanRendererImpl::PickPhysicalDevice()
 
     if (deviceCount == 0)
     {
+        CLogger::Error("failed to find GPU's with Vulkan support", "");
         throw std::runtime_error("failed to find GPU's with Vulkan support");
     }
 
@@ -469,6 +472,7 @@ void CVulkanRendererImpl::PickPhysicalDevice()
 
     if (vkContext.physicalDevice == VK_NULL_HANDLE)
     {
+        CLogger::Error("failed to find a suitable GPU", "");
         throw std::runtime_error("failed to find a suitable GPU");
     }
 
@@ -742,8 +746,8 @@ void CVulkanRendererImpl::CreateDescriptorSetLayout()
 void CVulkanRendererImpl::CreateGraphicsPipeline()
 {
     // SECTION: 1. Shaders
-    auto vertShaderCode = CShader::ReadFile("../../src/engine/assets/shaders/vert.spv");
-    auto fragShaderCode = CShader::ReadFile("../../src/engine/assets/shaders/frag.spv");
+    auto vertShaderCode = CShader::ReadFile("assets/shaders/vert.spv");
+    auto fragShaderCode = CShader::ReadFile("assets/shaders/frag.spv");
 
     // creating shader module
     VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);

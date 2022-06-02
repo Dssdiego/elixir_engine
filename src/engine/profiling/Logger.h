@@ -52,7 +52,7 @@ public:
 
     static void Info(std::string msg);
     static void Warn(std::string msg);
-    static void Error(std::string errMsg, char* errParam);
+    static void Error(std::string errMsg, std::string errParam);
     static void Debug(std::string msg);
 
 private:

@@ -13,11 +13,20 @@ SWindowImpl* mWindowImpl = nullptr;
 SWindowImpl::SWindowImpl(SEngineConfig* pConfig)
 {
     window = nullptr;
+
+    CLogger::Debug("initializing glfw");
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // tell GLFW to not create a OpenGL context (because we might use Vulkan/DirectX)
 
     // TODO: Pass engine config here
+    CLogger::Debug("creating window");
     window = glfwCreateWindow(pConfig->windowSize.width, pConfig->windowSize.height, pConfig->gameTitle.c_str(), nullptr, nullptr);
+
+    if (window == nullptr)
+        CLogger::Error("failed to create window with GLFW", "window == nullptr");
+    else
+        CLogger::Info("glfw window created successfully");
+
     glfwSetWindowUserPointer(window, this);
 //    glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 //    glfwSetWindowSizeLimits(window, 480, 320, GLFW_DONT_CARE, GLFW_DONT_CARE);
@@ -37,8 +46,10 @@ SWindowImpl::~SWindowImpl()
 
 void SWindowImpl::loadIcon()
 {
+    CLogger::Debug("loading icon");
+
     GLFWimage icons[1];
-    icons[0].pixels = stbi_load("../../src/engine/assets/icons/icon.png", &icons[0].width, &icons[0].height, nullptr, STBI_rgb_alpha);
+    icons[0].pixels = stbi_load("assets/icons/icon.png", &icons[0].width, &icons[0].height, nullptr, STBI_rgb_alpha);
 
     if (!icons[0].pixels)
     {

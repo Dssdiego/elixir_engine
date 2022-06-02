@@ -65,7 +65,7 @@ void CLogger::Warn(std::string msg)
 /*
  * ERRORS
  */
-void CLogger::Error(std::string errMsg, char *errParam)
+void CLogger::Error(std::string errMsg, std::string errParam)
 {
 #ifdef SHOW_CONSOLE
 #if __linux__ || __APPLE__
