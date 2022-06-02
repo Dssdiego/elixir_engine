@@ -68,6 +68,7 @@ SET(CPACK_GENERATOR "ZIP")
 SET(CPACK_PACKAGE_NAME "Elixir Engine")
 include(CPack)
 
+# creating executable
 add_executable(${PROJECT_NAME}
         ${SOURCE_FILES}
         thirdparty/glad/glad.c
@@ -98,5 +99,11 @@ endif()
 
 # defining final executable name
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "Elixir Engine")
+
+# asset copying
+add_custom_target(copy_assets
+        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/copy-assets.cmake
+        )
+add_dependencies(${PROJECT_NAME} copy_assets)
 
 # TODO: Package project with CPACK
