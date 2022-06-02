@@ -249,15 +249,26 @@ bool CVulkanRendererImpl::IsDeviceSuitable(VkPhysicalDevice device)
 
 VkSurfaceFormatKHR CVulkanRendererImpl::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 {
-    // using SRGB color format
+    VkSurfaceFormatKHR result;
+
+    // if vulkan returned an unknown format, then we just force what we want.
+    if (availableFormats.size() == 1 && availableFormats[0].format == VK_FORMAT_UNDEFINED)
+    {
+        result.format = VK_FORMAT_B8G8R8A8_UNORM;
+        result.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+        return result;
+    }
+
+    // favor 32 bit rgba and srgb nonlinear colorspace
     for (const auto& availableFormat : availableFormats)
     {
-        if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
+        if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM &&
             availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
             return availableFormat;
         }
     }
 
+    // if all else fails, just return what's available
     return availableFormats[0];
 }
 
