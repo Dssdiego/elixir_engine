@@ -54,6 +54,11 @@ struct CVulkanRendererImpl
     VkExtent2D vkSwapChainExtent;
 
     std::vector<VkImageView> vkSwapChainImageViews;
+    std::vector<VkFramebuffer> vkSwapChainFrameBuffers;
+
+    VkImage vkDepthImage;
+    VkDeviceMemory vkDepthImageMemory;
+    VkImageView vkDepthImageView;
 
     VkDescriptorSetLayout vkDescriptorSetLayout;
 
@@ -75,9 +80,13 @@ struct CVulkanRendererImpl
     VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
     VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
     VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+    void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
+                     VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image,
+                     VkDeviceMemory& imageMemory);
     VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
     VkFormat FindDepthFormat();
     VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+    uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
     // Methods
