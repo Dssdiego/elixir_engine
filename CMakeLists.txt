@@ -10,6 +10,7 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(thirdparty/glfw)
 add_subdirectory(thirdparty/lua)
 add_subdirectory(thirdparty/imgui)
+add_subdirectory(thirdparty/tracy)
 
 # Vulkan
 find_package(Vulkan REQUIRED)
@@ -83,6 +84,7 @@ if(WIN32)
             OpenGL::GL
             lua_lib
             imgui
+            TracyClient
             ${FMOD_LIBRARY}
     )
 else()
@@ -93,6 +95,7 @@ else()
             OpenGL::GL
             lua_lib
             imgui
+            TracyClient
             ${FMOD_LIBRARY}
     )
 endif()

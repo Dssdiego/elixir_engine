@@ -10,6 +10,8 @@
 #include "../gui/EditorInterface.h"
 #include "../profiling/Logger.h"
 #include "../scenes/SceneSystem.h"
+#include "tracy/Tracy.hpp"
+
 
 /*
  * Methods
@@ -36,6 +38,8 @@ void CGame::Run()
         Draw();
 
         CAudioEngine::Update();
+
+        FrameMark;
     }
 }
 
