@@ -2,6 +2,7 @@
 // Created by Diego S. Seabra on 08/03/22.
 //
 
+#include <Tracy.hpp>
 #include "Game.h"
 #include "../audio/AudioEngine.h"
 #include "../input/Input.h"
@@ -10,7 +11,6 @@
 #include "../gui/EditorInterface.h"
 #include "../profiling/Logger.h"
 #include "../scenes/SceneSystem.h"
-#include "tracy/Tracy.hpp"
 
 
 /*

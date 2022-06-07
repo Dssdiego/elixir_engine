@@ -2,6 +2,7 @@
 // Created by Diego S. Seabra on 10/05/22.
 //
 
+#include <Tracy.hpp>
 #include "EditorInterface.h"
 #include "../profiling/Logger.h"
 #include "../rendering/Window.h"
@@ -18,6 +19,7 @@ void CEditorInterface::Init()
 
 void CEditorInterface::Draw()
 {
+    ZoneScopedC(0x34495e);
     // TODO: Implement
 //    ImGui_ImplVulkan_NewFrame();
 //    ImGui_ImplGlfw_NewFrame();

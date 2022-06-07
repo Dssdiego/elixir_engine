@@ -9,6 +9,7 @@
 #endif
 
 #include <cstring>
+#include <TracyVulkan.hpp>
 #include "VulkanRenderer.h"
 #include "Window.h"
 #include "../profiling/Logger.h"
@@ -53,6 +54,11 @@ void CVulkanRenderer::Init()
 void CVulkanRenderer::Draw()
 {
     // TODO: Implement drawing
+
+    // TODO: Add tracy zone for vulkan drawing
+//    vkBeginCommandBuffer(cmd, &beginInfo);
+//    TracyVkZone(ctx, cmd, "Render");
+//    vkEndCommandBuffer(cmd);
 }
 
 void CVulkanRenderer::Shutdown()

@@ -2,6 +2,7 @@
 // Created by Diego S. Seabra on 14/03/22.
 //
 
+#include <Tracy.hpp>
 #include "Renderer.h"
 #include "DirectXRenderer.h"
 #include "../profiling/Logger.h"
@@ -35,6 +36,7 @@ void CRenderer::Init(SBackend backend)
 
 void CRenderer::Draw()
 {
+    ZoneScopedC(0x9b59b6);
     // FIXME: Using vulkan as default backend for now. This should be dynamic and follow the current backend
     CVulkanRenderer::Draw();
 }

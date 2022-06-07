@@ -7,6 +7,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
+#include <Tracy.hpp>
 
 SWindowImpl* mWindowImpl = nullptr;
 
@@ -74,6 +75,7 @@ void CWindow::Init(SEngineConfig* pConfig)
 
 void CWindow::Update()
 {
+    ZoneScopedC(0x2ecc71);
     glfwPollEvents();
 }
 
