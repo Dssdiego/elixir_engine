@@ -9,8 +9,8 @@
 #endif
 
 #include <cstring>
-#include <TracyVulkan.hpp>
 #include "VulkanRenderer.h"
+#include <TracyVulkan.hpp>
 #include "Window.h"
 #include "../profiling/Logger.h"
 #include "Vertex.h"
