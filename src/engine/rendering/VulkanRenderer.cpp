@@ -54,6 +54,7 @@ void CVulkanRenderer::Init()
 void CVulkanRenderer::Draw()
 {
     // TODO: Implement drawing
+    mVulkanRendererImpl->DrawFrame();
 
     // TODO: Add tracy zone for vulkan drawing
 //    vkBeginCommandBuffer(cmd, &beginInfo);
@@ -1160,6 +1161,115 @@ void CVulkanRendererImpl::CreateSemaphores()
     }
 }
 
+void CVulkanRendererImpl::DrawFrame()
+{
+    CLogger::Debug("Draw frame (start)");
+
+    // waiting for fence synchronization (CPU <-> GPU)
+    vkWaitForFences(vkContext.logicalDevice, 1, &commandBufferFences[currentFrame], VK_TRUE, UINT64_MAX);
+
+    // acquiring an image from the swap chain
+    uint32_t imageIndex;
+    VkResult result = vkAcquireNextImageKHR(vkContext.logicalDevice, vkSwapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR) // swap chain out of date (can happen on window resize)
+    {
+        RecreateSwapChain();
+        return;
+    } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+    {
+        // REVIEW: Should this be a runtime error?
+        throw std::runtime_error("failed to acquire swap chain image");
+    }
+
+    // TODO: Implement uniform buffer
+//    UpdateUniformBuffer();
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+    VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[currentFrame] };
+    VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+
+    submitInfo.waitSemaphoreCount = 1;
+    submitInfo.pWaitSemaphores = waitSemaphores;
+    submitInfo.pWaitDstStageMask = waitStages;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &vkContext.commandBuffers[imageIndex]; // which command buffers to actually submit for execution
+
+    VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[currentFrame] };
+    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.pSignalSemaphores = signalSemaphores; // which semaphore to signal once the command buffer(s) have finished execution
+
+    vkResetFences(vkContext.logicalDevice, 1, &commandBufferFences[currentFrame]);
+    if (vkQueueSubmit(vkContext.graphicsQueue, 1, &submitInfo, commandBufferFences[currentFrame]) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to submit draw command buffer");
+    }
+
+    // submitting the result back to the swap chain to have it eventually show up on the screen
+    VkPresentInfoKHR presentInfo{};
+    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.waitSemaphoreCount = 1;
+    presentInfo.pWaitSemaphores = signalSemaphores; // which semaphores to wait on before presentation can happen
+
+    VkSwapchainKHR swapChains[] = { vkSwapChain };
+    presentInfo.swapchainCount = 1;
+    presentInfo.pSwapchains = swapChains;
+    presentInfo.pImageIndices = &imageIndex;
+    presentInfo.pResults = nullptr; // optional, allows to check for every individual swap chain if presentation was successful
+
+    // submitting the request to present an image to the swap chain
+    result = vkQueuePresentKHR(vkContext.presentQueue, &presentInfo);
+
+//    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) // TODO: For window resizing
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+    {
+//        framebufferResized = false; // TODO: For window resizing
+        RecreateSwapChain();
+    } else if (result != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to present swap chain image");
+    }
+
+    // waiting for work to finish right after submitting it
+    vkQueueWaitIdle(vkContext.presentQueue);
+
+    // advance current frame
+    currentFrame = (currentFrame + 1) % NUM_FRAME_DATA;
+
+    CLogger::Debug("Draw frame (end)");
+}
+
+void CVulkanRendererImpl::RecreateSwapChain()
+{
+    CLogger::Debug("Recreating swap chain...");
+    int width, height = 0;
+    glfwGetFramebufferSize(CWindow::GetWindow(), &width, &height);
+    while (width == 0 || height == 0) // window is minimized, wait for it to be on the foreground again
+    {
+        glfwGetFramebufferSize(CWindow::GetWindow(), &width, &height);
+        glfwWaitEvents();
+    }
+
+    // don't touch resources that may still be in use
+    vkDeviceWaitIdle(vkContext.logicalDevice);
+
+    // cleanup
+    CleanupSwapChain();
+
+    // effectively recreation of the swap chain
+    CreateSwapChain();
+    CreateImageViews();
+    CreateRenderPass();
+    CreateGraphicsPipeline();
+    CreateDepthResources();
+    CreateFramebuffers();
+    CreateUniformBuffers();
+    CreateDescriptorPool();
+    CreateDescriptorSets();
+    CreateCommandBuffer();
+}
+
 void CVulkanRendererImpl::CleanupSwapChain()
 {
     for (auto framebuffer : vkSwapChainFrameBuffers)
@@ -1187,9 +1297,4 @@ void CVulkanRendererImpl::CleanupSwapChain()
 
     vkDestroyDescriptorPool(vkContext.logicalDevice, vkContext.descriptorPool, nullptr);
 }
-
-
-
-
-
 

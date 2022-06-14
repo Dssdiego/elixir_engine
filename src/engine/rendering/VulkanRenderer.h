@@ -72,6 +72,8 @@ struct CVulkanRendererImpl
 
     std::vector<VkFence> commandBufferFences;
 
+    size_t currentFrame = 0;
+
     // Auxiliary Methods
     bool CheckValidationLayerSupport();
     bool IsDeviceSuitable(VkPhysicalDevice device);
@@ -114,6 +116,12 @@ struct CVulkanRendererImpl
     void CreateSemaphores();
 
     void CleanupSwapChain();
+
+    void RecreateSwapChain();
+
+    void DrawFrame();
+//    void StartFrame();
+//    void EndFrame();
 };
 
 

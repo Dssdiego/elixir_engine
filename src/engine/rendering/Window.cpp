@@ -29,7 +29,7 @@ SWindowImpl::SWindowImpl(SEngineConfig* pConfig)
         CLogger::Info("glfw window created successfully");
 
     glfwSetWindowUserPointer(window, this);
-//    glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+//    glfwSetFramebufferSizeCallback(window, WindowResized);
 //    glfwSetWindowSizeLimits(window, 480, 320, GLFW_DONT_CARE, GLFW_DONT_CARE);
 //    glfwSetKeyCallback(window, keyCallback);
 
@@ -98,6 +98,3 @@ GLFWwindow *CWindow::GetWindow()
 {
     return mWindowImpl->window;
 }
-
-
-

@@ -33,7 +33,7 @@ public:
     static GLFWwindow* GetWindow();
 
 private:
-    void LoadCusor();
+    void LoadCursor();
     void Resize();
 
 };
