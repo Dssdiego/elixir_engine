@@ -66,7 +66,7 @@ void CEditorInterfaceImpl::InitializeImGui()
     imguiInfo.Instance = vkContext.instance;
     imguiInfo.PhysicalDevice = vkContext.physicalDevice;
     imguiInfo.Device = vkContext.logicalDevice;
-    imguiInfo.QueueFamily = vkContext.graphicsFamilyIdx;
+    imguiInfo.QueueFamily = vkContext.graphicsFamilyIdx.value();
     imguiInfo.Queue = vkContext.graphicsQueue;
     imguiInfo.DescriptorPool = vkContext.descriptorPool;
     imguiInfo.MinImageCount = vkContext.swapChainImageCount;

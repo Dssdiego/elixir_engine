@@ -7,6 +7,7 @@
 
 #include <vulkan/vulkan.h>
 #include <vector>
+#include <optional>
 
 struct SVulkanContext {
     // instance
@@ -19,8 +20,8 @@ struct SVulkanContext {
     // queues and indices
     VkQueue graphicsQueue;
     VkQueue presentQueue;
-    uint32_t graphicsFamilyIdx;
-    uint32_t presentFamilyIdx;
+    std::optional<uint32_t> graphicsFamilyIdx;
+    std::optional<uint32_t> presentFamilyIdx;
 
     // format
     VkFormat depthFormat;
