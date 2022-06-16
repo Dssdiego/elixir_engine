@@ -54,7 +54,7 @@ void CVulkanRenderer::Init()
 void CVulkanRenderer::Draw()
 {
     // TODO: Implement drawing
-    mVulkanRendererImpl->DrawFrame();
+//    mVulkanRendererImpl->DrawFrame();
 
     // TODO: Add tracy zone for vulkan drawing
 //    vkBeginCommandBuffer(cmd, &beginInfo);
@@ -65,6 +65,16 @@ void CVulkanRenderer::Draw()
 void CVulkanRenderer::Shutdown()
 {
     delete mVulkanRendererImpl;
+}
+
+VkCommandBuffer CVulkanRenderer::BeginSingleTimeCommands()
+{
+    return mVulkanRendererImpl->BeginSingleTimeCommands();
+}
+
+void CVulkanRenderer::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
+{
+    mVulkanRendererImpl->EndSingleTimeCommands(commandBuffer);
 }
 
 /*
@@ -1184,7 +1194,7 @@ void CVulkanRendererImpl::DrawFrame()
     // TODO: Implement uniform buffer
 //    UpdateUniformBuffer();
 
-    VkSubmitInfo submitInfo{};
+    VkSubmitInfo submitInfo {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
     VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[currentFrame] };
@@ -1296,5 +1306,39 @@ void CVulkanRendererImpl::CleanupSwapChain()
 //    }
 
     vkDestroyDescriptorPool(vkContext.logicalDevice, vkContext.descriptorPool, nullptr);
+}
+
+VkCommandBuffer CVulkanRendererImpl::BeginSingleTimeCommands()
+{
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = vkCommandPool;
+    allocInfo.commandBufferCount = 1;
+
+    VkCommandBuffer commandBuffer;
+    vkAllocateCommandBuffers(vkContext.logicalDevice, &allocInfo, &commandBuffer);
+
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+    return commandBuffer;
+}
+
+void CVulkanRendererImpl::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
+{
+    vkEndCommandBuffer(commandBuffer);
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    vkQueueSubmit(vkContext.graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(vkContext.graphicsQueue);
+    vkFreeCommandBuffers(vkContext.logicalDevice, vkCommandPool, 1, &commandBuffer);
 }
 

@@ -91,6 +91,10 @@ struct CVulkanRendererImpl
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
+    // command buffer single time commands
+    VkCommandBuffer BeginSingleTimeCommands();
+    void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
+
     // Methods
     void CreateInstance();
     void SetupDebugMessenger();
@@ -131,6 +135,10 @@ public:
     static void Init();
     static void Draw();
     static void Shutdown();
+
+    // command buffer single time commands
+    static VkCommandBuffer BeginSingleTimeCommands();
+    static void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
 };
 
 

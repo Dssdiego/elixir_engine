@@ -7,6 +7,7 @@
 #include "../profiling/Logger.h"
 #include "../rendering/Window.h"
 #include "../rendering/VulkanContext.h"
+#include "../rendering/VulkanRenderer.h"
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
@@ -75,6 +76,12 @@ void CEditorInterfaceImpl::InitializeImGui()
 
     // Init ImGui for Vulkan
     ImGui_ImplVulkan_Init(&imguiInfo, vkContext.renderPass);
+
+    // create fonts texture in the GPU
+    VkCommandBuffer commandBuffer = CVulkanRenderer::BeginSingleTimeCommands();
+    ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
+    CVulkanRenderer::EndSingleTimeCommands(commandBuffer);
+
     CLogger::Debug("Initialized imgui for vulkan");
 
     // TODO: Allocate a command buffer
