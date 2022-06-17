@@ -22,7 +22,7 @@ Game Engine being created in C++ from scratch using Vulkan, GLFW, ImGUI and FMOD
   - Mouse
   - Gamepad/Joystick
 - Scripting
-  - Basic lua integration
+  - Basic lua integration (script reading) ✅
   - Run lua code at runtime
 - Tools
   - File logging (debugging info) ✅
