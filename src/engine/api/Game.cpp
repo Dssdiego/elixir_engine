@@ -11,6 +11,7 @@
 #include "../gui/EditorInterface.h"
 #include "../profiling/Logger.h"
 #include "../scenes/SceneSystem.h"
+#include "../sdks/GeforceNow.h"
 
 
 /*
@@ -26,6 +27,7 @@ void CGame::Init(SEngineConfig* pConfig)
     CInput::Init();
     CRenderer::Init(SBackend::VULKAN);
     CEditorInterface::Init();
+//    CGeforceNow::Init();
 }
 
 void CGame::Run()
@@ -55,6 +57,7 @@ void CGame::Cleanup()
     // destroy engine systems
     CSceneSystem::Shutdown();
     CEditorInterface::Shutdown();
+//    CGeforceNow::Shutdown();
     CRenderer::Shutdown();
     CInput::Shutdown();
     CAudioEngine::Shutdown();

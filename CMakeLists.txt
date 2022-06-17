@@ -46,17 +46,30 @@ else()
 
 endif()
 
+# Geforce NOW
+set(GEFORCE_NOW_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/thirdparty/geforce_now/include")
+#set(GEFORCE_NOW_LIBRARY
+#        "${CMAKE_SOURCE_DIR}/thirdparty/geforce_now/lib/x64/GfnRuntimeSdk.dll"
+#        )
+file(COPY
+        "${CMAKE_SOURCE_DIR}/thirdparty/geforce_now/lib/x64/GfnRuntimeSdk.dll"
+        DESTINATION ${CMAKE_BINARY_DIR})
+#add_library(GEFORCE_NOW_LIBRARY SHARED thirdparty/geforce_now/lib/x64/GfnRuntimeSdk.dll)
+#set_target_properties(GEFORCE_NOW_LIBRARY PROPERTIES LINKER_LANGUAGE C)
+
 # Messages
 message("Libraries:")
 message(VULKAN_INCLUDE_DIRS: ${Vulkan_INCLUDE_DIRS})
 message(VULKAN_LIB: ${Vulkan_LIBRARIES})
 message(OPENGL_LIBRARIES: ${OPENGL_LIBRARIES})
-message(FMOD LIBRARY: ${FMOD_LIBRARY})
+message(FMOD_LIBRARY: ${FMOD_LIBRARY})
+message(GEFORCE_NOW_LIBRARY: ${GEFORCE_NOW_LIBRARY})
 
 # include directories
 include_directories(
         thirdparty
         ${FMOD_INCLUDE_DIR}
+        ${GEFORCE_NOW_INCLUDE_DIR}
 )
 
 # load source and header files
