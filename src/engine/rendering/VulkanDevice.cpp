@@ -7,6 +7,7 @@
 //
 // Constructor/Destructor
 //
+
 VulkanDevice::VulkanDevice()
 {
     CreateInstance();
@@ -25,6 +26,7 @@ VulkanDevice::~VulkanDevice()
 //
 // Methods
 //
+
 void VulkanDevice::CreateInstance()
 {
     if (enableValidationLayers && !CheckValidationLayerSupport())
@@ -84,6 +86,37 @@ void VulkanDevice::CreateInstance()
 //
 // Helpers
 //
+
+bool VulkanDevice::CheckValidationLayerSupport()
+{
+    uint32_t layerCount;
+    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+    std::vector<VkLayerProperties> availableLayers(layerCount);
+    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+    for (const char* layerName: validationLayers)
+    {
+        bool layerFound = false;
+
+        for (const auto& layerProperties: availableLayers)
+        {
+            if (strcmp(layerName, layerProperties.layerName) == 0)
+            {
+                layerFound = true;
+                break;
+            }
+        }
+
+        if (!layerFound)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 SwapChainSupportDetails VulkanDevice::QuerySwapChainSupport(VkPhysicalDevice device)
 {
     // querying basic surface capabilities
@@ -116,5 +149,3 @@ SwapChainSupportDetails VulkanDevice::QuerySwapChainSupport(VkPhysicalDevice dev
 
     return details;
 }
-
-

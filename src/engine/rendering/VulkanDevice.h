@@ -50,49 +50,49 @@ public:
     VkQueue GetGraphicsQueue() { return graphicsQueue; }
     VkQueue GetPresentQueue() { return presentQueue; }
 
-    SwapChainSupportDetails GetSwapChainSupport() { return QuerySwapChainSupport(physicalDevice); }
-    uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-    QueueFamilyIndices FindPhysicalQueueFamilies() { return FindQueueFamilies(physicalDevice); }
-    VkFormat FindSupportedFormat(
-            const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
-
-    // Buffer Helper Functions
-    void CreateBuffer(
-            VkDeviceSize size,
-            VkBufferUsageFlags usage,
-            VkMemoryPropertyFlags properties,
-            VkBuffer &buffer,
-            VkDeviceMemory &bufferMemory);
-    VkCommandBuffer beginSingleTimeCommands();
-    void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
-    void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-    void CopyBufferToImage(
-            VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount);
-
-    void CreateImageWithInfo(
-            const VkImageCreateInfo &imageInfo,
-            VkMemoryPropertyFlags properties,
-            VkImage &image,
-            VkDeviceMemory &imageMemory);
+//    SwapChainSupportDetails GetSwapChainSupport() { return QuerySwapChainSupport(physicalDevice); }
+//    uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+//    QueueFamilyIndices FindPhysicalQueueFamilies() { return FindQueueFamilies(physicalDevice); }
+//    VkFormat FindSupportedFormat(
+//            const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+//
+//    // Buffer Helper Functions
+//    void CreateBuffer(
+//            VkDeviceSize size,
+//            VkBufferUsageFlags usage,
+//            VkMemoryPropertyFlags properties,
+//            VkBuffer &buffer,
+//            VkDeviceMemory &bufferMemory);
+//    VkCommandBuffer beginSingleTimeCommands();
+//    void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
+//    void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+//    void CopyBufferToImage(
+//            VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount);
+//
+//    void CreateImageWithInfo(
+//            const VkImageCreateInfo &imageInfo,
+//            VkMemoryPropertyFlags properties,
+//            VkImage &image,
+//            VkDeviceMemory &imageMemory);
 
     VkPhysicalDeviceProperties properties{};
 
 private:
     void CreateInstance();
-    void SetupDebugMessenger();
-    void CreateSurface();
-    void PickPhysicalDevice();
-    void CreateLogicalDevice();
-    void CreateCommandPool();
+//    void SetupDebugMessenger();
+//    void CreateSurface();
+//    void PickPhysicalDevice();
+//    void CreateLogicalDevice();
+//    void CreateCommandPool();
 
     // helper functions
-    bool IsDeviceSuitable(VkPhysicalDevice device);
-    std::vector<const char *> GetRequiredExtensions();
+//    bool IsDeviceSuitable(VkPhysicalDevice device);
+//    std::vector<const char *> GetRequiredExtensions();
     bool CheckValidationLayerSupport();
-    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
-    void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
-    void HasGflwRequiredInstanceExtensions();
-    bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
+//    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
+//    void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
+//    void HasGflwRequiredInstanceExtensions();
+//    bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
 
     // variables
