@@ -6,6 +6,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2.0.0
+      - name: Update Ubuntu
+        run: sudo apt-get update
       - name: Download and Install GLFW
         run: sudo apt-get install xorg-dev libglfw3 libglfw3-dev
       - name: Build Project

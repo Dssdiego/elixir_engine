@@ -11,6 +11,7 @@
 #include "VulkanCommon.h"
 #include "../profiling/Logger.h"
 #include "../config.h"
+#include <cstring>
 
 struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities;
