@@ -44,7 +44,7 @@ struct CAudioEngineImpl
     ChannelMap mChannels;
 };
 
-class CAudioEngine
+class AudioEngine
 {
 public:
     static void Init();

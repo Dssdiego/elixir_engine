@@ -10,7 +10,7 @@
 #include <fstream>
 #include <vulkan/vulkan.h>
 
-class CShader
+class Shader
 {
 public:
     static std::vector<char> ReadFile(const std::string& filename);

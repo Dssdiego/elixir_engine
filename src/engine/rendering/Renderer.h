@@ -5,17 +5,17 @@
 #ifndef VULKAN_ENGINE_RENDERER_H
 #define VULKAN_ENGINE_RENDERER_H
 
-enum SBackend
+enum GraphicsBackend
 {
     DIRECTX,
     VULKAN,
     OPENGL
 };
 
-class CRenderer
+class Renderer
 {
 public:
-    static void Init(SBackend backend);
+    static void Init(GraphicsBackend backend);
     static void Draw();
     static void Shutdown();
 };

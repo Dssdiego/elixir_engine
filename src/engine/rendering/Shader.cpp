@@ -4,7 +4,7 @@
 
 #include "Shader.h"
 
-std::vector<char> CShader::ReadFile(const std::string &filename)
+std::vector<char> Shader::ReadFile(const std::string &filename)
 {
     std::ifstream file(filename, std::ios::ate | std::ios::binary);
 

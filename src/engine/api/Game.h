@@ -8,10 +8,10 @@
 #include <string>
 #include "../common/structs.h"
 
-class CGame
+class Game
 {
 public:
-    void Init(SEngineConfig* pConfig); // initializes everything in the engine
+    void Init(EngineConfig* pConfig); // initializes everything in the engine
     void Run();  // main loop
     void Draw(); // draw loop
     void Cleanup(); // shuts down the engine

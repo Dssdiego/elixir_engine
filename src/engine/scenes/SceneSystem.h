@@ -7,7 +7,7 @@
 
 #include <entt/entt.hpp>
 
-class CSceneSystem
+class SceneSystem
 {
 public:
     static void Init();

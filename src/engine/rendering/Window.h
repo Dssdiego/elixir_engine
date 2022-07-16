@@ -9,10 +9,10 @@
 #include <GLFW/glfw3.h>
 #include "../common/structs.h"
 
-struct SWindowImpl
+struct WindowImpl
 {
-    SWindowImpl(SEngineConfig* pConfig);
-    ~SWindowImpl();
+    WindowImpl(EngineConfig* pConfig);
+    ~WindowImpl();
 
     GLFWwindow* window;
 
@@ -24,12 +24,12 @@ struct SWindowImpl
 class CWindow
 {
 public:
-    static void Init(SEngineConfig* pConfig);
+    static void Init(EngineConfig* pConfig);
     static void Update();
     static void Shutdown();
 
     static bool ShouldCloseWindow();
-    static SWindowSize GetSize();
+    static WindowSize GetSize();
     static GLFWwindow* GetWindow();
 
 private:

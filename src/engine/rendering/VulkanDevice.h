@@ -8,6 +8,9 @@
 #include <vulkan/vulkan.h>
 #include <vector>
 #include "Window.h"
+#include "VulkanCommon.h"
+#include "../profiling/Logger.h"
+#include "../config.h"
 
 struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities;
@@ -47,10 +50,10 @@ public:
     VkQueue GetGraphicsQueue() { return graphicsQueue; }
     VkQueue GetPresentQueue() { return presentQueue; }
 
-    SwapChainSupportDetails getSwapChainSupport() { return querySwapChainSupport(physicalDevice); }
-    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-    QueueFamilyIndices findPhysicalQueueFamilies() { return findQueueFamilies(physicalDevice); }
-    VkFormat findSupportedFormat(
+    SwapChainSupportDetails GetSwapChainSupport() { return QuerySwapChainSupport(physicalDevice); }
+    uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+    QueueFamilyIndices FindPhysicalQueueFamilies() { return FindQueueFamilies(physicalDevice); }
+    VkFormat FindSupportedFormat(
             const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 
     // Buffer Helper Functions
@@ -72,7 +75,7 @@ public:
             VkImage &image,
             VkDeviceMemory &imageMemory);
 
-    VkPhysicalDeviceProperties properties;
+    VkPhysicalDeviceProperties properties{};
 
 private:
     void CreateInstance();
@@ -86,22 +89,22 @@ private:
     bool IsDeviceSuitable(VkPhysicalDevice device);
     std::vector<const char *> GetRequiredExtensions();
     bool CheckValidationLayerSupport();
-    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
     void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
     void HasGflwRequiredInstanceExtensions();
     bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
-    SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+    SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
 
-    VkInstance instance;
-    VkDebugUtilsMessengerEXT debugMessenger;
+    // variables
+    VkInstance instance{};
+    VkDebugUtilsMessengerEXT debugMessenger{};
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-    CWindow &window;
-    VkCommandPool commandPool;
+    VkCommandPool commandPool{};
 
-    VkDevice device;
-    VkSurfaceKHR surface;
-    VkQueue graphicsQueue;
-    VkQueue presentQueue;
+    VkDevice device{};
+    VkSurfaceKHR surface{};
+    VkQueue graphicsQueue{};
+    VkQueue presentQueue{};
 
     const std::vector<const char *> validationLayers = { "VK_LAYER_KHRONOS_validation" };
     const std::vector<const char *> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };

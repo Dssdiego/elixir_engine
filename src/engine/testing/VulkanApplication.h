@@ -1798,8 +1798,8 @@ private:
     void mainLoop()
     {
         PROFILE_FUNCTION();
-        CAudioEngine::Init();
-        CInput::Init();
+        AudioEngine::Init();
+        Input::Init();
 //        CAudioEngine engine;
 //        engine.PlaySoundFile("../../assets/audio/test_audio.mp3", Vector3{0.0f, 0.0f, 0.0f}, engine.VolumeTodB(1.0f));
 //        engine.LoadBank("../../assets/audio/Master.bank", NULL);
@@ -1812,14 +1812,14 @@ private:
             glfwPollEvents();
             drawFrame();
 
-            CAudioEngine::Update();
+            AudioEngine::Update();
         }
 
         // waiting for the logical device to finish operations before exiting and destroying the window
         vkDeviceWaitIdle(device);
 
-        CAudioEngine::Shutdown();
-        CInput::Shutdown();
+        AudioEngine::Shutdown();
+        Input::Shutdown();
     }
 
     void drawFrame()

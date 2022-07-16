@@ -8,8 +8,8 @@
 
 int main()
 {
-    CGame game;
-    SEngineConfig config {
+    Game game;
+    EngineConfig config {
             "My Game",
             {800, 600},
             {320, 240},

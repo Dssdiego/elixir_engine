@@ -5,7 +5,7 @@
 #ifndef VULKAN_ENGINE_OPENGLRENDERER_H
 #define VULKAN_ENGINE_OPENGLRENDERER_H
 
-class COpenGLRenderer
+class OpenGLRenderer
 {
 
 };

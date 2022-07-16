@@ -19,7 +19,7 @@ struct CEditorInterfaceImpl
     void InitializeImGui();
 };
 
-class CEditorInterface
+class EditorInterface
 {
 public:
     static void Init();

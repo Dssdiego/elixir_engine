@@ -13,12 +13,12 @@
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
 CEditorInterfaceImpl* mEditorInterfaceImpl = nullptr;
 
-void CEditorInterface::Init()
+void EditorInterface::Init()
 {
     mEditorInterfaceImpl = new CEditorInterfaceImpl;
 }
 
-void CEditorInterface::Draw()
+void EditorInterface::Draw()
 {
     ZoneScopedC(0x34495e);
     // TODO: Implement
@@ -29,21 +29,21 @@ void CEditorInterface::Draw()
 //    ImGui::ShowDemoWindow();
 }
 
-void CEditorInterface::Shutdown()
+void EditorInterface::Shutdown()
 {
     delete mEditorInterfaceImpl;
 }
 
 CEditorInterfaceImpl::CEditorInterfaceImpl()
 {
-    CLogger::Info("Initializing editor interface");
+    Logger::Info("Initializing editor interface");
 
     InitializeImGui();
 }
 
 CEditorInterfaceImpl::~CEditorInterfaceImpl()
 {
-    CLogger::Info("Shutting down editor interface");
+    Logger::Info("Shutting down editor interface");
 
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -82,7 +82,7 @@ void CEditorInterfaceImpl::InitializeImGui()
     ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
     CVulkanRenderer::EndSingleTimeCommands(commandBuffer);
 
-    CLogger::Debug("Initialized imgui for vulkan");
+    Logger::Debug("Initialized imgui for vulkan");
 
     // TODO: Allocate a command buffer
     // TODO: Record the command buffer

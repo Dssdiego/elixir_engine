@@ -59,7 +59,7 @@ struct CDirectXRendererImpl
 #endif
 };
 
-class CDirectXRenderer
+class DirectXRenderer
 {
 public:
     static void Init();

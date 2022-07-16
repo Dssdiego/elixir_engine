@@ -11,20 +11,20 @@ CAudioEngineImpl* mImplementation = nullptr;
 CAudioEngineImpl::CAudioEngineImpl()
 {
     mStudioSystem = nullptr;
-    CAudioEngine::ErrorCheck(FMOD::Studio::System::create(&mStudioSystem));
-    CAudioEngine::ErrorCheck(mStudioSystem->initialize(32,
-                                                       FMOD_STUDIO_INIT_LIVEUPDATE,
-                                                       FMOD_INIT_PROFILE_ENABLE,
-                                                       nullptr));
+    AudioEngine::ErrorCheck(FMOD::Studio::System::create(&mStudioSystem));
+    AudioEngine::ErrorCheck(mStudioSystem->initialize(32,
+                                                      FMOD_STUDIO_INIT_LIVEUPDATE,
+                                                      FMOD_INIT_PROFILE_ENABLE,
+                                                      nullptr));
 
     mSystem = nullptr;
-    CAudioEngine::ErrorCheck(mStudioSystem->getCoreSystem(&mSystem));
+    AudioEngine::ErrorCheck(mStudioSystem->getCoreSystem(&mSystem));
 }
 
 CAudioEngineImpl::~CAudioEngineImpl()
 {
-    CAudioEngine::ErrorCheck(mStudioSystem->unloadAll());
-    CAudioEngine::ErrorCheck(mStudioSystem->release());
+    AudioEngine::ErrorCheck(mStudioSystem->unloadAll());
+    AudioEngine::ErrorCheck(mStudioSystem->release());
 }
 
 void CAudioEngineImpl::Update()
@@ -48,41 +48,41 @@ void CAudioEngineImpl::Update()
     }
 
     // update the fmod system object
-    CAudioEngine::ErrorCheck(mStudioSystem->update());
+    AudioEngine::ErrorCheck(mStudioSystem->update());
 }
 
-void CAudioEngine::Init()
+void AudioEngine::Init()
 {
-    CLogger::Info("Initializing audio engine");
+    Logger::Info("Initializing audio engine");
     PROFILE_FUNCTION();
     mImplementation = new CAudioEngineImpl;
 }
 
-void CAudioEngine::Update()
+void AudioEngine::Update()
 {
     PROFILE_FUNCTION();
     mImplementation->Update();
 }
 
-void CAudioEngine::Shutdown()
+void AudioEngine::Shutdown()
 {
-    CLogger::Info("Shutting down audio engine");
+    Logger::Info("Shutting down audio engine");
     PROFILE_FUNCTION();
     delete mImplementation;
 }
 
-int CAudioEngine::ErrorCheck(FMOD_RESULT result)
+int AudioEngine::ErrorCheck(FMOD_RESULT result)
 {
     if (result != FMOD_OK)
     {
-        CLogger::Error("FMOD Error", (char *) result);
+        Logger::Error("FMOD Error", (char *) result);
         throw std::runtime_error("FMOD error");
     }
 
     return 0;
 }
 
-void CAudioEngine::LoadSound(const std::string &sSoundName, bool b3d, bool bLooping, bool bStream)
+void AudioEngine::LoadSound(const std::string &sSoundName, bool b3d, bool bLooping, bool bStream)
 {
     // check if the sound is loaded
     auto tFoundIt = mImplementation->mSounds.find(sSoundName);
@@ -96,14 +96,14 @@ void CAudioEngine::LoadSound(const std::string &sSoundName, bool b3d, bool bLoop
 
     // load the sound
     FMOD::Sound* sound = nullptr;
-    CAudioEngine::ErrorCheck(mImplementation->mSystem->createSound(sSoundName.c_str(), eMode, nullptr, &sound));
+    AudioEngine::ErrorCheck(mImplementation->mSystem->createSound(sSoundName.c_str(), eMode, nullptr, &sound));
     if (sound)
     {
         mImplementation->mSounds[sSoundName] = sound;
     }
 }
 
-void CAudioEngine::UnLoadSound(const std::string &sSoundName)
+void AudioEngine::UnLoadSound(const std::string &sSoundName)
 {
     // check if the sound is loaded
     auto foundIt = mImplementation->mSounds.find(sSoundName);
@@ -111,11 +111,11 @@ void CAudioEngine::UnLoadSound(const std::string &sSoundName)
         return;
 
     // unload the sound
-    CAudioEngine::ErrorCheck(foundIt->second->release());
+    AudioEngine::ErrorCheck(foundIt->second->release());
     mImplementation->mSounds.erase(foundIt);
 }
 
-int CAudioEngine::PlaySoundFile(const std::string &sSoundName, const Vector3 &vPosition, float fVolumedB)
+int AudioEngine::PlaySoundFile(const std::string &sSoundName, const Vector3 &vPosition, float fVolumedB)
 {
     // check if the sound is loaded
     int channelId = mImplementation->mNextChannelId++;
@@ -134,7 +134,7 @@ int CAudioEngine::PlaySoundFile(const std::string &sSoundName, const Vector3 &vP
 
     // play the sound in a new created channel
     FMOD::Channel* channel = nullptr;
-    CAudioEngine::ErrorCheck(mImplementation->mSystem->playSound(foundIt->second, nullptr, true, &channel));
+    AudioEngine::ErrorCheck(mImplementation->mSystem->playSound(foundIt->second, nullptr, true, &channel));
     if (channel)
     {
         FMOD_MODE currMode;
@@ -144,10 +144,10 @@ int CAudioEngine::PlaySoundFile(const std::string &sSoundName, const Vector3 &vP
         if (currMode & FMOD_3D)
         {
             FMOD_VECTOR fmodVector = VectorToFmod(vPosition);
-            CAudioEngine::ErrorCheck(channel->set3DAttributes(&fmodVector, nullptr));
+            AudioEngine::ErrorCheck(channel->set3DAttributes(&fmodVector, nullptr));
         }
-        CAudioEngine::ErrorCheck(channel->setVolume(dbToVolume(fVolumedB)));
-        CAudioEngine::ErrorCheck(channel->setPaused(false));
+        AudioEngine::ErrorCheck(channel->setVolume(dbToVolume(fVolumedB)));
+        AudioEngine::ErrorCheck(channel->setPaused(false));
 
         mImplementation->mChannels[channelId] = channel;
     }
@@ -155,27 +155,27 @@ int CAudioEngine::PlaySoundFile(const std::string &sSoundName, const Vector3 &vP
     return channelId;
 }
 
-void CAudioEngine::SetChannel3dPosition(int nChannelId, const Vector3 &vPosition)
+void AudioEngine::SetChannel3dPosition(int nChannelId, const Vector3 &vPosition)
 {
     auto foundIt = mImplementation->mChannels.find(nChannelId);
     if (foundIt == mImplementation->mChannels.end())
         return;
 
     FMOD_VECTOR position = VectorToFmod(vPosition);
-    CAudioEngine::ErrorCheck(foundIt->second->set3DAttributes(&position, nullptr));
+    AudioEngine::ErrorCheck(foundIt->second->set3DAttributes(&position, nullptr));
 }
 
-void CAudioEngine::SetChannelVolume(int nChannelId, float fVolumedB)
+void AudioEngine::SetChannelVolume(int nChannelId, float fVolumedB)
 {
     auto foundIt = mImplementation->mChannels.find(nChannelId);
     if (foundIt == mImplementation->mChannels.end())
         return;
 
-    CAudioEngine::ErrorCheck(foundIt->second->setVolume(fVolumedB));
+    AudioEngine::ErrorCheck(foundIt->second->setVolume(fVolumedB));
 }
 
 // banks are what stores all the sounds and informations for each FMOD event
-void CAudioEngine::LoadBank(const std::string &sBankName, FMOD_STUDIO_LOAD_BANK_FLAGS pflags)
+void AudioEngine::LoadBank(const std::string &sBankName, FMOD_STUDIO_LOAD_BANK_FLAGS pflags)
 {
     // check if the bank is loaded
     auto foundIt = mImplementation->mBanks.find(sBankName);
@@ -184,7 +184,7 @@ void CAudioEngine::LoadBank(const std::string &sBankName, FMOD_STUDIO_LOAD_BANK_
 
     // load the bank
     FMOD::Studio::Bank* bank;
-    CAudioEngine::ErrorCheck(mImplementation->mStudioSystem->loadBankFile(
+    AudioEngine::ErrorCheck(mImplementation->mStudioSystem->loadBankFile(
             sBankName.c_str(), pflags, &bank));
     if (bank)
     {
@@ -195,7 +195,7 @@ void CAudioEngine::LoadBank(const std::string &sBankName, FMOD_STUDIO_LOAD_BANK_
 // FMOD events have a description and an instance
 //   the description is the information and the instance is what actually plays the sound
 // FIXME: Only works with the GUID for now
-void CAudioEngine::LoadEvent(const std::string &sEventName)
+void AudioEngine::LoadEvent(const std::string &sEventName)
 {
     // check if the event is loaded
     auto foundIt = mImplementation->mEvents.find(sEventName);
@@ -203,12 +203,12 @@ void CAudioEngine::LoadEvent(const std::string &sEventName)
         return;
 
     FMOD::Studio::EventDescription* eventDescription = nullptr;
-    CAudioEngine::ErrorCheck(mImplementation->mStudioSystem->getEvent(sEventName.c_str(), &eventDescription));
+    AudioEngine::ErrorCheck(mImplementation->mStudioSystem->getEvent(sEventName.c_str(), &eventDescription));
 
     if (eventDescription)
     {
         FMOD::Studio::EventInstance* eventInstance = nullptr;
-        CAudioEngine::ErrorCheck(eventDescription->createInstance(&eventInstance));
+        AudioEngine::ErrorCheck(eventDescription->createInstance(&eventInstance));
         if (eventInstance)
         {
             mImplementation->mEvents[sEventName] = eventInstance;
@@ -217,7 +217,7 @@ void CAudioEngine::LoadEvent(const std::string &sEventName)
 }
 
 // FIXME: Only works with the GUID for now
-void CAudioEngine::PlayEvent(const std::string &sEventName)
+void AudioEngine::PlayEvent(const std::string &sEventName)
 {
     // check if the event is loaded
     auto foundIt = mImplementation->mEvents.find(sEventName);
@@ -235,7 +235,7 @@ void CAudioEngine::PlayEvent(const std::string &sEventName)
     foundIt->second->start();
 }
 
-void CAudioEngine::StopEvent(const std::string &sEventName, bool bImmediate)
+void AudioEngine::StopEvent(const std::string &sEventName, bool bImmediate)
 {
     // check if the event is loaded
     auto foundIt = mImplementation->mEvents.find(sEventName);
@@ -245,10 +245,10 @@ void CAudioEngine::StopEvent(const std::string &sEventName, bool bImmediate)
     // stop the event
     FMOD_STUDIO_STOP_MODE mode;
     mode = bImmediate ? FMOD_STUDIO_STOP_IMMEDIATE : FMOD_STUDIO_STOP_ALLOWFADEOUT;
-    CAudioEngine::ErrorCheck(foundIt->second->stop(mode));
+    AudioEngine::ErrorCheck(foundIt->second->stop(mode));
 }
 
-bool CAudioEngine::IsEventPlaying(const std::string &sEventName)
+bool AudioEngine::IsEventPlaying(const std::string &sEventName)
 {
     // check is the event is loaded
     auto foundIt = mImplementation->mEvents.find(sEventName);
@@ -263,36 +263,36 @@ bool CAudioEngine::IsEventPlaying(const std::string &sEventName)
     return false;
 }
 
-void CAudioEngine::GetEventParameter(const std::string &sEventName, const std::string &sEventParameter, float *fParameter)
+void AudioEngine::GetEventParameter(const std::string &sEventName, const std::string &sEventParameter, float *fParameter)
 {
     // check if the event is loaded
     auto foundIt = mImplementation->mEvents.find(sEventName);
     if (foundIt == mImplementation->mEvents.end())
         return;
 
-    CAudioEngine::ErrorCheck(foundIt->second->getParameterByName(sEventName.c_str(), fParameter, nullptr));
+    AudioEngine::ErrorCheck(foundIt->second->getParameterByName(sEventName.c_str(), fParameter, nullptr));
 }
 
-void CAudioEngine::SetEventParameter(const std::string &sEventName, const std::string &sParameterName, float fValue)
+void AudioEngine::SetEventParameter(const std::string &sEventName, const std::string &sParameterName, float fValue)
 {
     auto foundIt = mImplementation->mEvents.find(sEventName);
     if (foundIt == mImplementation->mEvents.end())
         return;
 
-    CAudioEngine::ErrorCheck(foundIt->second->setParameterByName(sEventName.c_str(), fValue));
+    AudioEngine::ErrorCheck(foundIt->second->setParameterByName(sEventName.c_str(), fValue));
 }
 
-float CAudioEngine::dbToVolume(float fdB)
+float AudioEngine::dbToVolume(float fdB)
 {
     return powf(10.0f, 0.05f * fdB);
 }
 
-float CAudioEngine::VolumeTodB(float fVolume)
+float AudioEngine::VolumeTodB(float fVolume)
 {
     return 20.0f * log10f(fVolume);
 }
 
-FMOD_VECTOR CAudioEngine::VectorToFmod(const Vector3 &vPosition)
+FMOD_VECTOR AudioEngine::VectorToFmod(const Vector3 &vPosition)
 {
     return FMOD_VECTOR{
             vPosition.x,

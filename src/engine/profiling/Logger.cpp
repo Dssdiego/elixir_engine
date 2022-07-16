@@ -8,7 +8,7 @@
 /*
  * INITIALIZATION
  */
-void CLogger::Init()
+void Logger::Init()
 {
     // REVIEW: This could be leaking memory!
     auto t = std::time(nullptr);
@@ -31,7 +31,7 @@ void CLogger::Init()
 /*
  * INFO
  */
-void CLogger::Info(std::string msg)
+void Logger::Info(std::string msg)
 {
 #ifdef SHOW_CONSOLE
 #if __linux__ || __APPLE__
@@ -48,7 +48,7 @@ void CLogger::Info(std::string msg)
 /*
  * WARNINGS
  */
-void CLogger::Warn(std::string msg)
+void Logger::Warn(std::string msg)
 {
 #ifdef SHOW_CONSOLE
 #if __linux__ || __APPLE__
@@ -65,7 +65,7 @@ void CLogger::Warn(std::string msg)
 /*
  * ERRORS
  */
-void CLogger::Error(std::string errMsg, std::string errParam)
+void Logger::Error(std::string errMsg, std::string errParam)
 {
 #ifdef SHOW_CONSOLE
 #if __linux__ || __APPLE__
@@ -82,7 +82,7 @@ void CLogger::Error(std::string errMsg, std::string errParam)
 /*
  * DEBUG
  */
-void CLogger::Debug(std::string msg)
+void Logger::Debug(std::string msg)
 {
 #ifdef SHOW_CONSOLE
 #if __linux__ || __APPLE__
@@ -99,7 +99,7 @@ void CLogger::Debug(std::string msg)
 /*
  * WRITE TO FILE
  */
-void CLogger::WriteToLogFile(std::string type, std::string msg)
+void Logger::WriteToLogFile(std::string type, std::string msg)
 {
     // REVIEW: This could be leaking memory!
     auto t = std::time(nullptr);

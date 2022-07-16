@@ -17,20 +17,20 @@
 /*
  * Methods
  */
-void CGame::Init(SEngineConfig* pConfig)
+void Game::Init(EngineConfig* pConfig)
 {
     // init engine systems
-    CLogger::Init();
-    CSceneSystem::Init();
+    Logger::Init();
+    SceneSystem::Init();
     CWindow::Init(pConfig);
-    CAudioEngine::Init();
-    CInput::Init();
-    CRenderer::Init(SBackend::VULKAN);
-    CEditorInterface::Init();
+    AudioEngine::Init();
+    Input::Init();
+    Renderer::Init(GraphicsBackend::VULKAN);
+    EditorInterface::Init();
 //    CGeforceNow::Init();
 }
 
-void CGame::Run()
+void Game::Run()
 {
     while(!CWindow::ShouldCloseWindow())
     {
@@ -39,28 +39,28 @@ void CGame::Run()
 
         Draw();
 
-        CAudioEngine::Update();
+        AudioEngine::Update();
 
         FrameMark;
     }
 }
 
-void CGame::Draw()
+void Game::Draw()
 {
     // REVIEW: Does the editor draws BEFORE or AFTER the gamne?
-    CEditorInterface::Draw();
-    CRenderer::Draw();
+    EditorInterface::Draw();
+    Renderer::Draw();
 }
 
-void CGame::Cleanup()
+void Game::Cleanup()
 {
     // destroy engine systems
-    CSceneSystem::Shutdown();
-    CEditorInterface::Shutdown();
+    SceneSystem::Shutdown();
+    EditorInterface::Shutdown();
 //    CGeforceNow::Shutdown();
-    CRenderer::Shutdown();
-    CInput::Shutdown();
-    CAudioEngine::Shutdown();
+    Renderer::Shutdown();
+    Input::Shutdown();
+    AudioEngine::Shutdown();
     CWindow::Shutdown();
 }
 

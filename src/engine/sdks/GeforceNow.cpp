@@ -5,9 +5,9 @@
 #include "GeforceNow.h"
 #include "../profiling/Logger.h"
 
-void CGeforceNow::Init()
+void GeforceNow::Init()
 {
-    CLogger::Debug("Initializing Geforce Now SDK");
+    Logger::Debug("Initializing Geforce Now SDK");
 
 //    GfnRuntimeError err = GfnInitializeSdk(gfnDefaultLanguage);
 //    if (GFNSDK_FAILED(err))
@@ -19,9 +19,9 @@ void CGeforceNow::Init()
 //    std::cout << "Geforce now init error: " << err << std::endl;
 }
 
-void CGeforceNow::Shutdown()
+void GeforceNow::Shutdown()
 {
-    CLogger::Debug("Shutting down Geforce Now SDK");
+    Logger::Debug("Shutting down Geforce Now SDK");
 
     // Shut down the Geforce NOW Runtime SDK. Note that it's safe to call
     // gfnShutdownRuntimeSdk even if the SDK was not initialized.

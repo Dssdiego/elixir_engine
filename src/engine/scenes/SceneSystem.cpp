@@ -4,12 +4,12 @@
 
 #include "SceneSystem.h"
 
-void CSceneSystem::Init()
+void SceneSystem::Init()
 {
     entt::registry registry;
 }
 
-void CSceneSystem::Shutdown()
+void SceneSystem::Shutdown()
 {
 
 }

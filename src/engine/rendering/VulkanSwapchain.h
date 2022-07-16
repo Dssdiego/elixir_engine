@@ -26,11 +26,11 @@ public:
 private:
     void Init();
     void CreateSwapChain();
-    void CreateImageViews();
-    void CreateRenderPass();
-    void CreateDepthResources();
-    void CreateFramebuffers();
-    void CreateSyncObjects();
+//    void CreateImageViews();
+//    void CreateRenderPass();
+//    void CreateDepthResources();
+//    void CreateFramebuffers();
+//    void CreateSyncObjects();
 };
 
 

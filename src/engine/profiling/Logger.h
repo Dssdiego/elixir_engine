@@ -45,7 +45,7 @@ const std::string WARN_STR = "WARN::";
 const std::string ERROR_STR = "ERROR::";
 const std::string DEBUG_STR = "DEBUG::";
 
-class CLogger
+class Logger
 {
 public:
     static void Init();

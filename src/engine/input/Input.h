@@ -35,10 +35,10 @@ struct InputState
     JoystickState joystick;
 };
 
-struct CInputImpl
+struct InputImpl
 {
-    CInputImpl();
-    ~CInputImpl();
+    InputImpl();
+    ~InputImpl();
 
     InputState mInputState;
 //    KeyboardState mKeyboardState;
@@ -46,7 +46,7 @@ struct CInputImpl
 //    JoystickState mJoystickState;
 };
 
-class CInput
+class Input
 {
 public:
     static void Init();

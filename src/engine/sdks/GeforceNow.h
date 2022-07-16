@@ -10,7 +10,7 @@
 #include <GfnSdk.h>
 #include <iostream>
 
-class CGeforceNow
+class GeforceNow
 {
 public:
     static void Init();

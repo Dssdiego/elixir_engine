@@ -9,24 +9,24 @@
 #include <stb/stb_image.h>
 #include <Tracy.hpp>
 
-SWindowImpl* mWindowImpl = nullptr;
+WindowImpl* mWindowImpl = nullptr;
 
-SWindowImpl::SWindowImpl(SEngineConfig* pConfig)
+WindowImpl::WindowImpl(EngineConfig* pConfig)
 {
     window = nullptr;
 
-    CLogger::Debug("initializing glfw");
+    Logger::Debug("initializing glfw");
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // tell GLFW to not create a OpenGL context (because we might use Vulkan/DirectX)
 
     // TODO: Pass engine config here
-    CLogger::Debug("creating window");
+    Logger::Debug("creating window");
     window = glfwCreateWindow(pConfig->windowSize.width, pConfig->windowSize.height, pConfig->gameTitle.c_str(), nullptr, nullptr);
 
     if (window == nullptr)
-        CLogger::Error("failed to create window with GLFW", "window == nullptr");
+        Logger::Error("failed to create window with GLFW", "window == nullptr");
     else
-        CLogger::Info("glfw window created successfully");
+        Logger::Info("glfw window created successfully");
 
     glfwSetWindowUserPointer(window, this);
 //    glfwSetFramebufferSizeCallback(window, WindowResized);
@@ -39,15 +39,15 @@ SWindowImpl::SWindowImpl(SEngineConfig* pConfig)
     loadIcon();
 }
 
-SWindowImpl::~SWindowImpl()
+WindowImpl::~WindowImpl()
 {
     glfwDestroyWindow(mWindowImpl->window);
     glfwTerminate();
 }
 
-void SWindowImpl::loadIcon()
+void WindowImpl::loadIcon()
 {
-    CLogger::Debug("loading icon");
+    Logger::Debug("loading icon");
 
     GLFWimage icons[1];
     icons[0].pixels = stbi_load("assets/icons/icon.png", &icons[0].width, &icons[0].height, nullptr, STBI_rgb_alpha);
@@ -67,10 +67,10 @@ bool CWindow::ShouldCloseWindow()
     return glfwWindowShouldClose(mWindowImpl->window);
 }
 
-void CWindow::Init(SEngineConfig* pConfig)
+void CWindow::Init(EngineConfig* pConfig)
 {
-    CLogger::Info("Initializing window");
-    mWindowImpl = new SWindowImpl(pConfig);
+    Logger::Info("Initializing window");
+    mWindowImpl = new WindowImpl(pConfig);
 }
 
 void CWindow::Update()
@@ -81,13 +81,13 @@ void CWindow::Update()
 
 void CWindow::Shutdown()
 {
-    CLogger::Info("Shutting down window");
+    Logger::Info("Shutting down window");
     delete mWindowImpl;
 }
 
-SWindowSize CWindow::GetSize()
+WindowSize CWindow::GetSize()
 {
-    return SWindowSize
+    return WindowSize
             {
         mWindowImpl->mWidth,
         mWindowImpl->mHeight

@@ -12,11 +12,11 @@
 #include <optional>
 #include <set>
 
-struct SwapChainSupportDetails {
-    VkSurfaceCapabilitiesKHR capabilities;
-    std::vector<VkSurfaceFormatKHR> formats;
-    std::vector<VkPresentModeKHR> presentModes;
-};
+//struct SwapChainSupportDetails {
+//    VkSurfaceCapabilitiesKHR capabilities;
+//    std::vector<VkSurfaceFormatKHR> formats;
+//    std::vector<VkPresentModeKHR> presentModes;
+//};
 
 struct CVulkanRendererImpl
 {
@@ -68,7 +68,7 @@ struct CVulkanRendererImpl
     bool CheckValidationLayerSupport();
     bool IsDeviceSuitable(VkPhysicalDevice device);
     bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
-    SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
+//    SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
     VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
     VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
     VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
@@ -91,7 +91,7 @@ struct CVulkanRendererImpl
     void CreateSurface();
     void PickPhysicalDevice();
     void CreateLogicalDeviceAndQueues();
-    void CreateSwapChain();
+//    void CreateSwapChain();
     void CreateImageViews();
     void CreateRenderPass();
     void CreateDescriptorSetLayout();
@@ -101,8 +101,8 @@ struct CVulkanRendererImpl
     void CreateFramebuffers();
     void CreateTextureImage();
     void CreateTextureSampler();
-    void CreateVertexBuffer();
-    void CreateIndexBuffer();
+//    void CreateVertexBuffer();
+//    void CreateIndexBuffer();
     void CreateUniformBuffers();
     void CreateDescriptorPool();
     void CreateDescriptorSets();

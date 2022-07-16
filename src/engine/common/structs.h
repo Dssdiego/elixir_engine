@@ -7,17 +7,17 @@
 
 #include <string>
 
-struct SWindowSize
+struct WindowSize
 {
     uint32_t width;
     uint32_t height;
 };
 
-struct SEngineConfig
+struct EngineConfig
 {
     std::string gameTitle;
-    SWindowSize windowSize;
-    SWindowSize minWindowSize;
+    WindowSize windowSize;
+    WindowSize minWindowSize;
     bool saveLogToFile;
 };
 

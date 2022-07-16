@@ -12,12 +12,12 @@
 
 CDirectXRendererImpl* mImplementation = nullptr;
 
-void CDirectXRenderer::Init()
+void DirectXRenderer::Init()
 {
     mImplementation = new CDirectXRendererImpl;
 }
 
-void CDirectXRenderer::Shutdown()
+void DirectXRenderer::Shutdown()
 {
     delete mImplementation;
 }
@@ -91,7 +91,7 @@ void CDirectXRendererImpl::CreateFactory()
     dc = nullptr;
 #endif
 
-    CLogger::Info("DIRECTX::CreateFactory");
+    Logger::Info("DIRECTX::CreateFactory");
     if FAILED(CreateDXGIFactory2(mDxgiFactoryFlags, IID_PPV_ARGS(&mFactory)))
     {
         throw std::runtime_error("DIRECTX::Failed to create factory");
@@ -102,7 +102,7 @@ void CDirectXRendererImpl::CreateFactory()
 // We can query the current GPU, how much memory it has, etc.
 void CDirectXRendererImpl::CreateAdapter()
 {
-    CLogger::Info("DIRECTX::CreateAdapter");
+    Logger::Info("DIRECTX::CreateAdapter");
     for (UINT adapterIndex = 0; DXGI_ERROR_NOT_FOUND != mFactory->EnumAdapters1(adapterIndex, &mAdapter); ++adapterIndex)
     {
         DXGI_ADAPTER_DESC1 desc;
@@ -126,7 +126,7 @@ void CDirectXRendererImpl::CreateAdapter()
 // resource barriers, etc.
 void CDirectXRendererImpl::CreateDevice()
 {
-    CLogger::Info("DIRECTX::CreateDevice");
+    Logger::Info("DIRECTX::CreateDevice");
     if (FAILED(D3D12CreateDevice(mAdapter, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&mDevice))))
     {
         throw std::runtime_error("DIRECTX::Failed to create a Direct3D 12.0 device");
@@ -137,7 +137,7 @@ void CDirectXRendererImpl::CreateDevice()
 // thus allowing a GPU to stay busy and optimize its execution speed.
 void CDirectXRendererImpl::CreateCommandQueue()
 {
-    CLogger::Info("DIRECTX::CreateCommandQueue");
+    Logger::Info("DIRECTX::CreateCommandQueue");
     D3D12_COMMAND_QUEUE_DESC queueDesc = {};
     queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
     queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
@@ -152,7 +152,7 @@ void CDirectXRendererImpl::CreateCommandQueue()
 // the GPU to execute.
 void CDirectXRendererImpl::CreateCommandAllocator()
 {
-    CLogger::Info("DIRECTX::CreateCommandAllocator");
+    Logger::Info("DIRECTX::CreateCommandAllocator");
     if (FAILED(mDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mCommandAllocator))))
     {
         throw std::runtime_error("DIRECTX::Failed to create command allocator");
@@ -163,7 +163,7 @@ void CDirectXRendererImpl::CreateCommandAllocator()
 // or when we've finished presenting to the screen
 void CDirectXRendererImpl::CreateFencePrimitive()
 {
-    CLogger::Info("DIRECTX::CreateFencePrimitive");
+    Logger::Info("DIRECTX::CreateFencePrimitive");
     if (FAILED(mDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence))))
     {
         throw std::runtime_error("DIRECTX::Failed to create fence primitive");
@@ -174,7 +174,7 @@ void CDirectXRendererImpl::CreateFencePrimitive()
 // we're writing to a texture, and we want to copy that texture to another texture (such as the swapchain's render attachment)
 void CDirectXRendererImpl::CreateBarrierPrimitive()
 {
-    CLogger::Info("DIRECTX::CreateBarrierPrimitive");
+    Logger::Info("DIRECTX::CreateBarrierPrimitive");
 
     D3D12_RESOURCE_BARRIER barrier = {};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -191,7 +191,7 @@ void CDirectXRendererImpl::CreateBarrierPrimitive()
 // what we're rendering to a given window
 void CDirectXRendererImpl::CreateSwapchain()
 {
-    CLogger::Info("DIRECTX::CreateSwapchain");
+    Logger::Info("DIRECTX::CreateSwapchain");
 
     mSurfaceSize.left = 0;
     mSurfaceSize.top = 0;

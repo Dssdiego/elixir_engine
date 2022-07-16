@@ -109,7 +109,7 @@ CVulkanRendererImpl::CVulkanRendererImpl()
     CreateCommandBuffer();
 
     // Create swap chain
-    CreateSwapChain();
+//    CreateSwapChain();
 
     // Create render pass
     CreateRenderPass();
@@ -133,8 +133,8 @@ CVulkanRendererImpl::CVulkanRendererImpl()
     CreateGraphicsPipeline();
     CreateTextureImage();
     CreateTextureSampler();
-    CreateVertexBuffer();
-    CreateIndexBuffer();
+//    CreateVertexBuffer();
+//    CreateIndexBuffer();
     CreateUniformBuffers();
     CreateDescriptorPool();
     CreateDescriptorSets();
@@ -220,56 +220,57 @@ bool CVulkanRendererImpl::CheckDeviceExtensionSupport(VkPhysicalDevice device)
     return requiredExtensions.empty();
 }
 
-SwapChainSupportDetails CVulkanRendererImpl::QuerySwapChainSupport(VkPhysicalDevice device)
-{
-    // querying basic surface capabilities
-    SwapChainSupportDetails details;
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, vkSurface, &details.capabilities);
-
-    // querying the supported surface formats
-    uint32_t formatCount;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(device, vkSurface, &formatCount, nullptr);
-
-    if (formatCount != 0)
-    {
-        // resize to hold all the available formats
-        std::cout << "# of available formats: " << formatCount << std::endl;
-        details.formats.resize(formatCount);
-        vkGetPhysicalDeviceSurfaceFormatsKHR(device, vkSurface, &formatCount, details.formats.data());
-    }
-
-    // querying the supported presentation modes
-    uint32_t presentModeCount;
-    vkGetPhysicalDeviceSurfacePresentModesKHR(device, vkSurface, &presentModeCount, nullptr);
-
-    if (presentModeCount != 0)
-    {
-        // resize to hold all the available present modes
-        std::cout << "# of present modes: " << presentModeCount << std::endl;
-        details.presentModes.resize(presentModeCount);
-        vkGetPhysicalDeviceSurfacePresentModesKHR(device, vkSurface, &presentModeCount, details.presentModes.data());
-    }
-
-    return details;
-}
+//SwapChainSupportDetails CVulkanRendererImpl::QuerySwapChainSupport(VkPhysicalDevice device)
+//{
+//    // querying basic surface capabilities
+//    SwapChainSupportDetails details;
+//    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, vkSurface, &details.capabilities);
+//
+//    // querying the supported surface formats
+//    uint32_t formatCount;
+//    vkGetPhysicalDeviceSurfaceFormatsKHR(device, vkSurface, &formatCount, nullptr);
+//
+//    if (formatCount != 0)
+//    {
+//        // resize to hold all the available formats
+//        std::cout << "# of available formats: " << formatCount << std::endl;
+//        details.formats.resize(formatCount);
+//        vkGetPhysicalDeviceSurfaceFormatsKHR(device, vkSurface, &formatCount, details.formats.data());
+//    }
+//
+//    // querying the supported presentation modes
+//    uint32_t presentModeCount;
+//    vkGetPhysicalDeviceSurfacePresentModesKHR(device, vkSurface, &presentModeCount, nullptr);
+//
+//    if (presentModeCount != 0)
+//    {
+//        // resize to hold all the available present modes
+//        std::cout << "# of present modes: " << presentModeCount << std::endl;
+//        details.presentModes.resize(presentModeCount);
+//        vkGetPhysicalDeviceSurfacePresentModesKHR(device, vkSurface, &presentModeCount, details.presentModes.data());
+//    }
+//
+//    return details;
+//}
 
 bool CVulkanRendererImpl::IsDeviceSuitable(VkPhysicalDevice device)
 {
-    bool extensionsSupported = CheckDeviceExtensionSupport(device);
-    bool swapChainAdequate = false;
-
-    // we only check for swap chain support AFTER checking that the extension is available
-    if (extensionsSupported)
-    {
-        SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(device);
-        swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
-    }
-
-    VkPhysicalDeviceFeatures supportedFeatures;
-    vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
-
-    return extensionsSupported &&
-           swapChainAdequate && supportedFeatures.samplerAnisotropy;
+//    bool extensionsSupported = CheckDeviceExtensionSupport(device);
+//    bool swapChainAdequate = false;
+//
+//    // we only check for swap chain support AFTER checking that the extension is available
+//    if (extensionsSupported)
+//    {
+//        SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(device);
+//        swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+//    }
+//
+//    VkPhysicalDeviceFeatures supportedFeatures;
+//    vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
+//
+//    return extensionsSupported &&
+//           swapChainAdequate && supportedFeatures.samplerAnisotropy;
+    return false;
 }
 
 VkSurfaceFormatKHR CVulkanRendererImpl::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
@@ -422,7 +423,7 @@ VkFormat CVulkanRendererImpl::FindSupportedFormat(const std::vector<VkFormat> &c
         }
     }
 
-    CLogger::Error("failed to find supported format", "");
+    Logger::Error("failed to find supported format", "");
     throw std::runtime_error("failed to find supported format");
 }
 
@@ -461,6 +462,12 @@ VkShaderModule CVulkanRendererImpl::CreateShaderModule(const std::vector<char> &
  */
 void CVulkanRendererImpl::CreateInstance()
 {
+    if (enableValidationLayers && !CheckValidationLayerSupport())
+    {
+        Logger::Error("validation layers requested, but not available", "");
+        throw std::runtime_error("validation layers requested, but not available");
+    }
+
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = ENGINE_NAME; // TODO: Game name should go here!
@@ -484,18 +491,13 @@ void CVulkanRendererImpl::CreateInstance()
     createInfo.enabledExtensionCount = glfwExtensionCount;
     createInfo.ppEnabledExtensionNames = glfwExtensions;
 
-    if (enableValidationLayers && !CheckValidationLayerSupport())
-    {
-        CLogger::Error("validation layers requested, but not available", "");
-        throw std::runtime_error("validation layers requested, but not available");
-    }
-
     if (enableValidationLayers)
     {
         createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
         createInfo.ppEnabledLayerNames = validationLayers.data();
     } else {
         createInfo.enabledLayerCount = 0;
+        createInfo.pNext = nullptr;
     }
 
     uint32_t extensionCount = 0;
@@ -511,7 +513,7 @@ void CVulkanRendererImpl::CreateInstance()
 
     VK_CHECK(vkCreateInstance(&createInfo, nullptr, &vkContext.instance));
 
-    CLogger::Debug("Instance created");
+    Logger::Debug("Instance created");
 }
 
 void CVulkanRendererImpl::SetupDebugMessenger()
@@ -523,7 +525,7 @@ void CVulkanRendererImpl::CreateSurface()
 {
     VK_CHECK(glfwCreateWindowSurface(vkContext.instance, CWindow::GetWindow(), nullptr, &vkSurface));
 
-    CLogger::Debug("Surface created");
+    Logger::Debug("Surface created");
 }
 
 void CVulkanRendererImpl::PickPhysicalDevice()
@@ -533,7 +535,7 @@ void CVulkanRendererImpl::PickPhysicalDevice()
 
     if (deviceCount == 0)
     {
-        CLogger::Error("failed to find GPU's with Vulkan support", "");
+        Logger::Error("failed to find GPU's with Vulkan support", "");
         throw std::runtime_error("failed to find GPU's with Vulkan support");
     }
 
@@ -551,7 +553,7 @@ void CVulkanRendererImpl::PickPhysicalDevice()
 
     if (vkContext.physicalDevice == VK_NULL_HANDLE)
     {
-        CLogger::Error("failed to find a suitable GPU", "");
+        Logger::Error("failed to find a suitable GPU", "");
         throw std::runtime_error("failed to find a suitable GPU");
     }
 
@@ -567,10 +569,10 @@ void CVulkanRendererImpl::PickPhysicalDevice()
     std::stringstream ssVulkanVersion;
     ssVulkanVersion << "Vulkan Version: " << vulkanVMajor << "." << vulkanVMinor << "." << vulkanVPatch;
 
-    CLogger::Info("GPU: " + std::string(props.deviceName));
-    CLogger::Info(ssVulkanVersion.str());
+    Logger::Info("GPU: " + std::string(props.deviceName));
+    Logger::Info(ssVulkanVersion.str());
 
-    CLogger::Debug("Picked physical device");
+    Logger::Debug("Picked physical device");
 }
 
 void CVulkanRendererImpl::CreateLogicalDeviceAndQueues()
@@ -651,78 +653,78 @@ void CVulkanRendererImpl::CreateLogicalDeviceAndQueues()
     vkGetDeviceQueue(vkContext.logicalDevice, vkContext.graphicsFamilyIdx.value(), 0, &vkContext.graphicsQueue);
     vkGetDeviceQueue(vkContext.logicalDevice, vkContext.presentFamilyIdx.value(), 0, &vkContext.presentQueue);
 
-    CLogger::Debug("Created logical device and queues");
+    Logger::Debug("Created logical device and queues");
 }
 
-void CVulkanRendererImpl::CreateSwapChain()
-{
-    SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(vkContext.physicalDevice);
-
-    VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
-    VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
-    VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities);
-
-    vkContext.swapChainImageCount = swapChainSupport.capabilities.minImageCount + 1; // one more image to have "room" for more processing
-    if (swapChainSupport.capabilities.maxImageCount > 0 && vkContext.swapChainImageCount > swapChainSupport.capabilities.maxImageCount)
-    {
-        // making sure we don't exceed the maximum number of images in the swap chain
-        vkContext.swapChainImageCount = swapChainSupport.capabilities.maxImageCount;
-    }
-    std::cout << "Minimum image count in the swap chain: " << vkContext.swapChainImageCount << std::endl;
-
-    VkSwapchainCreateInfoKHR createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    createInfo.surface = vkSurface; // tying our surface to the swap chain
-    createInfo.minImageCount = vkContext.swapChainImageCount;
-    createInfo.imageFormat = surfaceFormat.format;
-    createInfo.imageColorSpace = surfaceFormat.colorSpace;
-    createInfo.imageExtent = extent;
-    createInfo.imageArrayLayers = 1; // the amount of layers each image consists of (always 1 unless we are developing a stereoscopic 3D app)
-
-    // VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT - This is a color image we're rendering into
-    // VK_IMAGE_USAGE_TRANSFER_SRC_BIT - We'll be copying the image somewhere (screenshot, postProcess)
-    createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-
-    uint32_t queueFamilyIndices[] = {vkContext.graphicsFamilyIdx.value(), vkContext.presentFamilyIdx.value()};
-
-    // specifying how to handle swap chain images that will be used across multiple queue families (graphics and presentation)
-    // in our case, we'll be drawing on the images in the swap chain from the graphics queue and then
-    //    submitting them on the presentation queue
-    if (vkContext.graphicsFamilyIdx != vkContext.presentFamilyIdx)
-    {
-        createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-        createInfo.queueFamilyIndexCount = 2;
-        createInfo.pQueueFamilyIndices = queueFamilyIndices;
-    } else {
-        createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-        createInfo.queueFamilyIndexCount = 0; // optional
-        createInfo.pQueueFamilyIndices = nullptr; // optional
-    }
-
-    // we don't want any pre-transformation on the images for now
-    createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
-
-    // compositeAlpha = blending with other windows in the window system. So we will ignore the alpha channel (aka opaque)
-    createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-
-    createInfo.presentMode = presentMode;
-    createInfo.clipped = VK_TRUE; // we don't care for pixels that are obscured (ex.: another window in front of our own)
-    createInfo.oldSwapchain = VK_NULL_HANDLE; // for now we assume that we'll be creating only one swap chain.
-    // NOTE: Only one swap chain is not the best option because we'd like the screen to be resized, so in the future we'll probably recreate the swap chain ;)
-
-    // effectively creating the swap chain
-    VK_CHECK(vkCreateSwapchainKHR(vkContext.logicalDevice, &createInfo, nullptr, &vkSwapChain));
-
-    // retrieve swap chain images from the logical device
-    vkGetSwapchainImagesKHR(vkContext.logicalDevice, vkSwapChain, &vkContext.swapChainImageCount, nullptr);
-    vkSwapChainImages.resize(vkContext.swapChainImageCount);
-    vkGetSwapchainImagesKHR(vkContext.logicalDevice, vkSwapChain, &vkContext.swapChainImageCount, vkSwapChainImages.data());
-
-    vkSwapChainImageFormat = surfaceFormat.format;
-    vkSwapChainExtent = extent;
-
-    CLogger::Debug("Swap chain created");
-}
+//void CVulkanRendererImpl::CreateSwapChain()
+//{
+//    SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(vkContext.physicalDevice);
+//
+//    VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
+//    VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
+//    VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities);
+//
+//    vkContext.swapChainImageCount = swapChainSupport.capabilities.minImageCount + 1; // one more image to have "room" for more processing
+//    if (swapChainSupport.capabilities.maxImageCount > 0 && vkContext.swapChainImageCount > swapChainSupport.capabilities.maxImageCount)
+//    {
+//        // making sure we don't exceed the maximum number of images in the swap chain
+//        vkContext.swapChainImageCount = swapChainSupport.capabilities.maxImageCount;
+//    }
+//    std::cout << "Minimum image count in the swap chain: " << vkContext.swapChainImageCount << std::endl;
+//
+//    VkSwapchainCreateInfoKHR createInfo{};
+//    createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+//    createInfo.surface = vkSurface; // tying our surface to the swap chain
+//    createInfo.minImageCount = vkContext.swapChainImageCount;
+//    createInfo.imageFormat = surfaceFormat.format;
+//    createInfo.imageColorSpace = surfaceFormat.colorSpace;
+//    createInfo.imageExtent = extent;
+//    createInfo.imageArrayLayers = 1; // the amount of layers each image consists of (always 1 unless we are developing a stereoscopic 3D app)
+//
+//    // VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT - This is a color image we're rendering into
+//    // VK_IMAGE_USAGE_TRANSFER_SRC_BIT - We'll be copying the image somewhere (screenshot, postProcess)
+//    createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+//
+//    uint32_t queueFamilyIndices[] = {vkContext.graphicsFamilyIdx.value(), vkContext.presentFamilyIdx.value()};
+//
+//    // specifying how to handle swap chain images that will be used across multiple queue families (graphics and presentation)
+//    // in our case, we'll be drawing on the images in the swap chain from the graphics queue and then
+//    //    submitting them on the presentation queue
+//    if (vkContext.graphicsFamilyIdx != vkContext.presentFamilyIdx)
+//    {
+//        createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+//        createInfo.queueFamilyIndexCount = 2;
+//        createInfo.pQueueFamilyIndices = queueFamilyIndices;
+//    } else {
+//        createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+//        createInfo.queueFamilyIndexCount = 0; // optional
+//        createInfo.pQueueFamilyIndices = nullptr; // optional
+//    }
+//
+//    // we don't want any pre-transformation on the images for now
+//    createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+//
+//    // compositeAlpha = blending with other windows in the window system. So we will ignore the alpha channel (aka opaque)
+//    createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+//
+//    createInfo.presentMode = presentMode;
+//    createInfo.clipped = VK_TRUE; // we don't care for pixels that are obscured (ex.: another window in front of our own)
+//    createInfo.oldSwapchain = VK_NULL_HANDLE; // for now we assume that we'll be creating only one swap chain.
+//    // NOTE: Only one swap chain is not the best option because we'd like the screen to be resized, so in the future we'll probably recreate the swap chain ;)
+//
+//    // effectively creating the swap chain
+//    VK_CHECK(vkCreateSwapchainKHR(vkContext.logicalDevice, &createInfo, nullptr, &vkSwapChain));
+//
+//    // retrieve swap chain images from the logical device
+//    vkGetSwapchainImagesKHR(vkContext.logicalDevice, vkSwapChain, &vkContext.swapChainImageCount, nullptr);
+//    vkSwapChainImages.resize(vkContext.swapChainImageCount);
+//    vkGetSwapchainImagesKHR(vkContext.logicalDevice, vkSwapChain, &vkContext.swapChainImageCount, vkSwapChainImages.data());
+//
+//    vkSwapChainImageFormat = surfaceFormat.format;
+//    vkSwapChainExtent = extent;
+//
+//    CLogger::Debug("Swap chain created");
+//}
 
 void CVulkanRendererImpl::CreateImageViews()
 {
@@ -799,7 +801,7 @@ void CVulkanRendererImpl::CreateRenderPass()
     // effectively creating the render pass
     VK_CHECK(vkCreateRenderPass(vkContext.logicalDevice, &renderPassInfo, nullptr, &vkContext.renderPass));
 
-    CLogger::Debug("Render pass created");
+    Logger::Debug("Render pass created");
 }
 
 void CVulkanRendererImpl::CreateDescriptorSetLayout()
@@ -827,14 +829,14 @@ void CVulkanRendererImpl::CreateDescriptorSetLayout()
 
     VK_CHECK(vkCreateDescriptorSetLayout(vkContext.logicalDevice, &layoutInfo, nullptr, &vkDescriptorSetLayout));
 
-    CLogger::Debug("Descriptor set layout created");
+    Logger::Debug("Descriptor set layout created");
 }
 
 void CVulkanRendererImpl::CreateGraphicsPipeline()
 {
     // SECTION: 1. Shaders
-    auto vertShaderCode = CShader::ReadFile("assets/shaders/vert.spv");
-    auto fragShaderCode = CShader::ReadFile("assets/shaders/frag.spv");
+    auto vertShaderCode = Shader::ReadFile("assets/shaders/vert.spv");
+    auto fragShaderCode = Shader::ReadFile("assets/shaders/frag.spv");
 
     // creating shader module
     VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
@@ -1006,7 +1008,7 @@ void CVulkanRendererImpl::CreateGraphicsPipeline()
     vkDestroyShaderModule(vkContext.logicalDevice, vertShaderModule, nullptr);
     vkDestroyShaderModule(vkContext.logicalDevice, fragShaderModule, nullptr);
 
-    CLogger::Debug("Graphics pipeline created");
+    Logger::Debug("Graphics pipeline created");
 }
 
 void CVulkanRendererImpl::CreateCommandPool()
@@ -1018,7 +1020,7 @@ void CVulkanRendererImpl::CreateCommandPool()
 
     VK_CHECK(vkCreateCommandPool(vkContext.logicalDevice, &poolInfo, nullptr, &vkCommandPool));
 
-    CLogger::Debug("Command pool created");
+    Logger::Debug("Command pool created");
 }
 
 void CVulkanRendererImpl::CreateDepthResources()
@@ -1059,7 +1061,7 @@ void CVulkanRendererImpl::CreateFramebuffers()
         VK_CHECK(vkCreateFramebuffer(vkContext.logicalDevice, &frameBufferInfo, nullptr, &vkSwapChainFrameBuffers[i]));
     }
 
-    CLogger::Debug("Framebuffers created");
+    Logger::Debug("Framebuffers created");
 }
 
 void CVulkanRendererImpl::CreateTextureImage()
@@ -1072,15 +1074,37 @@ void CVulkanRendererImpl::CreateTextureSampler()
 
 }
 
-void CVulkanRendererImpl::CreateVertexBuffer()
-{
-
-}
-
-void CVulkanRendererImpl::CreateIndexBuffer()
-{
-
-}
+//void CVulkanRendererImpl::CreateVertexBuffer()
+//{
+//    VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+//
+//    VkBuffer stagingBuffer;
+//    VkDeviceMemory stagingBufferMemory;
+//    CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+//                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+//                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
+//                 stagingBufferMemory);
+//
+//    void* data;
+//    vkMapMemory(vkContext.logicalDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
+//    memcpy(data, vertices.data(), (size_t) bufferSize);
+//    vkUnmapMemory(vkContext.logicalDevice, stagingBufferMemory);
+//
+//    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT |
+//                             VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+//                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer,
+//                 vertexBufferMemory);
+//
+//    copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+//
+//    vkDestroyBuffer(vkContext.logicalDevice, stagingBuffer, nullptr);
+//    vkFreeMemory(vkContext.logicalDevice, stagingBufferMemory, nullptr);
+//}
+//
+//void CVulkanRendererImpl::CreateIndexBuffer()
+//{
+//
+//}
 
 void CVulkanRendererImpl::CreateUniformBuffers()
 {
@@ -1113,7 +1137,7 @@ void CVulkanRendererImpl::CreateDescriptorPool()
 
     VK_CHECK(vkCreateDescriptorPool(vkContext.logicalDevice, &poolInfo, nullptr, &vkContext.descriptorPool));
 
-    CLogger::Debug("Descriptor pool created");
+    Logger::Debug("Descriptor pool created");
 
     // vulkan-tutorial's "original" code
 //    std::array<VkDescriptorPoolSize, 2> poolSizes{};
@@ -1158,7 +1182,7 @@ void CVulkanRendererImpl::CreateCommandBuffer()
         VK_CHECK(vkCreateFence(vkContext.logicalDevice, &fenceInfo, nullptr, &commandBufferFences[i]));
     }
 
-    CLogger::Debug("Created command buffers");
+    Logger::Debug("Created command buffers");
 }
 
 void CVulkanRendererImpl::CreateSemaphores()
@@ -1178,7 +1202,7 @@ void CVulkanRendererImpl::CreateSemaphores()
 
 void CVulkanRendererImpl::DrawFrame()
 {
-    CLogger::Debug("Draw frame (start)");
+    Logger::Debug("Draw frame (start)");
 
     // waiting for fence synchronization (CPU <-> GPU)
     vkWaitForFences(vkContext.logicalDevice, 1, &commandBufferFences[currentFrame], VK_TRUE, UINT64_MAX);
@@ -1252,12 +1276,12 @@ void CVulkanRendererImpl::DrawFrame()
     // advance current frame
     currentFrame = (currentFrame + 1) % NUM_FRAME_DATA;
 
-    CLogger::Debug("Draw frame (end)");
+    Logger::Debug("Draw frame (end)");
 }
 
 void CVulkanRendererImpl::RecreateSwapChain()
 {
-    CLogger::Debug("Recreating swap chain...");
+    Logger::Debug("Recreating swap chain...");
     int width, height = 0;
     glfwGetFramebufferSize(CWindow::GetWindow(), &width, &height);
     while (width == 0 || height == 0) // window is minimized, wait for it to be on the foreground again
@@ -1273,7 +1297,7 @@ void CVulkanRendererImpl::RecreateSwapChain()
     CleanupSwapChain();
 
     // effectively recreation of the swap chain
-    CreateSwapChain();
+//    CreateSwapChain();
     CreateImageViews();
     CreateRenderPass();
     CreateGraphicsPipeline();
