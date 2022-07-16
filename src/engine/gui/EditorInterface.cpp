@@ -56,7 +56,7 @@ void CEditorInterfaceImpl::InitializeImGui()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void) io;
-    ImGui_ImplGlfw_InitForVulkan(CWindow::GetWindow(), true);
+    ImGui_ImplGlfw_InitForVulkan(Window::GetWindow(), true);
 
     // Setting ImGui to use dark colors
     ImGui::StyleColorsDark();

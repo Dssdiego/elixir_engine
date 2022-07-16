@@ -22,7 +22,7 @@ void Game::Init(EngineConfig* pConfig)
     // init engine systems
     Logger::Init();
     SceneSystem::Init();
-    CWindow::Init(pConfig);
+    Window::Init(pConfig);
     AudioEngine::Init();
     Input::Init();
     Renderer::Init(GraphicsBackend::VULKAN);
@@ -32,9 +32,9 @@ void Game::Init(EngineConfig* pConfig)
 
 void Game::Run()
 {
-    while(!CWindow::ShouldCloseWindow())
+    while(!Window::ShouldCloseWindow())
     {
-        CWindow::Update();
+        Window::Update();
         glfwPollEvents();
 
         Draw();
@@ -61,7 +61,7 @@ void Game::Cleanup()
     Renderer::Shutdown();
     Input::Shutdown();
     AudioEngine::Shutdown();
-    CWindow::Shutdown();
+    Window::Shutdown();
 }
 
 

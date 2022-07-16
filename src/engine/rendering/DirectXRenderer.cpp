@@ -195,13 +195,13 @@ void CDirectXRendererImpl::CreateSwapchain()
 
     mSurfaceSize.left = 0;
     mSurfaceSize.top = 0;
-    mSurfaceSize.right = static_cast<LONG>(CWindow::GetSize().width);
-    mSurfaceSize.bottom = static_cast<LONG>(CWindow::GetSize().height);
+    mSurfaceSize.right = static_cast<LONG>(Window::GetSize().width);
+    mSurfaceSize.bottom = static_cast<LONG>(Window::GetSize().height);
 
     mViewport.TopLeftX = 0.0f;
     mViewport.TopLeftY = 0.0f;
-    mViewport.Width = static_cast<float>(CWindow::GetSize().width);
-    mViewport.Height = static_cast<float>(CWindow::GetSize().height);
+    mViewport.Width = static_cast<float>(Window::GetSize().width);
+    mViewport.Height = static_cast<float>(Window::GetSize().height);
     mViewport.MinDepth = 0.1f;
     mViewport.MaxDepth = 1000.0f;
 

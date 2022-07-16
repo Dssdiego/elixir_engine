@@ -321,7 +321,7 @@ VkExtent2D CVulkanRendererImpl::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR&
         return capabilities.currentExtent;
     } else {
         int width, height;
-        glfwGetFramebufferSize(CWindow::GetWindow(), &width, &height);
+        glfwGetFramebufferSize(Window::GetWindow(), &width, &height);
 
         VkExtent2D actualExtent = {
                 static_cast<uint32_t>(width),
@@ -523,7 +523,7 @@ void CVulkanRendererImpl::SetupDebugMessenger()
 
 void CVulkanRendererImpl::CreateSurface()
 {
-    VK_CHECK(glfwCreateWindowSurface(vkContext.instance, CWindow::GetWindow(), nullptr, &vkSurface));
+    VK_CHECK(glfwCreateWindowSurface(vkContext.instance, Window::GetWindow(), nullptr, &vkSurface));
 
     Logger::Debug("Surface created");
 }
@@ -1283,10 +1283,10 @@ void CVulkanRendererImpl::RecreateSwapChain()
 {
     Logger::Debug("Recreating swap chain...");
     int width, height = 0;
-    glfwGetFramebufferSize(CWindow::GetWindow(), &width, &height);
+    glfwGetFramebufferSize(Window::GetWindow(), &width, &height);
     while (width == 0 || height == 0) // window is minimized, wait for it to be on the foreground again
     {
-        glfwGetFramebufferSize(CWindow::GetWindow(), &width, &height);
+        glfwGetFramebufferSize(Window::GetWindow(), &width, &height);
         glfwWaitEvents();
     }
 

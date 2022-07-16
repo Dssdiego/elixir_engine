@@ -62,30 +62,30 @@ void WindowImpl::loadIcon()
     stbi_image_free(icons[0].pixels);
 }
 
-bool CWindow::ShouldCloseWindow()
+bool Window::ShouldCloseWindow()
 {
     return glfwWindowShouldClose(mWindowImpl->window);
 }
 
-void CWindow::Init(EngineConfig* pConfig)
+void Window::Init(EngineConfig* pConfig)
 {
     Logger::Info("Initializing window");
     mWindowImpl = new WindowImpl(pConfig);
 }
 
-void CWindow::Update()
+void Window::Update()
 {
     ZoneScopedC(0x2ecc71);
     glfwPollEvents();
 }
 
-void CWindow::Shutdown()
+void Window::Shutdown()
 {
     Logger::Info("Shutting down window");
     delete mWindowImpl;
 }
 
-WindowSize CWindow::GetSize()
+WindowSize Window::GetSize()
 {
     return WindowSize
             {
@@ -94,7 +94,21 @@ WindowSize CWindow::GetSize()
             };
 }
 
-GLFWwindow *CWindow::GetWindow()
+GLFWwindow *Window::GetWindow()
 {
     return mWindowImpl->window;
+}
+
+std::vector<const char *> Window::GetRequiredExtensions()
+{
+    uint32_t glfwExtensionCount = 0;
+    const char** glfwExtensions;
+
+    glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+    std::cout << "extensions count: " << glfwExtensionCount << std::endl;
+    std::cout << *glfwExtensions << std::endl;
+
+    std::vector<const char *> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+    return extensions;
 }
