@@ -79,7 +79,7 @@ public:
 
 private:
     void CreateInstance();
-//    void SetupDebugMessenger();
+    void SetupDebugMessenger();
 //    void CreateSurface();
 //    void PickPhysicalDevice();
 //    void CreateLogicalDevice();
@@ -90,7 +90,8 @@ private:
 //    std::vector<const char *> GetRequiredExtensions();
     bool CheckValidationLayerSupport();
 //    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
-//    void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
+    void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
+    VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *createInfo, const VkAllocationCallbacks *allocator, VkDebugUtilsMessengerEXT *debugMessenger);
 //    void HasGflwRequiredInstanceExtensions();
 //    bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
