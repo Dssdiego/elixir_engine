@@ -87,6 +87,12 @@ void VulkanDevice::CreateInstance()
     Logger::Debug("Instance created");
 }
 
+void VulkanDevice::CreateSurface()
+{
+    VK_CHECK(glfwCreateWindowSurface(instance, Window::GetWindow(), nullptr, &surface));
+    Logger::Debug("Surface created");
+}
+
 void VulkanDevice::SetupDebugMessenger()
 {
     if (!enableValidationLayers)
@@ -191,3 +197,4 @@ SwapChainSupportDetails VulkanDevice::QuerySwapChainSupport(VkPhysicalDevice dev
 
     return details;
 }
+
