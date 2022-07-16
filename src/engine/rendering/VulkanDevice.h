@@ -7,6 +7,7 @@
 
 #include <vulkan/vulkan.h>
 #include <vector>
+#include <set>
 #include "Window.h"
 #include "VulkanCommon.h"
 #include "../profiling/Logger.h"
@@ -82,19 +83,19 @@ private:
     void CreateInstance();
     void SetupDebugMessenger();
     void CreateSurface();
-//    void PickPhysicalDevice();
-//    void CreateLogicalDevice();
-//    void CreateCommandPool();
+    void PickPhysicalDevice();
+    void CreateLogicalDeviceAndQueues();
+    void CreateCommandPool();
 
     // helper methods
-//    bool IsDeviceSuitable(VkPhysicalDevice device);
+    bool IsDeviceSuitable(VkPhysicalDevice device);
 //    std::vector<const char *> GetRequiredExtensions();
     bool CheckValidationLayerSupport();
 //    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
     void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
     VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *createInfo, const VkAllocationCallbacks *allocator, VkDebugUtilsMessengerEXT *debugMessenger);
 //    void HasGflwRequiredInstanceExtensions();
-//    bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
+    bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
 
     // variables

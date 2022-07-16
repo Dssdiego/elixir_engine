@@ -23,15 +23,22 @@ VulkanDevice::VulkanDevice()
 {
     CreateInstance();
     SetupDebugMessenger();
-//    CreateSurface();
-//    PickPhysicalDevice();
-//    CreateLogicalDevice();
-//    CreateCommandPool();
+    CreateSurface();
+    PickPhysicalDevice();
+    CreateLogicalDeviceAndQueues();
+    CreateCommandPool();
 }
 
 VulkanDevice::~VulkanDevice()
 {
+    vkDestroyCommandPool(device, commandPool, nullptr);
+    vkDestroyDevice(device, nullptr);
 
+//    if (enableValidationLayers)
+//        DestroyDebugUtilsMesse
+
+    vkDestroySurfaceKHR(instance, surface, nullptr);
+    vkDestroyInstance(instance, nullptr);
 }
 
 //
@@ -103,6 +110,63 @@ void VulkanDevice::SetupDebugMessenger()
     if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
         throw std::runtime_error("failed to set up debug messenger!");
     }
+}
+
+void VulkanDevice::PickPhysicalDevice()
+{
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+
+    if (deviceCount == 0)
+    {
+        Logger::Error("failed to find GPU's with Vulkan support", "");
+        throw std::runtime_error("failed to find GPU's with Vulkan support");
+    }
+
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+    vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+
+    for (const auto& device: devices)
+    {
+        if (IsDeviceSuitable(device))
+        {
+            physicalDevice = device;
+            break;
+        }
+    }
+
+    if (physicalDevice == VK_NULL_HANDLE)
+    {
+        Logger::Error("failed to find a suitable GPU", "");
+        throw std::runtime_error("failed to find a suitable GPU");
+    }
+
+    VkPhysicalDeviceProperties props;
+    vkGetPhysicalDeviceProperties(physicalDevice, &props);
+
+    // getting vulkan version
+    uint32_t vulkanVersion = props.apiVersion;
+    uint32_t vulkanVMajor = VK_API_VERSION_MAJOR(vulkanVersion);
+    uint32_t vulkanVMinor = VK_API_VERSION_MINOR(vulkanVersion);
+    uint32_t vulkanVPatch = VK_API_VERSION_PATCH(vulkanVersion);
+
+    std::stringstream ssVulkanVersion;
+    ssVulkanVersion << "Vulkan Version: " << vulkanVMajor << "." << vulkanVMinor << "." << vulkanVPatch;
+
+    Logger::Info("GPU: " + std::string(props.deviceName));
+    Logger::Info(ssVulkanVersion.str());
+
+    Logger::Debug("Picked physical device");
+}
+
+void VulkanDevice::CreateLogicalDeviceAndQueues()
+{
+
+}
+
+void VulkanDevice::CreateCommandPool()
+{
+
 }
 
 //
@@ -198,3 +262,38 @@ SwapChainSupportDetails VulkanDevice::QuerySwapChainSupport(VkPhysicalDevice dev
     return details;
 }
 
+bool VulkanDevice::IsDeviceSuitable(VkPhysicalDevice device)
+{
+    bool extensionsSupported = CheckDeviceExtensionSupport(device);
+    bool swapChainAdequate = false;
+
+    // we only check for swap chain support AFTER checking that the extension is available
+    if (extensionsSupported)
+    {
+        SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(device);
+        swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+    }
+
+    VkPhysicalDeviceFeatures supportedFeatures;
+    vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
+
+    return extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
+}
+
+bool VulkanDevice::CheckDeviceExtensionSupport(VkPhysicalDevice device)
+{
+    uint32_t extensionsCount;
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsCount, nullptr);
+
+    std::vector<VkExtensionProperties> availableExtensions(extensionsCount);
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsCount, availableExtensions.data());
+
+    std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+    for (const auto& extension : availableExtensions)
+    {
+        requiredExtensions.erase(extension.extensionName);
+    }
+
+    return requiredExtensions.empty();
+}
