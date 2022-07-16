@@ -80,12 +80,12 @@ public:
 private:
     void CreateInstance();
     void SetupDebugMessenger();
-//    void CreateSurface();
+    void CreateSurface();
 //    void PickPhysicalDevice();
 //    void CreateLogicalDevice();
 //    void CreateCommandPool();
 
-    // helper functions
+    // helper methods
 //    bool IsDeviceSuitable(VkPhysicalDevice device);
 //    std::vector<const char *> GetRequiredExtensions();
     bool CheckValidationLayerSupport();
