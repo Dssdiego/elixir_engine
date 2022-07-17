@@ -3,7 +3,7 @@
 //
 
 #include "Logger.h"
-#include "../config.h"
+#include "../common/Config.h"
 
 /*
  * INITIALIZATION

@@ -8,10 +8,10 @@
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <set>
+#include <optional>
 #include "Window.h"
 #include "VulkanCommon.h"
 #include "../profiling/Logger.h"
-#include "../config.h"
 #include <cstring>
 
 struct SwapChainSupportDetails {

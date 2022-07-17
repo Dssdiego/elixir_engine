@@ -3,6 +3,7 @@
 //
 
 #include "VulkanDevice.h"
+#include "../common/Config.h"
 
 // callback functions
 static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(

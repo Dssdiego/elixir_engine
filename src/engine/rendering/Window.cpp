@@ -4,6 +4,7 @@
 
 #include "Window.h"
 #include "../profiling/Logger.h"
+#include "../common/Config.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
@@ -29,6 +30,7 @@ WindowImpl::WindowImpl(EngineConfig* pConfig)
         Logger::Info("glfw window created successfully");
 
     glfwSetWindowUserPointer(window, this);
+    glfwSetWindowPos(window, Config::GetWindowPositionX(), Config::GetWindowPositionY());
 //    glfwSetFramebufferSizeCallback(window, WindowResized);
 //    glfwSetWindowSizeLimits(window, 480, 320, GLFW_DONT_CARE, GLFW_DONT_CARE);
 //    glfwSetKeyCallback(window, keyCallback);

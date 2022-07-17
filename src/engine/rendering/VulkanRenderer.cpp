@@ -16,7 +16,7 @@
 #include "Vertex.h"
 #include "Shader.h"
 #include "VulkanContext.h"
-#include "../config.h"
+#include "../common/Config.h"
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
