@@ -162,12 +162,95 @@ void VulkanDevice::PickPhysicalDevice()
 
 void VulkanDevice::CreateLogicalDeviceAndQueues()
 {
+    // get queue families
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());
 
+    int i = 0;
+    for (const auto& queueFamily: queueFamilies)
+    {
+        // getting the graphics queue family index
+        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            graphicsFamilyIdx = i;
+
+        // look for a queue family that has the capability of presenting to our window surface
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &presentSupport);
+
+        // getting the present queue family index
+        if (presentSupport)
+            presentFamilyIdx = i;
+
+        // checking if we found queue(s) that support both graphics as presentation
+        if (graphicsFamilyIdx.has_value() && presentFamilyIdx.has_value())
+            break;
+
+        i++;
+    }
+
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::set<uint32_t> uniqueQueueFamilies = {
+            &graphicsFamilyIdx.value(), &presentFamilyIdx.value()
+    };
+
+    // assigning a priority queue (0.0f -> 1.0f)
+    float queuePriority = 1.0f;
+    for (uint32_t queueFamily: uniqueQueueFamilies)
+    {
+        VkDeviceQueueCreateInfo queueCreateInfo{};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = queueFamily;
+        queueCreateInfo.queueCount = 1;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
+        queueCreateInfos.push_back(queueCreateInfo);
+    }
+
+    VkPhysicalDeviceFeatures deviceFeatures{};
+    deviceFeatures.samplerAnisotropy = VK_TRUE;
+
+    // creating the logical device
+    VkDeviceCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+    createInfo.pQueueCreateInfos = queueCreateInfos.data();
+
+    createInfo.pEnabledFeatures = &deviceFeatures;
+
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+    createInfo.ppEnabledExtensionNames = deviceExtensions.data();
+
+    // retro compatibility with older implementations
+    if (enableValidationLayers)
+    {
+        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+        createInfo.ppEnabledLayerNames = validationLayers.data();
+    } else
+    {
+        createInfo.enabledLayerCount = 0;
+    }
+
+    // we're now ready to instantiate the logical device
+    VK_CHECK(vkCreateDevice(physicalDevice, &createInfo, nullptr, &device));
+
+    // getting the device graphics/present queues
+    vkGetDeviceQueue(device, graphicsFamilyIdx.value(), 0, &graphicsQueue);
+    vkGetDeviceQueue(device, presentFamilyIdx.value(), 0, &presentQueue);
+
+    Logger::Debug("Created logical device and queues");
 }
 
 void VulkanDevice::CreateCommandPool()
 {
+    VkCommandPoolCreateInfo poolInfo{};
+    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // this allows the command buffer to be implicitly reset when 'vkBeginCommandBuffer' is called
+    poolInfo.queueFamilyIndex = graphicsFamilyIdx.value(); // since we want to record the commands for drawing, we must use the graphics queue family
 
+    VK_CHECK(vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool));
+
+    Logger::Debug("Command pool created");
 }
 
 //

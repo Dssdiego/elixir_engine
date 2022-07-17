@@ -20,14 +20,6 @@ struct SwapChainSupportDetails {
     std::vector<VkPresentModeKHR> presentModes;
 };
 
-struct QueueFamilyIndices {
-    uint32_t graphicsFamily;
-    uint32_t presentFamily;
-    bool graphicsFamilyHasValue = false;
-    bool presentFamilyHasValue = false;
-    bool isComplete() { return graphicsFamilyHasValue && presentFamilyHasValue; }
-};
-
 class VulkanDevice
 {
 public:
@@ -108,6 +100,9 @@ private:
     VkSurfaceKHR surface{};
     VkQueue graphicsQueue{};
     VkQueue presentQueue{};
+
+    std::optional<uint32_t> graphicsFamilyIdx;
+    std::optional<uint32_t> presentFamilyIdx;
 
     const std::vector<const char *> validationLayers = { "VK_LAYER_KHRONOS_validation" };
     const std::vector<const char *> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
