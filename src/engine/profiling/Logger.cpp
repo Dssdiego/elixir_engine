@@ -18,9 +18,9 @@ void Logger::Init()
     oss << std::put_time(&tm, "%Y_%m_%d");
     auto dateStr = oss.str();
 
-    std::string buf(ENGINE_NAME);
+    std::string buf(Config::GetEngineName());
     buf.append(" ");
-    buf.append(ENGINE_VERSION);
+    buf.append(Config::GetEngineVersion());
 
     std::ofstream logFile;
     logFile.open("elixir_" + dateStr + std::string(".log"));

@@ -8,21 +8,6 @@
 #include <inih/INIReader.h>
 #include <iostream>
 
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
-
-#define ENGINE_NAME "Elixir Engine"
-
-#define ENGINE_VERSION_MAJOR 0
-#define ENGINE_VERSION_MINOR 1
-#define ENGINE_VERSION_PATCH 0
-#define RELEASE_TYPE "alpha"
-
-#define ENGINE_VERSION "v" STR(ENGINE_VERSION_MAJOR) \
-    "." STR(ENGINE_VERSION_MINOR) \
-    "." STR(ENGINE_VERSION_PATCH) \
-    "-" RELEASE_TYPE
-
 // Config singleton
 class Config
 {
@@ -39,6 +24,8 @@ public:
     static uint32_t GetWindowPositionX();
     static uint32_t GetWindowPositionY();
     static bool GetSaveToLogFile();
+    static std::string GetEngineName();
+    static std::string GetEngineVersion();
 
 private:
     INIReader reader;
@@ -50,6 +37,8 @@ private:
     uint32_t GetWindowPositionXImpl();
     uint32_t GetWindowPositionYImpl();
     bool GetSaveToLogFileImpl();
+    std::string GetEngineNameImpl();
+    std::string GetEngineVersionImpl();
 };
 
 

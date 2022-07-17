@@ -44,6 +44,16 @@ bool Config::GetSaveToLogFile()
     return GetSingleton().GetSaveToLogFileImpl();
 }
 
+std::string Config::GetEngineName()
+{
+    return GetSingleton().GetEngineNameImpl();
+}
+
+std::string Config::GetEngineVersion()
+{
+    return GetSingleton().GetEngineVersionImpl();
+}
+
 // Implementations
 uint32_t Config::GetWindowWidthImpl()
 {
@@ -69,4 +79,18 @@ bool Config::GetSaveToLogFileImpl()
 {
     return static_cast<uint32_t>(reader.GetBoolean("Log", "SaveToFile", false));
 }
+
+std::string Config::GetEngineNameImpl()
+{
+    return reader.Get("Engine", "Name", "Elixir Engine");
+}
+
+std::string Config::GetEngineVersionImpl()
+{
+    return reader.Get("Engine", "Version", "v0.0.0");
+}
+
+
+
+
 
