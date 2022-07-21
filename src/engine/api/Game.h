@@ -5,8 +5,17 @@
 #ifndef VULKAN_ENGINE_GAME_H
 #define VULKAN_ENGINE_GAME_H
 
+#include <Tracy.hpp>
 #include <string>
 #include "../common/structs.h"
+#include "../audio/AudioEngine.h"
+#include "../input/Input.h"
+#include "../rendering/Window.h"
+#include "../rendering/Renderer.h"
+#include "../gui/EditorInterface.h"
+#include "../profiling/Logger.h"
+#include "../scenes/SceneSystem.h"
+#include "../sdks/GeforceNow.h"
 
 class Game
 {
@@ -18,6 +27,8 @@ public:
 
 private:
     int frames = 0;
+    int frameCount = 0;
+    double previousTime = glfwGetTime();
 };
 
 

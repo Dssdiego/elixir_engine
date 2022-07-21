@@ -2,17 +2,7 @@
 // Created by Diego S. Seabra on 08/03/22.
 //
 
-#include <Tracy.hpp>
 #include "Game.h"
-#include "../audio/AudioEngine.h"
-#include "../input/Input.h"
-#include "../rendering/Window.h"
-#include "../rendering/Renderer.h"
-#include "../gui/EditorInterface.h"
-#include "../profiling/Logger.h"
-#include "../scenes/SceneSystem.h"
-#include "../sdks/GeforceNow.h"
-
 
 /*
  * Methods
@@ -25,19 +15,35 @@ void Game::Init(EngineConfig* pConfig)
     Window::Init(pConfig);
     AudioEngine::Init();
     Input::Init();
-    Renderer::Init(GraphicsBackend::VULKAN);
-    EditorInterface::Init();
+//    Renderer::Init(GraphicsBackend::OPENGL);
+//    EditorInterface::Init();
 //    CGeforceNow::Init();
 }
 
 void Game::Run()
 {
+    Window::UpdateFPSInTitle(0.0f);
+
     while(!Window::ShouldCloseWindow())
     {
+        double currentTime = Window::GetTime();
+        double delta = currentTime - previousTime;
+        frameCount++;
+
+        // FPS calculation
+        if (delta >= 2.0f) // we update the fps info every two seconds
+        {
+            int fps = int(frameCount / delta);
+            Window::UpdateFPSInTitle(fps);
+
+            frameCount = 0;
+            previousTime = currentTime;
+        }
+
         Window::Update();
         glfwPollEvents();
 
-        Draw();
+//        Draw();
 
         AudioEngine::Update();
 
@@ -57,10 +63,10 @@ void Game::Draw()
 void Game::Cleanup()
 {
     // destroy engine systems
-    SceneSystem::Shutdown();
-    EditorInterface::Shutdown();
 //    CGeforceNow::Shutdown();
-    Renderer::Shutdown();
+    SceneSystem::Shutdown();
+//    EditorInterface::Shutdown();
+//    Renderer::Shutdown();
     Input::Shutdown();
     AudioEngine::Shutdown();
     Window::Shutdown();

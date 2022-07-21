@@ -18,6 +18,7 @@ struct WindowImpl
     GLFWwindow* window;
 
     uint32_t mWidth, mHeight;
+    std::string title;
 
     void loadIcon();
 };
@@ -37,6 +38,8 @@ public:
     static bool ShouldCloseWindow();
     static WindowSize GetSize();
     static GLFWwindow* GetWindow();
+    static void UpdateFPSInTitle(double fps);
+    static double GetTime();
 
 private:
     void LoadCursor();

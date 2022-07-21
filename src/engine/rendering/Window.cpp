@@ -23,6 +23,7 @@ WindowImpl::WindowImpl(EngineConfig* pConfig)
     // TODO: Pass engine config here
     Logger::Debug("creating window");
     window = glfwCreateWindow(pConfig->windowSize.width, pConfig->windowSize.height, pConfig->gameTitle.c_str(), nullptr, nullptr);
+    title = pConfig->gameTitle;
 
     if (window == nullptr)
         Logger::Error("failed to create window with GLFW", "window == nullptr");
@@ -113,4 +114,16 @@ std::vector<const char *> Window::GetRequiredExtensions()
 
     std::vector<const char *> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
     return extensions;
+}
+
+void Window::UpdateFPSInTitle(double fps)
+{
+    std::stringstream ss;
+    ss << mWindowImpl->title << " (FPS: " << fps << ")";
+    glfwSetWindowTitle(mWindowImpl->window, ss.str().c_str());
+}
+
+double Window::GetTime()
+{
+    return glfwGetTime();
 }
