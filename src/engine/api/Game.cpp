@@ -41,6 +41,8 @@ void Game::Run()
 
         AudioEngine::Update();
 
+        // increment the frame number
+        frames++;
         FrameMark;
     }
 }

@@ -17,7 +17,7 @@ public:
     void Cleanup(); // shuts down the engine
 
 private:
-    int mFrameNumber = 0;
+    int frames = 0;
 };
 
 
