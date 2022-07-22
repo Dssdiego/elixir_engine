@@ -14,12 +14,6 @@
 #include "../profiling/Logger.h"
 #include <cstring>
 
-struct SwapChainSupportDetails {
-    VkSurfaceCapabilitiesKHR capabilities;
-    std::vector<VkSurfaceFormatKHR> formats;
-    std::vector<VkPresentModeKHR> presentModes;
-};
-
 class VulkanDevice
 {
 public:
