@@ -16,11 +16,43 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
     return VK_FALSE;
 }
 
+// TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
+//       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
+VulkanDeviceImpl* mVulkanDeviceImpl = nullptr;
+
 //
-// Constructor/Destructor
+// Initialization/Destruction
 //
 
-VulkanDevice::VulkanDevice()
+void VulkanDevice::Init()
+{
+    mVulkanDeviceImpl = new VulkanDeviceImpl;
+}
+
+void VulkanDevice::Shutdown()
+{
+    delete mVulkanDeviceImpl;
+}
+
+//
+// External
+//
+
+VkCommandBuffer VulkanDevice::BeginSingleTimeCommands()
+{
+    return mVulkanDeviceImpl->BeginSingleTimeCommands();
+}
+
+void VulkanDevice::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
+{
+    mVulkanDeviceImpl->EndSingleTimeCommands(commandBuffer);
+}
+
+//
+// Implementation
+//
+
+VulkanDeviceImpl::VulkanDeviceImpl()
 {
     CreateInstance();
     SetupDebugMessenger();
@@ -30,7 +62,7 @@ VulkanDevice::VulkanDevice()
     CreateCommandPool();
 }
 
-VulkanDevice::~VulkanDevice()
+VulkanDeviceImpl::~VulkanDeviceImpl()
 {
     vkDestroyCommandPool(device, commandPool, nullptr);
     vkDestroyDevice(device, nullptr);
@@ -42,11 +74,7 @@ VulkanDevice::~VulkanDevice()
     vkDestroyInstance(instance, nullptr);
 }
 
-//
-// Methods
-//
-
-void VulkanDevice::CreateInstance()
+void VulkanDeviceImpl::CreateInstance()
 {
     if (enableValidationLayers && !CheckValidationLayerSupport())
     {
@@ -95,13 +123,13 @@ void VulkanDevice::CreateInstance()
     Logger::Debug("Instance created");
 }
 
-void VulkanDevice::CreateSurface()
+void VulkanDeviceImpl::CreateSurface()
 {
     VK_CHECK(glfwCreateWindowSurface(instance, Window::GetWindow(), nullptr, &surface));
     Logger::Debug("Surface created");
 }
 
-void VulkanDevice::SetupDebugMessenger()
+void VulkanDeviceImpl::SetupDebugMessenger()
 {
     if (!enableValidationLayers)
         return;
@@ -113,7 +141,7 @@ void VulkanDevice::SetupDebugMessenger()
     }
 }
 
-void VulkanDevice::PickPhysicalDevice()
+void VulkanDeviceImpl::PickPhysicalDevice()
 {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
@@ -160,7 +188,7 @@ void VulkanDevice::PickPhysicalDevice()
     Logger::Debug("Picked physical device");
 }
 
-void VulkanDevice::CreateLogicalDeviceAndQueues()
+void VulkanDeviceImpl::CreateLogicalDeviceAndQueues()
 {
     // get queue families
     uint32_t queueFamilyCount = 0;
@@ -241,7 +269,7 @@ void VulkanDevice::CreateLogicalDeviceAndQueues()
     Logger::Debug("Created logical device and queues");
 }
 
-void VulkanDevice::CreateCommandPool()
+void VulkanDeviceImpl::CreateCommandPool()
 {
     VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -253,11 +281,45 @@ void VulkanDevice::CreateCommandPool()
     Logger::Debug("Command pool created");
 }
 
+VkCommandBuffer VulkanDeviceImpl::BeginSingleTimeCommands()
+{
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = commandPool;
+    allocInfo.commandBufferCount = 1;
+
+    VkCommandBuffer commandBuffer;
+    vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
+
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+    return commandBuffer;
+}
+
+void VulkanDeviceImpl::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
+{
+    vkEndCommandBuffer(commandBuffer);
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(graphicsQueue);
+    vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+}
+
 //
 // Helpers
 //
 
-bool VulkanDevice::CheckValidationLayerSupport()
+bool VulkanDeviceImpl::CheckValidationLayerSupport()
 {
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -287,7 +349,7 @@ bool VulkanDevice::CheckValidationLayerSupport()
     return true;
 }
 
-void VulkanDevice::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo)
+void VulkanDeviceImpl::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo)
 {
     createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -301,7 +363,7 @@ void VulkanDevice::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateI
     createInfo.pUserData = nullptr;  // Optional
 }
 
-VkResult VulkanDevice::CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
+VkResult VulkanDeviceImpl::CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
                                            const VkAllocationCallbacks *pAllocator,
                                            VkDebugUtilsMessengerEXT *pDebugMessenger)
 {
@@ -313,7 +375,7 @@ VkResult VulkanDevice::CreateDebugUtilsMessengerEXT(VkInstance instance, const V
         return VK_ERROR_EXTENSION_NOT_PRESENT;
 }
 
-SwapChainSupportDetails VulkanDevice::QuerySwapChainSupport(VkPhysicalDevice device)
+SwapChainSupportDetails VulkanDeviceImpl::QuerySwapChainSupport(VkPhysicalDevice device)
 {
     // querying basic surface capabilities
     SwapChainSupportDetails details;
@@ -346,7 +408,7 @@ SwapChainSupportDetails VulkanDevice::QuerySwapChainSupport(VkPhysicalDevice dev
     return details;
 }
 
-bool VulkanDevice::IsDeviceSuitable(VkPhysicalDevice device)
+bool VulkanDeviceImpl::IsDeviceSuitable(VkPhysicalDevice device)
 {
     bool extensionsSupported = CheckDeviceExtensionSupport(device);
     bool swapChainAdequate = false;
@@ -364,7 +426,7 @@ bool VulkanDevice::IsDeviceSuitable(VkPhysicalDevice device)
     return extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
 }
 
-bool VulkanDevice::CheckDeviceExtensionSupport(VkPhysicalDevice device)
+bool VulkanDeviceImpl::CheckDeviceExtensionSupport(VkPhysicalDevice device)
 {
     uint32_t extensionsCount;
     vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionsCount, nullptr);

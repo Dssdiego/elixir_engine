@@ -14,58 +14,17 @@
 #include "../profiling/Logger.h"
 #include <cstring>
 
-class VulkanDevice
-{
-public:
 #ifdef NDEBUG
-    const bool enableValidationLayers = false;
+const bool enableValidationLayers = false;
 #else
-    const bool enableValidationLayers = true;
+const bool enableValidationLayers = true;
 #endif
 
-    VulkanDevice();
-    ~VulkanDevice();
+struct VulkanDeviceImpl
+{
+    VulkanDeviceImpl();
+    ~VulkanDeviceImpl();
 
-    // Not copyable or movable
-    VulkanDevice(const VulkanDevice &) = delete;
-    VulkanDevice &operator=(const VulkanDevice &) = delete;
-    VulkanDevice(VulkanDevice &&) = delete;
-    VulkanDevice &operator=(VulkanDevice &&) = delete;
-
-    VkCommandPool GetCommandPool() { return commandPool; }
-    VkDevice GetDevice() { return device; }
-    VkSurfaceKHR GetSurface() { return surface; }
-    VkQueue GetGraphicsQueue() { return graphicsQueue; }
-    VkQueue GetPresentQueue() { return presentQueue; }
-
-//    SwapChainSupportDetails GetSwapChainSupport() { return QuerySwapChainSupport(physicalDevice); }
-//    uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-//    QueueFamilyIndices FindPhysicalQueueFamilies() { return FindQueueFamilies(physicalDevice); }
-//    VkFormat FindSupportedFormat(
-//            const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
-//
-//    // Buffer Helper Functions
-//    void CreateBuffer(
-//            VkDeviceSize size,
-//            VkBufferUsageFlags usage,
-//            VkMemoryPropertyFlags properties,
-//            VkBuffer &buffer,
-//            VkDeviceMemory &bufferMemory);
-//    VkCommandBuffer beginSingleTimeCommands();
-//    void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
-//    void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-//    void CopyBufferToImage(
-//            VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount);
-//
-//    void CreateImageWithInfo(
-//            const VkImageCreateInfo &imageInfo,
-//            VkMemoryPropertyFlags properties,
-//            VkImage &image,
-//            VkDeviceMemory &imageMemory);
-
-    VkPhysicalDeviceProperties properties{};
-
-private:
     void CreateInstance();
     void SetupDebugMessenger();
     void CreateSurface();
@@ -84,6 +43,10 @@ private:
     bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
 
+    // command buffer single time commands
+    VkCommandBuffer BeginSingleTimeCommands();
+    void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
+
     // variables
     VkInstance instance{};
     VkDebugUtilsMessengerEXT debugMessenger{};
@@ -100,6 +63,61 @@ private:
 
     const std::vector<const char *> validationLayers = { "VK_LAYER_KHRONOS_validation" };
     const std::vector<const char *> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+};
+
+// REVIEW: Transform this class in a singleton?
+class VulkanDevice
+{
+public:
+
+    static void Init();
+    static void Shutdown();
+
+//    VulkanDevice();
+//    ~VulkanDevice();
+
+    // Not copyable or movable
+    VulkanDevice(const VulkanDevice &) = delete;
+    VulkanDevice &operator=(const VulkanDevice &) = delete;
+    VulkanDevice(VulkanDevice &&) = delete;
+    VulkanDevice &operator=(VulkanDevice &&) = delete;
+
+    static VkInstance GetInstance() { return instance; }
+    static VkCommandPool GetCommandPool() { return commandPool; }
+    static VkDevice GetDevice() { return device; }
+    static VkPhysicalDevice GetPhysicalDevice() { return physicalDevice; }
+    static VkSurfaceKHR GetSurface() { return surface; }
+    static VkQueue GetGraphicsQueue() { return graphicsQueue; }
+    static VkQueue GetPresentQueue() { return presentQueue; }
+    static uint32_t GetGraphicsQueueFamilyIdx() { return graphicsFamilyIdx.value(); }
+    static uint32_t GetPresentQueueFamilyIdx() { return presentFamilyIdx.value(); }
+
+//    SwapChainSupportDetails GetSwapChainSupport() { return QuerySwapChainSupport(physicalDevice); }
+//    uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+//    QueueFamilyIndices FindPhysicalQueueFamilies() { return FindQueueFamilies(physicalDevice); }
+//    VkFormat FindSupportedFormat(
+//            const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+//
+//    // Buffer Helper Functions
+//    void CreateBuffer(
+//            VkDeviceSize size,
+//            VkBufferUsageFlags usage,
+//            VkMemoryPropertyFlags properties,
+//            VkBuffer &buffer,
+//            VkDeviceMemory &bufferMemory);
+    static VkCommandBuffer BeginSingleTimeCommands();
+    static void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
+//    void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+//    void CopyBufferToImage(
+//            VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount);
+//
+//    void CreateImageWithInfo(
+//            const VkImageCreateInfo &imageInfo,
+//            VkMemoryPropertyFlags properties,
+//            VkImage &image,
+//            VkDeviceMemory &imageMemory);
+
+    VkPhysicalDeviceProperties properties{};
 };
 
 
