@@ -17,13 +17,14 @@ public:
     ~ImGuiRenderer();
 
     static void Init();
+    static void Shutdown();
 
     void NewFrame();
     void Draw(VkCommandBuffer commandBuffer);
 
 private:
     // we are using a separate descriptor pool for imgui
-    static VkDescriptorPool descriptorPool;
+    inline static VkDescriptorPool descriptorPool = nullptr;
 };
 
 #endif //VULKAN_ENGINE_IMGUIRENDERER_H

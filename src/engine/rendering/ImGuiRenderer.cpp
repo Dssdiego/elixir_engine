@@ -6,6 +6,7 @@
 #include "VulkanContext.h"
 #include "Window.h"
 #include "VulkanDevice.h"
+#include "VulkanSwapchain.h"
 
 // checking for vulkan error
 static void check_vk_result(VkResult err) {
