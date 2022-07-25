@@ -18,6 +18,10 @@ struct EngineRendererImpl
     uint32_t currentImageIdx;
     int currentFrameIndex = 0;
     bool frameHasStarted = false;
+
+    void CreateCommandBuffers();
+    void FreeCommandBuffers();
+    void RecreateSwapChain();
 };
 
 class EngineRenderer
@@ -26,8 +30,8 @@ public:
     static void Init();
     static void Shutdown();
 
-    VkCommandBuffer BeginFrame();
-    void EndFrame();
+    static VkCommandBuffer BeginFrame();
+    static void EndFrame();
 
     void BeginSwapChainRenderPass(VkCommandBuffer commandBuffer);
     void EndSwapChainRenderPass(VkCommandBuffer commandBuffer);

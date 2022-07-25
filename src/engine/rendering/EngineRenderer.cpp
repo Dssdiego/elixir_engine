@@ -23,7 +23,7 @@ void EngineRenderer::Shutdown()
 }
 
 //
-// Implementation
+// External
 //
 
 VkCommandBuffer EngineRenderer::BeginFrame()
@@ -34,4 +34,26 @@ VkCommandBuffer EngineRenderer::BeginFrame()
 void EngineRenderer::EndFrame()
 {
 
+}
+
+//
+// Implementation
+//
+
+void EngineRendererImpl::CreateCommandBuffers()
+{
+    commandBuffers.resize(VulkanSwapchain::MAX_FRAMES_IN_FLIGHT);
+
+    VkCommandBufferAllocateInfo allocInfo = {};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = VulkanDevice::GetCommandPool();
+    allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
+
+    VK_CHECK(vkAllocateCommandBuffers(VulkanDevice::GetDevice(), &allocInfo, commandBuffers.data()));
+
+    VkFenceCreateInfo fenceInfo = {};
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+
+    Logger::Debug("Created command buffers");
 }
