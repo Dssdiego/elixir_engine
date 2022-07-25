@@ -11,20 +11,41 @@
 
 #include "../profiling/Logger.h"
 
+struct VulkanSwapChainImpl
+{
+    VulkanSwapChainImpl();
+    ~VulkanSwapChainImpl();
+
+    void CreateSwapChain();
+    void CreateImageViews();
+    void CreateRenderPass();
+    void CreateDepthResources();
+    void CreateFramebuffers();
+    void CreateSyncObjects();
+
+    VkImageView VulkanSwapChainImpl::CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+
+    VkFormat swapChainImageFormat;
+    VkFormat swapChainDepthFormat;
+
+    VkExtent2D swapChainExtent;
+
+    std::vector<VkImage> swapChainImages;
+
+    VkSwapchainKHR swapChain;
+};
+
 class VulkanSwapchain
 {
 public:
-    const int MAX_FRAMES_IN_FLIGHT = 2;
+    static void Init();
+    static void Shutdown();
+
+    static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
     uint32_t imageCount;
 
-private:
-    void Init();
-    void CreateSwapChain();
-//    void CreateImageViews();
-//    void CreateRenderPass();
-//    void CreateDepthResources();
-//    void CreateFramebuffers();
-//    void CreateSyncObjects();
+    // TODO: Implement
+    static uint32_t GetImageCount() { return 0; }
 };
 
 
