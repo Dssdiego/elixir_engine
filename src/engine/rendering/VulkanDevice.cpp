@@ -48,6 +48,51 @@ void VulkanDevice::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
     mVulkanDeviceImpl->EndSingleTimeCommands(commandBuffer);
 }
 
+VkInstance VulkanDevice::GetInstance()
+{
+    return mVulkanDeviceImpl->instance;
+}
+
+VkCommandPool VulkanDevice::GetCommandPool()
+{
+    return mVulkanDeviceImpl->commandPool;
+}
+
+VkDevice VulkanDevice::GetDevice()
+{
+    return mVulkanDeviceImpl->device;
+}
+
+VkPhysicalDevice VulkanDevice::GetPhysicalDevice()
+{
+    return mVulkanDeviceImpl->physicalDevice;
+}
+
+VkSurfaceKHR VulkanDevice::GetSurface()
+{
+    return mVulkanDeviceImpl->surface;
+}
+
+VkQueue VulkanDevice::GetGraphicsQueue()
+{
+    return mVulkanDeviceImpl->graphicsQueue;
+}
+
+VkQueue VulkanDevice::GetPresentQueue()
+{
+    return mVulkanDeviceImpl->presentQueue;
+}
+
+uint32_t VulkanDevice::GetGraphicsQueueFamilyIdx()
+{
+    return mVulkanDeviceImpl->graphicsFamilyIdx.value();
+}
+
+uint32_t VulkanDevice::GetPresentQueueFamilyIdx()
+{
+    return mVulkanDeviceImpl->presentFamilyIdx.value();
+}
+
 //
 // Implementation
 //

@@ -20,6 +20,7 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
+
 struct VulkanDeviceImpl
 {
     VulkanDeviceImpl();
@@ -69,7 +70,6 @@ struct VulkanDeviceImpl
 class VulkanDevice
 {
 public:
-
     static void Init();
     static void Shutdown();
 
@@ -82,15 +82,15 @@ public:
     VulkanDevice(VulkanDevice &&) = delete;
     VulkanDevice &operator=(VulkanDevice &&) = delete;
 
-    static VkInstance GetInstance() { return instance; }
-    static VkCommandPool GetCommandPool() { return commandPool; }
-    static VkDevice GetDevice() { return device; }
-    static VkPhysicalDevice GetPhysicalDevice() { return physicalDevice; }
-    static VkSurfaceKHR GetSurface() { return surface; }
-    static VkQueue GetGraphicsQueue() { return graphicsQueue; }
-    static VkQueue GetPresentQueue() { return presentQueue; }
-    static uint32_t GetGraphicsQueueFamilyIdx() { return graphicsFamilyIdx.value(); }
-    static uint32_t GetPresentQueueFamilyIdx() { return presentFamilyIdx.value(); }
+    static VkInstance GetInstance();
+    static VkCommandPool GetCommandPool();
+    static VkDevice GetDevice();
+    static VkPhysicalDevice GetPhysicalDevice();
+    static VkSurfaceKHR GetSurface();
+    static VkQueue GetGraphicsQueue();
+    static VkQueue GetPresentQueue();
+    static uint32_t GetGraphicsQueueFamilyIdx();
+    static uint32_t GetPresentQueueFamilyIdx();
 
 //    SwapChainSupportDetails GetSwapChainSupport() { return QuerySwapChainSupport(physicalDevice); }
 //    uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
