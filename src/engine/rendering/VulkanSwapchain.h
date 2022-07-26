@@ -34,6 +34,12 @@ struct VulkanSwapChainImpl
     VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
     VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes);
     VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+    VkFormat FindDepthFormat();
+    VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+    void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
+                     VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image,
+                     VkDeviceMemory& imageMemory);
+    uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
     // variables
     VkFormat swapChainImageFormat;
@@ -45,6 +51,11 @@ struct VulkanSwapChainImpl
     std::vector<VkImageView> swapChainImageViews;
 
     VkSwapchainKHR swapChain;
+    VkRenderPass renderPass;
+
+    VkImage depthImage;
+    VkDeviceMemory depthImageMemory;
+    VkImageView depthImageView;
 };
 
 class VulkanSwapchain

@@ -31,8 +31,8 @@ VulkanSwapChainImpl::VulkanSwapChainImpl()
 {
     CreateSwapChain();
     CreateImageViews();
-//    CreateRenderPass(); // TODO
-//    CreateDepthResources(); // TODO
+    CreateRenderPass();
+    CreateDepthResources();
 //    CreateFramebuffers(); // TODO
 //    CreateSyncObjects(); // TODO
 }
@@ -149,6 +149,86 @@ void VulkanSwapChainImpl::CreateImageViews()
     std::cout << "# of image views created: " << swapChainImageViews.size() << std::endl;
 }
 
+void VulkanSwapChainImpl::CreateRenderPass()
+{
+    // for now, just a single color buffer attachment represented by one of the images from the swap chain
+    VkAttachmentDescription colorAttachment{};
+    colorAttachment.format = swapChainImageFormat; // matching the format of the swap chain images
+    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT; // matching the format of the swap chain images
+    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR; // clear the framebuffer before drawing a new frame
+    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE; // rendered contents will be stored in memory
+    colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE; // doing nothing with stencil buffers for now, so we don't care what is in the buffer
+    colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE; // doing nothing with stencil buffers for now, so we don't care what is in the buffer
+    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED; // layout of the image before the render pass begins
+    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR; // layout to automatically transition the image to when the render pass finishes
+
+    // we'll stick to a single subpass for now (so index 0)
+    VkAttachmentReference colorAttachmentRef{};
+    colorAttachmentRef.attachment = 0;
+    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    // depth
+    VkAttachmentDescription depthAttachment{};
+    depthAttachment.format = FindDepthFormat();
+    depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+    VkAttachmentReference depthAttachmentRef{};
+    depthAttachmentRef.attachment = 1;
+    depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+    // subpass
+    VkSubpassDescription subpass{};
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments = &colorAttachmentRef;
+    subpass.pDepthStencilAttachment = &depthAttachmentRef;
+
+    VkSubpassDependency dependency{};
+    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+    dependency.dstSubpass = 0;
+    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT; // wait for the swap chain to finish reading before we can access it
+    dependency.srcAccessMask = 0;
+    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+    std::array<VkAttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };
+
+    VkRenderPassCreateInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+    renderPassInfo.pAttachments = attachments.data();
+    renderPassInfo.subpassCount = 1;
+    renderPassInfo.pSubpasses = &subpass;
+    renderPassInfo.dependencyCount = 1;
+    renderPassInfo.pDependencies = &dependency;
+
+    // effectively creating the render pass
+    VK_CHECK(vkCreateRenderPass(VulkanDevice::GetDevice(), &renderPassInfo, nullptr, &renderPass));
+
+    Logger::Debug("Render pass created");
+}
+
+void VulkanSwapChainImpl::CreateDepthResources()
+{
+    // REVIEW: Use multiple depth buffers/images? Ex.: One depth buffer per framebuffer?
+    //         How it would change on our render pass?
+    VkFormat depthFormat = FindDepthFormat();
+
+    CreateImage(swapChainExtent.width, swapChainExtent.height,
+                depthFormat, VK_IMAGE_TILING_OPTIMAL,
+                VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage,
+                depthImageMemory);
+
+    depthImageView = CreateImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+}
+
 //
 // Helpers
 //
@@ -241,3 +321,89 @@ VkExtent2D VulkanSwapChainImpl::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR 
         return actualExtent;
     }
 }
+
+VkFormat VulkanSwapChainImpl::FindDepthFormat()
+{
+    return FindSupportedFormat(
+            { VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
+            VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
+    );
+}
+
+VkFormat VulkanSwapChainImpl::FindSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling,
+                                                  VkFormatFeatureFlags features)
+{
+    for (VkFormat format : candidates)
+    {
+        VkFormatProperties props;
+        vkGetPhysicalDeviceFormatProperties(VulkanDevice::GetPhysicalDevice(), format, &props);
+
+        if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features)
+        {
+            return format;
+        } else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features)
+        {
+            return format;
+        }
+    }
+
+    Logger::Error("failed to find supported format", "");
+    throw std::runtime_error("failed to find supported format");
+}
+
+void VulkanSwapChainImpl::CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
+                                      VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage &image,
+                                      VkDeviceMemory &imageMemory)
+{
+    // REVIEW: I stopped here
+    VkImageCreateInfo imageInfo{};
+    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageInfo.extent.width = width;
+    imageInfo.extent.height = height;
+    imageInfo.extent.depth = 1; // how many texels are on each axis of the image
+    imageInfo.mipLevels = 1; // not using mipmapping for now
+    imageInfo.arrayLayers = 1; // texture is not an array
+    imageInfo.format = format; // same as the pixels in the buffer
+    imageInfo.tiling = tiling; // texels are laid out in an implementation defined order for optimal access
+    // NOTE: tiling can't be changed at a later time, layout can
+    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageInfo.usage = usage;
+    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT; // related to multisampling
+    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE; // the image will only be used by one queue family
+    imageInfo.flags = 0; // optional
+
+    VK_CHECK(vkCreateImage(VulkanDevice::GetDevice(), &imageInfo, nullptr, &image));
+
+    VkMemoryRequirements memRequirements;
+    vkGetImageMemoryRequirements(VulkanDevice::GetDevice(), image, &memRequirements);
+
+    VkMemoryAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirements.size;
+    allocInfo.memoryTypeIndex = FindMemoryType(memRequirements.memoryTypeBits, properties);
+
+    VK_CHECK(vkAllocateMemory(VulkanDevice::GetDevice(), &allocInfo, nullptr, &imageMemory));
+
+    vkBindImageMemory(VulkanDevice::GetDevice(), image, imageMemory, 0);
+
+}
+
+uint32_t VulkanSwapChainImpl::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+{
+    // querying info about the available types of memory
+    VkPhysicalDeviceMemoryProperties memProperties;
+    vkGetPhysicalDeviceMemoryProperties(VulkanDevice::GetPhysicalDevice(), &memProperties);
+
+    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+    {
+        if (typeFilter & (1 << i) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+        {
+            return i;
+        }
+    }
+
+    throw std::runtime_error("failed to find a suitable memory type");
+}
+
+
