@@ -5,6 +5,12 @@
 #ifndef VULKAN_ENGINE_VULKANSWAPCHAIN_H
 #define VULKAN_ENGINE_VULKANSWAPCHAIN_H
 
+#ifdef _WIN32
+#define NOMINMAX
+#include <Windows.h>
+#include <array>
+#endif
+
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <iostream>
@@ -23,14 +29,20 @@ struct VulkanSwapChainImpl
     void CreateFramebuffers();
     void CreateSyncObjects();
 
+    // helpers
     VkImageView VulkanSwapChainImpl::CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+    VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
+    VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes);
+    VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
+    // variables
     VkFormat swapChainImageFormat;
     VkFormat swapChainDepthFormat;
 
     VkExtent2D swapChainExtent;
 
     std::vector<VkImage> swapChainImages;
+    std::vector<VkImageView> swapChainImageViews;
 
     VkSwapchainKHR swapChain;
 };

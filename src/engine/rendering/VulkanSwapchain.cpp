@@ -31,10 +31,38 @@ VulkanSwapChainImpl::VulkanSwapChainImpl()
 {
     CreateSwapChain();
     CreateImageViews();
-    CreateRenderPass();
-    CreateDepthResources();
-    CreateFramebuffers();
-    CreateSyncObjects();
+//    CreateRenderPass(); // TODO
+//    CreateDepthResources(); // TODO
+//    CreateFramebuffers(); // TODO
+//    CreateSyncObjects(); // TODO
+}
+
+VulkanSwapChainImpl::~VulkanSwapChainImpl()
+{
+    for (auto imageView : swapChainImageViews)
+    {
+        vkDestroyImageView(VulkanDevice::GetDevice(), imageView, nullptr);
+    }
+    swapChainImages.clear();
+
+    if (swapChain != nullptr)
+    {
+        vkDestroySwapchainKHR(VulkanDevice::GetDevice(), swapChain, nullptr);
+        swapChain = nullptr;
+    }
+
+    // TODO: Destroy depth images (image view, image and free memory)
+
+    // TODO: Destroy swapchain frame buffers
+//    for (auto frameBuffer : swapChainFrameBuffers)
+//    {
+//
+//    }
+
+    // TODO: Destroy render pass
+//    vkDestroyRenderPass(VulkanDevice::GetDevice(), renderPass, nullptr);
+
+    // TODO: Cleanup synchonization objects (semaphores and fences)
 }
 
 void VulkanSwapChainImpl::CreateSwapChain()
@@ -111,15 +139,14 @@ void VulkanSwapChainImpl::CreateSwapChain()
 void VulkanSwapChainImpl::CreateImageViews()
 {
     // resizing the list to fit all of the image views
-    swapChainImageViews.resize(swapChain.size());
+    swapChainImageViews.resize(swapChainImages.size());
 
-    for (size_t i = 0; i < vkSwapChainImages.size(); i++)
+    for (size_t i = 0; i < swapChainImages.size(); i++)
     {
-        vkSwapChainImageViews[i] = CreateImageView(vkSwapChainImages[i], vkSwapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
+        swapChainImageViews[i] = CreateImageView(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
     }
 
-    std::cout << "# of image views created: " << vkSwapChainImageViews.size() << std::endl;
-
+    std::cout << "# of image views created: " << swapChainImageViews.size() << std::endl;
 }
 
 //
@@ -143,4 +170,74 @@ VkImageView VulkanSwapChainImpl::CreateImageView(VkImage image, VkFormat format,
     VK_CHECK(vkCreateImageView(VulkanDevice::GetDevice(), &viewInfo, nullptr, &imageView));
 
     return imageView;
+}
+
+VkSurfaceFormatKHR VulkanSwapChainImpl::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats)
+{
+    VkSurfaceFormatKHR result;
+
+    // if vulkan returned an unknown format, then we just force what we want.
+    if (availableFormats.size() == 1 && availableFormats[0].format == VK_FORMAT_UNDEFINED)
+    {
+        result.format = VK_FORMAT_B8G8R8A8_UNORM;
+        result.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+        return result;
+    }
+
+    // favor 32 bit rgba and srgb nonlinear colorspace
+    for (const auto& availableFormat : availableFormats)
+    {
+        if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM &&
+            availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+            return availableFormat;
+        }
+    }
+
+    // if all else fails, just return what's available
+    return availableFormats[0];
+}
+
+VkPresentModeKHR VulkanSwapChainImpl::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes)
+{
+    // checking if triple buffering is available
+    for (const auto& availablePresentMode: availablePresentModes)
+    {
+        if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+        {
+            Logger::Debug("Present Mode: MAILBOX");
+            return availablePresentMode;
+        }
+    }
+
+    // if triple buffering is not available, use Vulkan's default swap chain queue (aka VSync)
+    Logger::Debug("Present Mode: V-SYNC");
+    return VK_PRESENT_MODE_FIFO_KHR;
+}
+
+VkExtent2D VulkanSwapChainImpl::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities)
+{
+    if (capabilities.currentExtent.width != UINT32_MAX)
+    {
+        return capabilities.currentExtent;
+    } else {
+        int width, height;
+        glfwGetFramebufferSize(Window::GetWindow(), &width, &height);
+
+        VkExtent2D actualExtent = {
+                static_cast<uint32_t>(width),
+                static_cast<uint32_t>(height)
+        };
+
+        actualExtent.width =
+                std::max(capabilities.minImageExtent.width,
+                         std::min(capabilities.maxImageExtent.width,
+                                  actualExtent.width));
+
+        actualExtent.height =
+                std::max(capabilities.minImageExtent.height,
+                         std::min(capabilities.maxImageExtent.height,
+                                  actualExtent.height));
+
+        return actualExtent;
+    }
 }
