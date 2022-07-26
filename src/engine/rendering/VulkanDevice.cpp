@@ -93,6 +93,11 @@ uint32_t VulkanDevice::GetPresentQueueFamilyIdx()
     return mVulkanDeviceImpl->presentFamilyIdx.value();
 }
 
+SwapChainSupportDetails VulkanDevice::GetSwapChainSupport()
+{
+    return mVulkanDeviceImpl->QuerySwapChainSupport(mVulkanDeviceImpl->physicalDevice);
+}
+
 //
 // Implementation
 //

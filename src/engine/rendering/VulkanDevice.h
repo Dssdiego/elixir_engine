@@ -92,7 +92,7 @@ public:
     static uint32_t GetGraphicsQueueFamilyIdx();
     static uint32_t GetPresentQueueFamilyIdx();
 
-//    SwapChainSupportDetails GetSwapChainSupport() { return QuerySwapChainSupport(physicalDevice); }
+    static SwapChainSupportDetails GetSwapChainSupport();
 //    uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 //    QueueFamilyIndices FindPhysicalQueueFamilies() { return FindQueueFamilies(physicalDevice); }
 //    VkFormat FindSupportedFormat(
