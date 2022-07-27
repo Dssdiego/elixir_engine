@@ -56,6 +56,8 @@ struct VulkanSwapChainImpl
     VkImage depthImage;
     VkDeviceMemory depthImageMemory;
     VkImageView depthImageView;
+
+    std::vector<VkFramebuffer> swapChainFrameBuffers;
 };
 
 class VulkanSwapchain

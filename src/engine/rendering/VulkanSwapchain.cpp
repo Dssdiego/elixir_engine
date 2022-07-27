@@ -33,7 +33,7 @@ VulkanSwapChainImpl::VulkanSwapChainImpl()
     CreateImageViews();
     CreateRenderPass();
     CreateDepthResources();
-//    CreateFramebuffers(); // TODO
+    CreateFramebuffers();
 //    CreateSyncObjects(); // TODO
 }
 
@@ -229,6 +229,36 @@ void VulkanSwapChainImpl::CreateDepthResources()
     depthImageView = CreateImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 }
 
+void VulkanSwapChainImpl::CreateFramebuffers()
+{
+    // resizing the container to hold all of the framebuffers
+    // REVIEW: Use swapchain image count here?
+    swapChainFrameBuffers.resize(swapChainImageViews.size());
+
+    // iterate through the image views and create framebuffers from them
+    // REVIEW: Use swapchain image count here?
+    for (size_t i = 0; i < swapChainImageViews.size(); i++)
+    {
+        std::array<VkImageView, 2> attachments = {
+                swapChainImageViews[i],
+                depthImageView // REVIEW: Pass multiple depth buffers here if we are using them
+        };
+
+        VkFramebufferCreateInfo frameBufferInfo{};
+        frameBufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        frameBufferInfo.renderPass = renderPass;
+        frameBufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+        frameBufferInfo.pAttachments = attachments.data();
+        frameBufferInfo.width = swapChainExtent.width;
+        frameBufferInfo.height = swapChainExtent.height;
+        frameBufferInfo.layers = 1; // out swap chain contains single images, so only 1 layer
+
+        VK_CHECK(vkCreateFramebuffer(VulkanDevice::GetDevice(), &frameBufferInfo, nullptr, &swapChainFrameBuffers[i]));
+    }
+
+    Logger::Debug("Framebuffers created");
+}
+
 //
 // Helpers
 //
@@ -405,5 +435,7 @@ uint32_t VulkanSwapChainImpl::FindMemoryType(uint32_t typeFilter, VkMemoryProper
 
     throw std::runtime_error("failed to find a suitable memory type");
 }
+
+
 
 
