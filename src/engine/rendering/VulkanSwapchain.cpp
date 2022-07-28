@@ -39,12 +39,14 @@ VulkanSwapChainImpl::VulkanSwapChainImpl()
 
 VulkanSwapChainImpl::~VulkanSwapChainImpl()
 {
+    Logger::Debug("Destroying swapchain image views");
     for (auto imageView : swapChainImageViews)
     {
         vkDestroyImageView(VulkanDevice::GetDevice(), imageView, nullptr);
     }
     swapChainImages.clear();
 
+    Logger::Debug("Destroying swapchain");
     if (swapChain != nullptr)
     {
         vkDestroySwapchainKHR(VulkanDevice::GetDevice(), swapChain, nullptr);
@@ -53,14 +55,14 @@ VulkanSwapChainImpl::~VulkanSwapChainImpl()
 
     // TODO: Destroy depth images (image view, image and free memory)
 
-    // TODO: Destroy swapchain frame buffers
-//    for (auto frameBuffer : swapChainFrameBuffers)
-//    {
-//
-//    }
+    Logger::Debug("Destroying framebuffers");
+    for (auto frameBuffer : swapChainFrameBuffers)
+    {
+        vkDestroyFramebuffer(VulkanDevice::GetDevice(), frameBuffer, nullptr);
+    }
 
-    // TODO: Destroy render pass
-//    vkDestroyRenderPass(VulkanDevice::GetDevice(), renderPass, nullptr);
+    Logger::Debug("Destroying renderpass");
+    vkDestroyRenderPass(VulkanDevice::GetDevice(), renderPass, nullptr);
 
     // TODO: Cleanup synchonization objects (semaphores and fences)
 }

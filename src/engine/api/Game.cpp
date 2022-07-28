@@ -15,8 +15,9 @@ void Game::Init(EngineConfig* pConfig)
     Window::Init(pConfig);
     AudioEngine::Init();
     Input::Init();
-    Renderer::Init(GraphicsBackend::VULKAN);
-    EditorInterface::Init();
+    EngineRenderer::Init();
+//    Renderer::Init(GraphicsBackend::VULKAN);
+//    EditorInterface::Init();
 //    CGeforceNow::Init();
 }
 
@@ -43,7 +44,7 @@ void Game::Run()
         Window::Update();
         glfwPollEvents();
 
-        Draw();
+//        Draw();
 
         AudioEngine::Update();
 
@@ -56,8 +57,8 @@ void Game::Run()
 void Game::Draw()
 {
     // REVIEW: Does the editor draws BEFORE or AFTER the gamne?
-    EditorInterface::Draw();
-    Renderer::Draw();
+//    EditorInterface::Draw();
+//    Renderer::Draw();
 }
 
 void Game::Cleanup()
@@ -65,8 +66,9 @@ void Game::Cleanup()
     // destroy engine systems
 //    CGeforceNow::Shutdown();
     SceneSystem::Shutdown();
-    EditorInterface::Shutdown();
-    Renderer::Shutdown();
+    EngineRenderer::Shutdown();
+//    EditorInterface::Shutdown();
+//    Renderer::Shutdown();
     Input::Shutdown();
     AudioEngine::Shutdown();
     Window::Shutdown();

@@ -14,12 +14,17 @@ EngineRendererImpl* mEngineRendererImpl = nullptr;
 
 void EngineRenderer::Init()
 {
+    Logger::Info("Initializing engine renderer");
 
+    VulkanDevice::Init();
+    VulkanSwapchain::Init();
 }
 
 void EngineRenderer::Shutdown()
 {
-
+    Logger::Info("Shutting down engine renderer");
+    VulkanSwapchain::Shutdown();
+    VulkanDevice::Shutdown();
 }
 
 //

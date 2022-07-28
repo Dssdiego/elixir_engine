@@ -453,6 +453,11 @@ SwapChainSupportDetails VulkanDeviceImpl::QuerySwapChainSupport(VkPhysicalDevice
         std::cout << "# of present modes: " << presentModeCount << std::endl;
         details.presentModes.resize(presentModeCount);
         vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
+
+        for (auto p : details.presentModes)
+        {
+            std::cout << "Present Mode Available: " << p << std::endl;
+        }
     }
 
     return details;
