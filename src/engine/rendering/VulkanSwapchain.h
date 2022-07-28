@@ -14,6 +14,7 @@
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <iostream>
+#include <array>
 
 #include "../profiling/Logger.h"
 
@@ -30,7 +31,7 @@ struct VulkanSwapChainImpl
     void CreateSyncObjects();
 
     // helpers
-    VkImageView VulkanSwapChainImpl::CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+    VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
     VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
     VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes);
     VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
