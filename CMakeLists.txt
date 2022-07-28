@@ -38,12 +38,6 @@ else()
             "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/libfmodstudio.so" # for production use
             #            "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/fmodstudioL_vc.lib" # for debug use
             )
-#    file(COPY
-#            "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/fmod.dll" # for production use
-#            "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/fmodstudio.dll" # for production use
-#            #            "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/fmodstudioL.dll" # for debug use
-#            DESTINATION ${CMAKE_BINARY_DIR})
-
 endif()
 
 # Geforce NOW
