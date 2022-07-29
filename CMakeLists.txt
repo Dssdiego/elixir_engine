@@ -120,4 +120,5 @@ add_custom_target(copy_assets
         )
 add_dependencies(${PROJECT_NAME} copy_assets)
 
+# TODO: Use rcedit after cmake build to change windows executable details
 # TODO: Package project with CPACK
