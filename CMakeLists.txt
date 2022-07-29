@@ -76,10 +76,14 @@ SET(CPACK_GENERATOR "ZIP")
 SET(CPACK_PACKAGE_NAME "Elixir Engine")
 include(CPack)
 
+# application icon
+set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/appicon.rc")
+
 # creating executable
 add_executable(${PROJECT_NAME}
         ${SOURCE_FILES}
         thirdparty/glad/glad.c
+        ${APP_ICON_RESOURCE_WINDOWS}
         )
 
 if(WIN32)
