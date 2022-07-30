@@ -38,8 +38,8 @@ struct VulkanDeviceImpl
 //    std::vector<const char *> GetRequiredExtensions();
     bool CheckValidationLayerSupport();
 //    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
-    void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
     VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *createInfo, const VkAllocationCallbacks *allocator, VkDebugUtilsMessengerEXT *debugMessenger);
+    void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
 //    void HasGflwRequiredInstanceExtensions();
     bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
@@ -49,15 +49,15 @@ struct VulkanDeviceImpl
     void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
 
     // variables
-    VkInstance instance{};
-    VkDebugUtilsMessengerEXT debugMessenger{};
+    VkInstance instance;
+    VkDebugUtilsMessengerEXT debugMessenger;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-    VkCommandPool commandPool{};
+    VkCommandPool commandPool;
 
-    VkDevice device{};
-    VkSurfaceKHR surface{};
-    VkQueue graphicsQueue{};
-    VkQueue presentQueue{};
+    VkDevice device;
+    VkSurfaceKHR surface;
+    VkQueue graphicsQueue;
+    VkQueue presentQueue;
 
     std::optional<uint32_t> graphicsFamilyIdx;
     std::optional<uint32_t> presentFamilyIdx;
@@ -117,7 +117,7 @@ public:
 //            VkImage &image,
 //            VkDeviceMemory &imageMemory);
 
-    VkPhysicalDeviceProperties properties{};
+    VkPhysicalDeviceProperties properties;
 };
 
 
