@@ -20,6 +20,13 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
+struct QueueFamilyIndices {
+    uint32_t graphicsFamily;
+    uint32_t presentFamily;
+    bool graphicsFamilyHasValue = false;
+    bool presentFamilyHasValue = false;
+    bool isComplete() { return graphicsFamilyHasValue && presentFamilyHasValue; }
+};
 
 struct VulkanDeviceImpl
 {
@@ -34,6 +41,8 @@ struct VulkanDeviceImpl
     void CreateCommandPool();
 
     // helper methods
+    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
+    QueueFamilyIndices FindPhysicalQueueFamilies();
     bool IsDeviceSuitable(VkPhysicalDevice device);
 //    std::vector<const char *> GetRequiredExtensions();
     bool CheckValidationLayerSupport();
@@ -59,8 +68,8 @@ struct VulkanDeviceImpl
     VkQueue graphicsQueue;
     VkQueue presentQueue;
 
-    std::optional<uint32_t> graphicsFamilyIdx;
-    std::optional<uint32_t> presentFamilyIdx;
+//    std::optional<uint32_t> graphicsFamilyIdx;
+//    std::optional<uint32_t> presentFamilyIdx;
 
     const std::vector<const char *> validationLayers = { "VK_LAYER_KHRONOS_validation" };
     const std::vector<const char *> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };

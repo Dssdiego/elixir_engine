@@ -100,12 +100,12 @@ VkQueue VulkanDevice::GetPresentQueue()
 
 uint32_t VulkanDevice::GetGraphicsQueueFamilyIdx()
 {
-    return mVulkanDeviceImpl->graphicsFamilyIdx.value();
+    return mVulkanDeviceImpl->FindPhysicalQueueFamilies().graphicsFamily;
 }
 
 uint32_t VulkanDevice::GetPresentQueueFamilyIdx()
 {
-    return mVulkanDeviceImpl->presentFamilyIdx.value();
+    return mVulkanDeviceImpl->FindPhysicalQueueFamilies().presentFamily;
 }
 
 SwapChainSupportDetails VulkanDevice::GetSwapChainSupport()
@@ -267,40 +267,10 @@ void VulkanDeviceImpl::PickPhysicalDevice()
 
 void VulkanDeviceImpl::CreateLogicalDeviceAndQueues()
 {
-
-
-    // get queue families
-    uint32_t queueFamilyCount = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
-    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-    vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());
-
-    int i = 0;
-    for (const auto& queueFamily: queueFamilies)
-    {
-        // getting the graphics queue family index
-        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
-            graphicsFamilyIdx = i;
-
-        // look for a queue family that has the capability of presenting to our window surface
-        VkBool32 presentSupport = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &presentSupport);
-
-        // getting the present queue family index
-        if (presentSupport)
-            presentFamilyIdx = i;
-
-        // checking if we found queue(s) that support both graphics as presentation
-        if (graphicsFamilyIdx.has_value() && presentFamilyIdx.has_value())
-            break;
-
-        i++;
-    }
+    QueueFamilyIndices indices = FindQueueFamilies(physicalDevice);
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-    std::set<uint32_t> uniqueQueueFamilies = {
-            &graphicsFamilyIdx.value(), &presentFamilyIdx.value()
-    };
+    std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily };
 
     // assigning a priority queue (0.0f -> 1.0f)
     float queuePriority = 1.0f;
@@ -342,18 +312,20 @@ void VulkanDeviceImpl::CreateLogicalDeviceAndQueues()
     VK_CHECK(vkCreateDevice(physicalDevice, &createInfo, nullptr, &device));
 
     // getting the device graphics/present queues
-    vkGetDeviceQueue(device, graphicsFamilyIdx.value(), 0, &graphicsQueue);
-    vkGetDeviceQueue(device, presentFamilyIdx.value(), 0, &presentQueue);
+    vkGetDeviceQueue(device, indices.graphicsFamily, 0, &graphicsQueue);
+    vkGetDeviceQueue(device, indices.presentFamily, 0, &presentQueue);
 
     Logger::Debug("Created logical device and queues");
 }
 
 void VulkanDeviceImpl::CreateCommandPool()
 {
+    QueueFamilyIndices queueFamilyIndices = FindPhysicalQueueFamilies();
+
     VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // this allows the command buffer to be implicitly reset when 'vkBeginCommandBuffer' is called
-    poolInfo.queueFamilyIndex = graphicsFamilyIdx.value(); // since we want to record the commands for drawing, we must use the graphics queue family
+    poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily; // since we want to record the commands for drawing, we must use the graphics queue family
 
     VK_CHECK(vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool));
 
@@ -397,6 +369,43 @@ void VulkanDeviceImpl::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
 //
 // Helpers
 //
+
+QueueFamilyIndices VulkanDeviceImpl::FindQueueFamilies(VkPhysicalDevice device)
+{
+    QueueFamilyIndices indices;
+
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+    int i = 0;
+    for (const auto &queueFamily : queueFamilies) {
+        if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+            indices.graphicsFamily = i;
+            indices.graphicsFamilyHasValue = true;
+        }
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+        if (queueFamily.queueCount > 0 && presentSupport) {
+            indices.presentFamily = i;
+            indices.presentFamilyHasValue = true;
+        }
+        if (indices.isComplete()) {
+            break;
+        }
+
+        i++;
+    }
+
+    return indices;
+}
+
+QueueFamilyIndices VulkanDeviceImpl::FindPhysicalQueueFamilies()
+{
+    return FindQueueFamilies(physicalDevice);
+}
 
 bool VulkanDeviceImpl::CheckValidationLayerSupport()
 {
@@ -486,6 +495,8 @@ SwapChainSupportDetails VulkanDeviceImpl::QuerySwapChainSupport(VkPhysicalDevice
 
 bool VulkanDeviceImpl::IsDeviceSuitable(VkPhysicalDevice device)
 {
+    QueueFamilyIndices indices = FindQueueFamilies(device);
+
     bool extensionsSupported = CheckDeviceExtensionSupport(device);
     bool swapChainAdequate = false;
 
@@ -499,7 +510,7 @@ bool VulkanDeviceImpl::IsDeviceSuitable(VkPhysicalDevice device)
     VkPhysicalDeviceFeatures supportedFeatures;
     vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
 
-    return extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
+    return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
 }
 
 bool VulkanDeviceImpl::CheckDeviceExtensionSupport(VkPhysicalDevice device)
@@ -519,5 +530,3 @@ bool VulkanDeviceImpl::CheckDeviceExtensionSupport(VkPhysicalDevice device)
 
     return requiredExtensions.empty();
 }
-
-
