@@ -23,6 +23,7 @@ void EngineRenderer::Init()
 void EngineRenderer::Shutdown()
 {
     Logger::Info("Shutting down engine renderer");
+
     VulkanSwapchain::Shutdown();
     VulkanDevice::Shutdown();
 }
@@ -61,4 +62,14 @@ void EngineRendererImpl::CreateCommandBuffers()
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 
     Logger::Debug("Created command buffers");
+}
+
+void EngineRendererImpl::FreeCommandBuffers()
+{
+    vkFreeCommandBuffers(
+            VulkanDevice::GetDevice(),
+            VulkanDevice::GetCommandPool(),
+            static_cast<uint32_t>(commandBuffers.size()),
+            commandBuffers.data());
+    commandBuffers.clear();
 }
