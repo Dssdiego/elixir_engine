@@ -54,6 +54,10 @@ VulkanSwapChainImpl::~VulkanSwapChainImpl()
     }
 
     // TODO: Destroy depth images (image view, image and free memory)
+    Logger::Debug("Destroying depth image");
+    vkDestroyImageView(VulkanDevice::GetDevice(), depthImageView, nullptr);
+    vkDestroyImage(VulkanDevice::GetDevice(), depthImage, nullptr);
+    vkFreeMemory(VulkanDevice::GetDevice(), depthImageMemory, nullptr);
 
     Logger::Debug("Destroying framebuffers");
     for (auto frameBuffer : swapChainFrameBuffers)
