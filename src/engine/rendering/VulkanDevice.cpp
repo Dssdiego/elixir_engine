@@ -198,6 +198,7 @@ void VulkanDeviceImpl::CreateInstance()
 void VulkanDeviceImpl::CreateSurface()
 {
     VK_CHECK(glfwCreateWindowSurface(instance, Window::GetWindow(), nullptr, &surface));
+
     Logger::Debug("Surface created");
 }
 
@@ -213,6 +214,8 @@ void VulkanDeviceImpl::SetupDebugMessenger()
     createInfo.pUserData = nullptr; // Optional
 
     VK_CHECK(CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger));
+
+    Logger::Debug("Setup debug messenger");
 }
 
 void VulkanDeviceImpl::PickPhysicalDevice()
@@ -264,6 +267,8 @@ void VulkanDeviceImpl::PickPhysicalDevice()
 
 void VulkanDeviceImpl::CreateLogicalDeviceAndQueues()
 {
+
+
     // get queue families
     uint32_t queueFamilyCount = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
