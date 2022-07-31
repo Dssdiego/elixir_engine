@@ -1,0 +1,22 @@
+name: osx
+on: [push]
+jobs:
+  osx-build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.0.0
+      - name: Download and Install GLFW
+        run: brew install glfw
+      - name: Prepare Vulkan SDK
+        uses: humbletim/setup-vulkan-sdk@v1.2.0
+        with:
+          vulkan-query-version: 1.3.204.0
+          vulkan-components: Vulkan-Headers, Vulkan-Loader
+          vulkan-use-cache: true
+      - name: Build Project
+        uses: nicledomaS/cmake_build_action@v1.4
+        with:
+          submodule_update: ON
+          run_tests: ON
+          unit_test_build: -Dtest=ON
