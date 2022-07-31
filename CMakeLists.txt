@@ -32,6 +32,11 @@ file(COPY
         "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/fmodstudio.dll" # for production use
         #            "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/fmodstudioL.dll" # for debug use
         DESTINATION ${CMAKE_BINARY_DIR})
+elseif(APPLE)
+    set(FMOD_LIBRARY
+            "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/libfmod.dylib" # for production use
+            "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/libfmodstudio.dylib" # for production use
+            )
 else()
     set(FMOD_LIBRARY
             "${CMAKE_SOURCE_DIR}/thirdparty/fmod/lib/x64/libfmod.so" # for production use
