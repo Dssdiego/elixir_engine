@@ -28,6 +28,11 @@ uint32_t VulkanSwapchain::GetImageCount()
     return mVulkanSwapChainImpl->GetImageCount();
 }
 
+uint32_t VulkanSwapchain::GetNumberOfFramesInFlight()
+{
+    return mVulkanSwapChainImpl->MAX_FRAMES_IN_FLIGHT;
+}
+
 //
 // Implementation
 //

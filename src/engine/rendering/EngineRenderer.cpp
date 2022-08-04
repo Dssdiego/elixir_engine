@@ -49,20 +49,17 @@ void EngineRenderer::EndFrame()
 void EngineRendererImpl::CreateCommandBuffers()
 {
     // REVIEW: This is probably wrong since we are creating the sync objects in the swap chain!
-//    commandBuffers.resize(VulkanSwapchain::GetNumberOfFramesInFlight());
-//
-//    VkCommandBufferAllocateInfo allocInfo = {};
-//    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-//    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-//    allocInfo.commandPool = VulkanDevice::GetCommandPool();
-//    allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
-//
-//    VK_CHECK(vkAllocateCommandBuffers(VulkanDevice::GetDevice(), &allocInfo, commandBuffers.data()));
-//
-//    VkFenceCreateInfo fenceInfo = {};
-//    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-//
-//    Logger::Debug("Created command buffers");
+    commandBuffers.resize(VulkanSwapchain::GetNumberOfFramesInFlight());
+
+    VkCommandBufferAllocateInfo allocInfo = {};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = VulkanDevice::GetCommandPool();
+    allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
+
+    VK_CHECK(vkAllocateCommandBuffers(VulkanDevice::GetDevice(), &allocInfo, commandBuffers.data()));
+
+    Logger::Debug("Created command buffers");
 }
 
 void EngineRendererImpl::FreeCommandBuffers()

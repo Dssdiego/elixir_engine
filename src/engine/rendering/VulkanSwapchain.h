@@ -77,6 +77,7 @@ public:
     static void Shutdown();
 
     static uint32_t GetImageCount();
+    static uint32_t GetNumberOfFramesInFlight();
 };
 
 
