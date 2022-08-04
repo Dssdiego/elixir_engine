@@ -23,6 +23,11 @@ void VulkanSwapchain::Shutdown()
     delete mVulkanSwapChainImpl;
 }
 
+uint32_t VulkanSwapchain::GetImageCount()
+{
+    return mVulkanSwapChainImpl->GetImageCount();
+}
+
 //
 // Implementation
 //
@@ -34,7 +39,7 @@ VulkanSwapChainImpl::VulkanSwapChainImpl()
     CreateRenderPass();
     CreateDepthResources();
     CreateFramebuffers();
-//    CreateSyncObjects(); // TODO
+    CreateSyncObjects();
 }
 
 VulkanSwapChainImpl::~VulkanSwapChainImpl()
@@ -44,7 +49,7 @@ VulkanSwapChainImpl::~VulkanSwapChainImpl()
     {
         vkDestroyImageView(VulkanDevice::GetDevice(), imageView, nullptr);
     }
-    swapChainImages.clear();
+    swapChainImageViews.clear();
 
     Logger::Debug("Destroying swapchain");
     if (swapChain != nullptr)
@@ -69,6 +74,12 @@ VulkanSwapChainImpl::~VulkanSwapChainImpl()
     vkDestroyRenderPass(VulkanDevice::GetDevice(), renderPass, nullptr);
 
     // TODO: Cleanup synchonization objects (semaphores and fences)
+    Logger::Debug("Destroying sync objects");
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        vkDestroySemaphore(VulkanDevice::GetDevice(), renderFinishedSemaphores[i], nullptr);
+        vkDestroySemaphore(VulkanDevice::GetDevice(), imageAvailableSemaphores[i], nullptr);
+        vkDestroyFence(VulkanDevice::GetDevice(), inFlightFences[i], nullptr);
+    }
 }
 
 void VulkanSwapChainImpl::CreateSwapChain()
@@ -265,6 +276,31 @@ void VulkanSwapChainImpl::CreateFramebuffers()
     Logger::Debug("Framebuffers created");
 }
 
+void VulkanSwapChainImpl::CreateSyncObjects()
+{
+    imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+
+    inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+    imagesInFlight.resize(GetImageCount(), VK_NULL_HANDLE);
+
+    VkSemaphoreCreateInfo semaphoreInfo{};
+    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    VkFenceCreateInfo fenceInfo = {};
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; // REVIEW: Why use the signaled bit?
+
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    {
+        VK_CHECK(vkCreateSemaphore(VulkanDevice::GetDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]));
+        VK_CHECK(vkCreateSemaphore(VulkanDevice::GetDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]));
+        VK_CHECK(vkCreateFence(VulkanDevice::GetDevice(), &fenceInfo, nullptr, &inFlightFences[i]));
+    }
+
+    Logger::Debug("Created sync objects (semaphores and fences)");
+}
+
 //
 // Helpers
 //
@@ -442,6 +478,7 @@ uint32_t VulkanSwapChainImpl::FindMemoryType(uint32_t typeFilter, VkMemoryProper
     throw std::runtime_error("failed to find a suitable memory type");
 }
 
-
-
-
+uint32_t VulkanSwapChainImpl::GetImageCount()
+{
+    return swapChainImages.size();
+}

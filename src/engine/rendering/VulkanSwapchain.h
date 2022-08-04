@@ -41,6 +41,7 @@ struct VulkanSwapChainImpl
                      VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image,
                      VkDeviceMemory& imageMemory);
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+    uint32_t GetImageCount();
 
     // variables
     VkFormat swapChainImageFormat;
@@ -59,6 +60,14 @@ struct VulkanSwapChainImpl
     VkImageView depthImageView;
 
     std::vector<VkFramebuffer> swapChainFrameBuffers;
+
+    std::vector<VkSemaphore> imageAvailableSemaphores;
+    std::vector<VkSemaphore> renderFinishedSemaphores;
+
+    std::vector<VkFence> inFlightFences;
+    std::vector<VkFence> imagesInFlight;
+
+    static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 };
 
 class VulkanSwapchain
@@ -67,11 +76,7 @@ public:
     static void Init();
     static void Shutdown();
 
-    static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
-    uint32_t imageCount;
-
-    // TODO: Implement
-    static uint32_t GetImageCount() { return 0; }
+    static uint32_t GetImageCount();
 };
 
 
