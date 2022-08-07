@@ -43,7 +43,7 @@ VulkanSwapChainImpl::VulkanSwapChainImpl()
     CreateImageViews();
     CreateRenderPass();
     CreateDepthResources();
-    CreateFramebuffers();
+    CreateFrameBuffers();
     CreateSyncObjects();
 }
 
@@ -251,7 +251,7 @@ void VulkanSwapChainImpl::CreateDepthResources()
     depthImageView = CreateImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 }
 
-void VulkanSwapChainImpl::CreateFramebuffers()
+void VulkanSwapChainImpl::CreateFrameBuffers()
 {
     // resizing the container to hold all of the framebuffers
     // REVIEW: Use swapchain image count here?

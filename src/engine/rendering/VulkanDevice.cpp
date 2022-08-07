@@ -129,14 +129,21 @@ VulkanDeviceImpl::VulkanDeviceImpl()
 
 VulkanDeviceImpl::~VulkanDeviceImpl()
 {
+    Logger::Debug("Destroying command pool");
     vkDestroyCommandPool(device, commandPool, nullptr);
+
+    Logger::Debug("Destroying device");
     vkDestroyDevice(device, nullptr);
 
     if (enableValidationLayers) {
+        Logger::Debug("Destroying debug messenger");
         DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
     }
 
+    Logger::Debug("Destroying surface");
     vkDestroySurfaceKHR(instance, surface, nullptr);
+
+    Logger::Debug("Destroying instance");
     vkDestroyInstance(instance, nullptr);
 }
 

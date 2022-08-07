@@ -27,7 +27,7 @@ struct VulkanSwapChainImpl
     void CreateImageViews();
     void CreateRenderPass();
     void CreateDepthResources();
-    void CreateFramebuffers();
+    void CreateFrameBuffers();
     void CreateSyncObjects();
 
     // helpers
