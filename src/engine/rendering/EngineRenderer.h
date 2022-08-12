@@ -5,6 +5,7 @@
 #ifndef VULKAN_ENGINE_ENGINERENDERER_H
 #define VULKAN_ENGINE_ENGINERENDERER_H
 
+#include <cassert>
 #include <vulkan/vulkan.h>
 #include "VulkanSwapchain.h"
 #include "VulkanDevice.h"
@@ -19,9 +20,13 @@ struct EngineRendererImpl
     int currentFrameIndex = 0;
     bool frameHasStarted = false;
 
+    VkCommandBuffer GetCurrentCommandBuffer();
+
     void CreateCommandBuffers();
     void FreeCommandBuffers();
-    void RecreateSwapChain();
+
+    VkCommandBuffer BeginFrame();
+    void EndFrame();
 };
 
 class EngineRenderer
@@ -36,8 +41,7 @@ public:
     void BeginSwapChainRenderPass(VkCommandBuffer commandBuffer);
     void EndSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
-private:
-
+    void RecreateSwapChain();
 };
 
 
