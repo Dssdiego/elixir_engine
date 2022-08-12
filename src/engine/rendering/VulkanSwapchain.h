@@ -31,6 +31,7 @@ struct VulkanSwapChainImpl
     void CreateSyncObjects();
 
     VkResult AcquireNextImage(uint32_t *imageIndex);
+    VkResult SubmitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex);
 
     // helpers
     VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
@@ -84,6 +85,7 @@ public:
     static uint32_t GetNumberOfFramesInFlight();
 
     static VkResult AcquireNextImage(uint32_t *imageIndex);
+    static VkResult SubmitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex);
 };
 
 

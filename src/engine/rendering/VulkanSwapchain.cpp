@@ -51,6 +51,11 @@ VkResult VulkanSwapchain::AcquireNextImage(uint32_t *imageIndex)
     return mVulkanSwapChainImpl->AcquireNextImage(imageIndex);
 }
 
+VkResult VulkanSwapchain::SubmitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex)
+{
+    return mVulkanSwapChainImpl->SubmitCommandBuffers(buffers, imageIndex);
+}
+
 //
 // Implementation
 //
@@ -344,6 +349,57 @@ VkResult VulkanSwapChainImpl::AcquireNextImage(uint32_t *imageIndex)
     return result;
 }
 
+VkResult VulkanSwapChainImpl::SubmitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex)
+{
+    if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE)
+    {
+        vkWaitForFences(VulkanDevice::GetDevice(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
+    }
+    imagesInFlight[*imageIndex] = inFlightFences[currentFrame];
+
+    VkSubmitInfo submitInfo {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+    VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[currentFrame] };
+    VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+
+    submitInfo.waitSemaphoreCount = 1;
+    submitInfo.pWaitSemaphores = waitSemaphores;
+    submitInfo.pWaitDstStageMask = waitStages;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = buffers; // which command buffers to actually submit for execution
+
+    VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[currentFrame] };
+    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.pSignalSemaphores = signalSemaphores; // which semaphore to signal once the command buffer(s) have finished execution
+
+    vkResetFences(VulkanDevice::GetDevice(), 1, &inFlightFences[currentFrame]);
+    if (vkQueueSubmit(VulkanDevice::GetGraphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS)
+    {
+        std::string err = "Failed to submit draw command buffer";
+        Logger::Error(err, "");
+        throw std::runtime_error(err);
+    }
+
+    // submitting the result back to the swap chain to have it eventually show up on the screen
+    VkPresentInfoKHR presentInfo{};
+    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.waitSemaphoreCount = 1;
+    presentInfo.pWaitSemaphores = signalSemaphores; // which semaphores to wait on before presentation can happen
+
+    VkSwapchainKHR swapChains[] = { swapChain };
+    presentInfo.swapchainCount = 1;
+    presentInfo.pSwapchains = swapChains;
+    presentInfo.pImageIndices = imageIndex;
+
+    // submitting the request to present an image to the swap chain
+    auto result = vkQueuePresentKHR(VulkanDevice::GetPresentQueue(), &presentInfo);
+
+    currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+
+    return result;
+}
+
 //
 // Helpers
 //
@@ -525,5 +581,3 @@ uint32_t VulkanSwapChainImpl::GetImageCount()
 {
     return swapChainImages.size();
 }
-
-

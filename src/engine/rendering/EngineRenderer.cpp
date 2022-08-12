@@ -36,13 +36,12 @@ void EngineRenderer::Shutdown()
 
 VkCommandBuffer EngineRenderer::BeginFrame()
 {
-    mEngineRendererImpl->BeginFrame();
+    return mEngineRendererImpl->BeginFrame();
 }
 
 void EngineRenderer::EndFrame()
 {
     mEngineRendererImpl->EndFrame();
-
 }
 
 //
