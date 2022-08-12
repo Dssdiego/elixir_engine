@@ -33,6 +33,24 @@ uint32_t VulkanSwapchain::GetNumberOfFramesInFlight()
     return mVulkanSwapChainImpl->MAX_FRAMES_IN_FLIGHT;
 }
 
+void VulkanSwapchain::Recreate()
+{
+    // when trying to recreate the swapchain, check if it already exists. if exists, we shut it down and we create it again
+    if (mVulkanSwapChainImpl->swapChain != nullptr)
+    {
+        Shutdown();
+        Init();
+    } else {
+        // if it doesn't exists, we create it from scratch
+        Init();
+    }
+}
+
+VkResult VulkanSwapchain::AcquireNextImage(uint32_t *imageIndex)
+{
+    return mVulkanSwapChainImpl->AcquireNextImage(imageIndex);
+}
+
 //
 // Implementation
 //
@@ -306,6 +324,26 @@ void VulkanSwapChainImpl::CreateSyncObjects()
     Logger::Debug("Created sync objects (semaphores and fences)");
 }
 
+VkResult VulkanSwapChainImpl::AcquireNextImage(uint32_t *imageIndex)
+{
+    vkWaitForFences(
+            VulkanDevice::GetDevice(),
+            1,
+            &inFlightFences[currentFrame],
+            VK_TRUE,
+            std::numeric_limits<uint64_t>::max());
+
+    VkResult result = vkAcquireNextImageKHR(
+            VulkanDevice::GetDevice(),
+            swapChain,
+            std::numeric_limits<uint64_t>::max(),
+            imageAvailableSemaphores[currentFrame],  // must be a not signaled semaphore
+            VK_NULL_HANDLE,
+            imageIndex);
+
+    return result;
+}
+
 //
 // Helpers
 //
@@ -487,3 +525,5 @@ uint32_t VulkanSwapChainImpl::GetImageCount()
 {
     return swapChainImages.size();
 }
+
+

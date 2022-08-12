@@ -30,6 +30,8 @@ struct VulkanSwapChainImpl
     void CreateFrameBuffers();
     void CreateSyncObjects();
 
+    VkResult AcquireNextImage(uint32_t *imageIndex);
+
     // helpers
     VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
     VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
@@ -67,7 +69,8 @@ struct VulkanSwapChainImpl
     std::vector<VkFence> inFlightFences;
     std::vector<VkFence> imagesInFlight;
 
-    static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+    size_t currentFrame = 0; // maximum size of a theoretically possible object
+    int MAX_FRAMES_IN_FLIGHT = 2;
 };
 
 class VulkanSwapchain
@@ -75,9 +78,12 @@ class VulkanSwapchain
 public:
     static void Init();
     static void Shutdown();
+    static void Recreate();
 
     static uint32_t GetImageCount();
     static uint32_t GetNumberOfFramesInFlight();
+
+    static VkResult AcquireNextImage(uint32_t *imageIndex);
 };
 
 
