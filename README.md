@@ -2,6 +2,10 @@
 
 Game Engine being created in C++ from scratch using Vulkan, GLFW, ImGUI and FMOD
 
+## Engine Development (Notion)
+
+https://diegosseabra.notion.site/Engine-Development-67f7d4d012bb47f1a21879e2b898bd24
+
 ## Roadmap
 
 - Renderer System (Vulkan)
@@ -10,6 +14,10 @@ Game Engine being created in C++ from scratch using Vulkan, GLFW, ImGUI and FMOD
   - Batch 2D rendering
   - 2D Atlas support
   - Font/Text (truetype fonts)
+- Editor
+  - Simple object inspector
+  - Render the game at a texture/viewport
+  - Play/Pause game in the editor
 - Audio Engine (FMOD)
   - 3D audio ✅
   - 2D audio ✅
@@ -26,6 +34,6 @@ Game Engine being created in C++ from scratch using Vulkan, GLFW, ImGUI and FMOD
   - Run lua code at runtime
 - Tools
   - File logging (debugging info) ✅
-  - IMGUI
+  - IMGUI ✅
 - Future
   - Fallback to DirectX/OpenGL on non-supported Vulkan hardware
