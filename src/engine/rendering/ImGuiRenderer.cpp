@@ -50,8 +50,6 @@ void ImGuiRenderer::Draw()
 {
     ImGui::Begin("Elixir Engine Editor");  // Create a window called "Hello, world!" and append into it.
     ImGui::Text( "Se esse texto for possível de ser visto\nquer dizer que a separação funcionou e que\nagora posso desenhar o ImGui e meus objetos\nde forma separada e que os 4 meses\nde trabalho não foram em vão ;)");  // Display some text (you can use a format strings too)
-//    ImGui::SliderFloat("float", &f, 0.0f, 1.0f);  // Edit 1 float using a slider from 0.0f to 1.0f
-//    ImGui::ColorEdit3("clear color", (float *)&clear_color);  // Edit 3 floats representing a color
     ImGui::End();
 }
 
