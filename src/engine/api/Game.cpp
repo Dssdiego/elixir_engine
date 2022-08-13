@@ -3,6 +3,7 @@
 //
 
 #include "Game.h"
+#include "../rendering/ImGuiRenderer.h"
 
 /*
  * Methods
@@ -16,6 +17,7 @@ void Game::Init(EngineConfig* pConfig)
     AudioEngine::Init();
     Input::Init();
     EngineRenderer::Init();
+    ImGuiRenderer::Init();
 //    Renderer::Init(GraphicsBackend::VULKAN);
 //    EditorInterface::Init();
 //    CGeforceNow::Init();
@@ -46,10 +48,12 @@ void Game::Run()
         Window::Update();
         glfwPollEvents();
 
-        auto commandBuffer = EngineRenderer::BeginFrame();
+        EngineRenderer::BeginFrame();
+        ImGuiRenderer::NewFrame();
 
 //        RenderSystem::RenderGameObjects(commandBuffer, gameObjects);
 
+        ImGuiRenderer::Render();
         EngineRenderer::EndFrame();
 
 //        Draw();
@@ -74,6 +78,7 @@ void Game::Cleanup()
 {
     // destroy engine systems
 //    CGeforceNow::Shutdown();
+    ImGuiRenderer::Shutdown();
     SceneSystem::Shutdown();
     EngineRenderer::Shutdown();
 //    EditorInterface::Shutdown();

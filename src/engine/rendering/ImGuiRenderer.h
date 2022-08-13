@@ -10,21 +10,30 @@
 #include <imgui_impl_vulkan.h>
 #include <imgui_impl_glfw.h>
 
+struct ImGuiRendererImpl
+{
+    ImGuiRendererImpl();
+    ~ImGuiRendererImpl();
+
+    // we are using a separate descriptor pool for imgui
+    VkDescriptorPool descriptorPool = nullptr;
+
+    void CreateDescriptorPool();
+    void SetupContext();
+    void BindVulkanBackend();
+};
+
 class ImGuiRenderer
 {
 public:
-    ImGuiRenderer();
-    ~ImGuiRenderer();
-
     static void Init();
     static void Shutdown();
 
-    void NewFrame();
-    void Draw(VkCommandBuffer commandBuffer);
+    static void NewFrame();
+    static void Render(); // all that is drawed now must be rendered on the screen
 
 private:
-    // we are using a separate descriptor pool for imgui
-    inline static VkDescriptorPool descriptorPool = nullptr;
+    static void Draw(); // here comes all the things we want to draw with ImGui
 };
 
 #endif //VULKAN_ENGINE_IMGUIRENDERER_H
