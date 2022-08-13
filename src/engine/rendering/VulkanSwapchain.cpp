@@ -35,6 +35,8 @@ uint32_t VulkanSwapchain::GetNumberOfFramesInFlight()
 
 void VulkanSwapchain::Recreate()
 {
+    vkDeviceWaitIdle(VulkanDevice::GetDevice());
+
     // when trying to recreate the swapchain, check if it already exists. if exists, we shut it down and we create it again
     if (mVulkanSwapChainImpl->swapChain != nullptr)
     {
