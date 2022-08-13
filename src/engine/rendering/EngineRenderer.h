@@ -16,9 +16,9 @@ struct EngineRendererImpl
     VulkanDevice &device;
     std::vector<VkCommandBuffer> commandBuffers;
 
-    uint32_t currentImageIdx;
-    int currentFrameIndex = 0;
-    bool frameHasStarted = false;
+    uint32_t currentImageIdx{0};
+    int currentFrameIndex{0};
+    bool frameHasStarted{false};
 
     VkCommandBuffer GetCurrentCommandBuffer();
 
@@ -26,6 +26,8 @@ struct EngineRendererImpl
     void FreeCommandBuffers();
 
     VkCommandBuffer BeginFrame();
+    void BeginSwapChainRenderPass();
+    void EndSwapChainRenderPass();
     void EndFrame();
 };
 
@@ -37,11 +39,6 @@ public:
 
     static VkCommandBuffer BeginFrame();
     static void EndFrame();
-
-    void BeginSwapChainRenderPass(VkCommandBuffer commandBuffer);
-    void EndSwapChainRenderPass(VkCommandBuffer commandBuffer);
-
-    void RecreateSwapChain();
 };
 
 

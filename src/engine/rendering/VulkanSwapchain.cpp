@@ -56,6 +56,21 @@ VkResult VulkanSwapchain::SubmitCommandBuffers(const VkCommandBuffer *buffers, u
     return mVulkanSwapChainImpl->SubmitCommandBuffers(buffers, imageIndex);
 }
 
+VkRenderPass VulkanSwapchain::GetRenderPass()
+{
+    return mVulkanSwapChainImpl->GetRenderPass();
+}
+
+VkFramebuffer VulkanSwapchain::GetFrameBuffer(int index)
+{
+    return mVulkanSwapChainImpl->GetFrameBuffer(index);
+}
+
+VkExtent2D VulkanSwapchain::GetSwapChainExtent()
+{
+    return mVulkanSwapChainImpl->GetSwapChainExtent();
+}
+
 //
 // Implementation
 //
@@ -580,4 +595,19 @@ uint32_t VulkanSwapChainImpl::FindMemoryType(uint32_t typeFilter, VkMemoryProper
 uint32_t VulkanSwapChainImpl::GetImageCount()
 {
     return swapChainImages.size();
+}
+
+VkRenderPass VulkanSwapChainImpl::GetRenderPass()
+{
+    return renderPass;
+}
+
+VkFramebuffer VulkanSwapChainImpl::GetFrameBuffer(int index)
+{
+    return swapChainFrameBuffers[index];
+}
+
+VkExtent2D VulkanSwapChainImpl::GetSwapChainExtent()
+{
+    return swapChainExtent;
 }

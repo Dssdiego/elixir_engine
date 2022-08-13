@@ -38,7 +38,7 @@ void Renderer::Draw()
 {
     ZoneScopedC(0x9b59b6);
     // FIXME: Using vulkan as default backend for now. This should be dynamic and choose the correct backend
-    CVulkanRenderer::Draw();
+//    CVulkanRenderer::Draw();
 }
 
 void Renderer::Shutdown()

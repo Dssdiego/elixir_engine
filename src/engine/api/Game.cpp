@@ -44,6 +44,12 @@ void Game::Run()
         Window::Update();
         glfwPollEvents();
 
+        auto commandBuffer = EngineRenderer::BeginFrame();
+
+//        RenderSystem::RenderGameObjects(commandBuffer, gameObjects);
+
+        EngineRenderer::EndFrame();
+
 //        Draw();
 
         AudioEngine::Update();

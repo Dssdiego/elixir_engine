@@ -45,6 +45,9 @@ struct VulkanSwapChainImpl
                      VkDeviceMemory& imageMemory);
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     uint32_t GetImageCount();
+    VkRenderPass GetRenderPass();
+    VkFramebuffer GetFrameBuffer(int index);
+    VkExtent2D GetSwapChainExtent();
 
     // variables
     VkFormat swapChainImageFormat;
@@ -86,7 +89,10 @@ public:
 
     static VkResult AcquireNextImage(uint32_t *imageIndex);
     static VkResult SubmitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex);
-};
 
+    static VkRenderPass GetRenderPass();
+    static VkFramebuffer GetFrameBuffer(int index);
+    static VkExtent2D GetSwapChainExtent();
+};
 
 #endif //VULKAN_ENGINE_VULKANSWAPCHAIN_H

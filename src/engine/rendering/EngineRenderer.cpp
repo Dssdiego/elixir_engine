@@ -84,7 +84,7 @@ VkCommandBuffer EngineRendererImpl::BeginFrame()
 {
     assert(!frameHasStarted && "Can't call BeginFrame() while a frame is already in progress");
 
-    auto result = VulkanSwapchain::AcquireNextImage(&mEngineRendererImpl->currentImageIdx);
+    auto result = VulkanSwapchain::AcquireNextImage(&currentImageIdx);
     if (result == VK_ERROR_OUT_OF_DATE_KHR)
     {
         VulkanSwapchain::Recreate();
@@ -110,11 +110,61 @@ VkCommandBuffer EngineRendererImpl::BeginFrame()
 
     VK_CHECK(vkBeginCommandBuffer(commandBuffer, &beginInfo));
 
+    // TODO: Document
+    BeginSwapChainRenderPass();
+
     return commandBuffer;
+}
+
+void EngineRendererImpl::BeginSwapChainRenderPass()
+{
+    assert(frameHasStarted && "Can't call BeginSwapChainRenderPass if frame is not in progreess");
+
+    auto commandBuffer = GetCurrentCommandBuffer();
+
+    VkRenderPassBeginInfo renderPassBeginInfo{};
+    renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassBeginInfo.renderPass = VulkanSwapchain::GetRenderPass();
+    renderPassBeginInfo.framebuffer = VulkanSwapchain::GetFrameBuffer(currentImageIdx);
+    renderPassBeginInfo.renderArea.offset = {0, 0};
+    renderPassBeginInfo.renderArea.extent = VulkanSwapchain::GetSwapChainExtent();
+
+    std::array<VkClearValue, 2> clearValues{};
+    clearValues[0]. color = {0.01, 0.01f, 0.01f, 1.0f};
+    clearValues[1].depthStencil = {1.0f, 0};
+
+    renderPassBeginInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassBeginInfo.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    VkViewport viewport{};
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = static_cast<float>(VulkanSwapchain::GetSwapChainExtent().width);
+    viewport.height = static_cast<float>(VulkanSwapchain::GetSwapChainExtent().height);
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+
+    VkRect2D scissor {{0, 0}, VulkanSwapchain::GetSwapChainExtent()};
+
+    vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+    vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+}
+
+void EngineRendererImpl::EndSwapChainRenderPass()
+{
+    assert(frameHasStarted && "Can't call EndSwapChainRenderPass if frame is not in progress");
+
+    auto commandBuffer = GetCurrentCommandBuffer();
+    vkCmdEndRenderPass(commandBuffer);
 }
 
 void EngineRendererImpl::EndFrame()
 {
+    // TODO: Document
+    EndSwapChainRenderPass();
+
     assert(frameHasStarted && "Can't call EndFrame() while frame is not in progress");
 
     auto commandBuffer = GetCurrentCommandBuffer();
@@ -132,6 +182,9 @@ void EngineRendererImpl::EndFrame()
         throw std::runtime_error(err);
     }
 
+    // frame has ended
     frameHasStarted = false;
+
+    // updating the current frame index (for the command buffers)
     currentFrameIndex = (currentFrameIndex + 1) % VulkanSwapchain::GetNumberOfFramesInFlight();
 }
