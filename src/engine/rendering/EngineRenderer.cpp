@@ -56,6 +56,9 @@ EngineRendererImpl::~EngineRendererImpl()
 {
     Logger::Info("Shutting down engine renderer");
 
+    // waiting for the device to finish operations before exiting and destroying stuff
+    vkDeviceWaitIdle(VulkanDevice::GetDevice());
+
     FreeCommandBuffers();
 
     VulkanSwapchain::Shutdown();
