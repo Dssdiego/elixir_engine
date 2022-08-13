@@ -38,7 +38,7 @@ public:
     static bool ShouldCloseWindow();
     static WindowSize GetSize();
     static GLFWwindow* GetWindow();
-    static void UpdateFPSInTitle(double fps);
+    static void UpdateFPSInTitle(double fps, uint32_t frameNumber);
     static double GetTime();
 
 private:

@@ -27,7 +27,7 @@ public:
     void Cleanup(); // shuts down the engine
 
 private:
-    int frames = 0;
+    size_t frames = 0;
     int frameCount = 0;
     double previousTime = glfwGetTime();
 };

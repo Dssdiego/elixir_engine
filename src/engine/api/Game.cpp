@@ -23,10 +23,12 @@ void Game::Init(EngineConfig* pConfig)
 
 void Game::Run()
 {
-    Window::UpdateFPSInTitle(0.0f);
+    Window::UpdateFPSInTitle(0.0f, 0);
 
     while(!Window::ShouldCloseWindow())
     {
+        // REVIEW: Probably won't need this because the renderer now has BeginFrame() and EndFrame() which could give us the FPS information
+        //         Put this in the EngineRenderer class?
         double currentTime = Window::GetTime();
         double delta = currentTime - previousTime;
         frameCount++;
@@ -35,7 +37,7 @@ void Game::Run()
         if (delta >= 2.0f) // we update the fps info every two seconds
         {
             int fps = int(frameCount / delta);
-            Window::UpdateFPSInTitle(fps);
+            Window::UpdateFPSInTitle(fps, frames);
 
             frameCount = 0;
             previousTime = currentTime;
@@ -55,6 +57,7 @@ void Game::Run()
         AudioEngine::Update();
 
         // increment the frame number
+        // REVIEW: Calculate frames in the Swapchain?
         frames++;
         FrameMark;
     }
