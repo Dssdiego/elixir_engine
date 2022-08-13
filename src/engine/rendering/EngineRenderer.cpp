@@ -26,6 +26,11 @@ void EngineRenderer::Shutdown()
 // External
 //
 
+VkCommandBuffer EngineRenderer::GetCurrentCommandBuffer()
+{
+    return mEngineRendererImpl->GetCurrentCommandBuffer();
+}
+
 VkCommandBuffer EngineRenderer::BeginFrame()
 {
     return mEngineRendererImpl->BeginFrame();
@@ -94,6 +99,8 @@ void EngineRendererImpl::FreeCommandBuffers()
 VkCommandBuffer EngineRendererImpl::GetCurrentCommandBuffer()
 {
     assert(!commandBuffers.empty() && "There must be at least one command buffer present!");
+    assert(frameHasStarted && "Cannot get command buffer when frame is not in progress!");
+
     // REVIEW: Assert the frame is already started? We can't get command buffer when a frame is not in progress!
     return commandBuffers[currentFrameIndex];
 }

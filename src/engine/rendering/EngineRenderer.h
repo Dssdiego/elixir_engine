@@ -41,6 +41,7 @@ public:
     static void Init();
     static void Shutdown();
 
+    static VkCommandBuffer GetCurrentCommandBuffer();
     static VkCommandBuffer BeginFrame();
     static void EndFrame();
 };
