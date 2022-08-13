@@ -14,6 +14,9 @@ EngineRendererImpl* mEngineRendererImpl = nullptr;
 
 void EngineRenderer::Init()
 {
+    // initialize implementation
+    mEngineRendererImpl = new EngineRendererImpl;
+
     Logger::Info("Initializing engine renderer");
 
     VulkanDevice::Init();
@@ -24,6 +27,9 @@ void EngineRenderer::Init()
 
 void EngineRenderer::Shutdown()
 {
+    // delete implementation
+    delete mEngineRendererImpl;
+
     Logger::Info("Shutting down engine renderer");
 
     VulkanSwapchain::Shutdown();
@@ -76,6 +82,7 @@ void EngineRendererImpl::FreeCommandBuffers()
 
 VkCommandBuffer EngineRendererImpl::GetCurrentCommandBuffer()
 {
+    assert(!commandBuffers.empty() && "There must be at least one command buffer present!");
     // REVIEW: Assert the frame is already started? We can't get command buffer when a frame is not in progress!
     return commandBuffers[currentFrameIndex];
 }

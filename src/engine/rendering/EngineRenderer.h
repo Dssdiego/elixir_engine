@@ -12,8 +12,8 @@
 
 struct EngineRendererImpl
 {
-    VulkanSwapchain &swapChain;
-    VulkanDevice &device;
+    VulkanSwapchain swapChain{};
+    VulkanDevice device{};
     std::vector<VkCommandBuffer> commandBuffers;
 
     uint32_t currentImageIdx{0};
