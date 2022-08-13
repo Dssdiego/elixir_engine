@@ -14,26 +14,12 @@ EngineRendererImpl* mEngineRendererImpl = nullptr;
 
 void EngineRenderer::Init()
 {
-    // initialize implementation
     mEngineRendererImpl = new EngineRendererImpl;
-
-    Logger::Info("Initializing engine renderer");
-
-    VulkanDevice::Init();
-    VulkanSwapchain::Init();
-
-    // REVIEW: Recreate swapchain on renderer init?
 }
 
 void EngineRenderer::Shutdown()
 {
-    // delete implementation
     delete mEngineRendererImpl;
-
-    Logger::Info("Shutting down engine renderer");
-
-    VulkanSwapchain::Shutdown();
-    VulkanDevice::Shutdown();
 }
 
 //
@@ -53,6 +39,28 @@ void EngineRenderer::EndFrame()
 //
 // Implementation
 //
+
+EngineRendererImpl::EngineRendererImpl()
+{
+    Logger::Info("Initializing engine renderer");
+
+    VulkanDevice::Init();
+    VulkanSwapchain::Init();
+
+    // REVIEW: Recreate swapchain on renderer init?
+
+    CreateCommandBuffers();
+}
+
+EngineRendererImpl::~EngineRendererImpl()
+{
+    Logger::Info("Shutting down engine renderer");
+
+    FreeCommandBuffers();
+
+    VulkanSwapchain::Shutdown();
+    VulkanDevice::Shutdown();
+}
 
 void EngineRendererImpl::CreateCommandBuffers()
 {
@@ -137,7 +145,7 @@ void EngineRendererImpl::BeginSwapChainRenderPass()
     renderPassBeginInfo.renderArea.extent = VulkanSwapchain::GetSwapChainExtent();
 
     std::array<VkClearValue, 2> clearValues{};
-    clearValues[0]. color = {0.01, 0.01f, 0.01f, 1.0f};
+    clearValues[0]. color = {1.0f, 0.0f, 0.0f, 1.0f};
     clearValues[1].depthStencil = {1.0f, 0};
 
     renderPassBeginInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
@@ -195,3 +203,5 @@ void EngineRendererImpl::EndFrame()
     // updating the current frame index (for the command buffers)
     currentFrameIndex = (currentFrameIndex + 1) % VulkanSwapchain::GetNumberOfFramesInFlight();
 }
+
+

@@ -12,6 +12,9 @@
 
 struct EngineRendererImpl
 {
+    EngineRendererImpl();
+    ~EngineRendererImpl();
+
     VulkanSwapchain swapChain{};
     VulkanDevice device{};
     std::vector<VkCommandBuffer> commandBuffers;
