@@ -26,13 +26,16 @@ ImGuiRendererImpl* mImGuiRendererImpl = nullptr;
 
 void ImGuiRenderer::Init()
 {
+#ifndef NDEBUG
     mImGuiRendererImpl = new ImGuiRendererImpl;
-
+#endif
 }
 
 void ImGuiRenderer::Shutdown()
 {
-
+#ifndef NDEBUG
+    delete mImGuiRendererImpl;
+#endif
 }
 
 //
@@ -41,9 +44,11 @@ void ImGuiRenderer::Shutdown()
 
 void ImGuiRenderer::NewFrame()
 {
+#ifndef NDEBUG
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+#endif
 }
 
 void ImGuiRenderer::Draw()
@@ -71,10 +76,12 @@ void ImGuiRenderer::Draw()
 
 void ImGuiRenderer::Render()
 {
+#ifndef NDEBUG
     Draw();
     ImGui::Render();
     ImDrawData *drawdata = ImGui::GetDrawData();
     ImGui_ImplVulkan_RenderDrawData(drawdata, EngineRenderer::GetCurrentCommandBuffer());
+#endif
 }
 
 //
