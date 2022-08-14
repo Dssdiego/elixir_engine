@@ -48,15 +48,7 @@ void Game::Run()
         Window::Update();
         glfwPollEvents();
 
-        EngineRenderer::BeginFrame();
-        ImGuiRenderer::NewFrame();
-
-//        RenderSystem::RenderGameObjects(commandBuffer, gameObjects);
-
-        ImGuiRenderer::Render();
-        EngineRenderer::EndFrame();
-
-//        Draw();
+        Draw();
 
         AudioEngine::Update();
 
@@ -69,9 +61,13 @@ void Game::Run()
 
 void Game::Draw()
 {
-    // REVIEW: Does the editor draws BEFORE or AFTER the gamne?
-//    EditorInterface::Draw();
-//    Renderer::Draw();
+    EngineRenderer::BeginFrame();
+    ImGuiRenderer::NewFrame();
+
+//        RenderSystem::RenderGameObjects(commandBuffer, gameObjects);
+
+    ImGuiRenderer::Render();
+    EngineRenderer::EndFrame();
 }
 
 void Game::Cleanup()
