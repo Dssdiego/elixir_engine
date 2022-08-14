@@ -53,25 +53,83 @@ void ImGuiRenderer::NewFrame()
 
 void ImGuiRenderer::Draw()
 {
-    ImGui::BeginMainMenuBar();
-    if (ImGui::BeginMenu("Engine"))
-    {
-        if (ImGui::MenuItem("Exit"))
-        {
-            glfwSetWindowShouldClose(Window::GetWindow(), GLFW_TRUE);
-        };
-        ImGui::EndMenu();
-    }
-//    if (ImGui::MenuItem("Engine"))
-//    {
-//        ImGui::MenuItem("Diego");
-//    }
-    ImGui::EndMainMenuBar();
+    bool show_demo = true;
+    ImGui::ShowDemoWindow(&show_demo);
 
-//    ImGui::Begin("Elixir Engine Editor");  // Create a window called "Hello, world!" and append into it.
-//    ImGui::Text( "Se esse texto for possível de ser visto\nquer dizer que a separação funcionou e que\nagora posso desenhar o ImGui e meus objetos\nde forma separada e que os 4 meses\nde trabalho não foram em vão ;)");  // Display some text (you can use a format strings too)
-//    ImGui::ColorPicker3("Background Color", color);
-//    ImGui::End();
+    const ImGuiWindowFlags mainWindowFlags =
+            ImGuiWindowFlags_NoDocking |
+            ImGuiWindowFlags_NoTitleBar |
+            ImGuiWindowFlags_NoCollapse |
+            ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoBringToFrontOnFocus |
+            ImGuiWindowFlags_NoNavFocus |
+            ImGuiWindowFlags_MenuBar;
+//
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->WorkPos);
+    ImGui::SetNextWindowSize(viewport->WorkSize);
+    ImGui::SetNextWindowViewport(viewport->ID);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+
+    // Main Window BEGIN
+    ImGui::Begin("Main Window", nullptr, mainWindowFlags);
+    ImGui::DockSpace(ImGui::GetID("Dockspace"), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+
+    // Main Menu Bar
+    {
+        ImGui::BeginMenuBar();
+        if (ImGui::BeginMenu("Engine"))
+        {
+            if (ImGui::MenuItem("Exit"))
+            {
+                glfwSetWindowShouldClose(Window::GetWindow(), GLFW_TRUE);
+            };
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenuBar();
+    }
+
+    // Scene
+    {
+        ImGui::Begin("Scene");
+        ImGui::Text("This is inside the scene");
+        ImGui::End();
+    }
+
+    // Viewport
+    {
+        ImGui::Begin("Viewport");
+        ImGui::Text("This is inside the viewport");
+        ImGui::End();
+    }
+
+    // Inspector
+    {
+        ImGui::Begin("Inspector");
+        ImGui::Text("This is inside the inspector");
+        ImGui::End();
+    }
+
+    // Console
+    {
+        ImGui::Begin("Console");
+        ImGui::Text("This is inside the console");
+        ImGui::End();
+    }
+
+    // Assets
+    {
+        ImGui::Begin("Assets");
+        ImGui::Text("This is inside the assets");
+        ImGui::End();
+    }
+
+    // Main Windows END
+    ImGui::End();
+
+    ImGui::PopStyleVar(2);
 }
 
 void ImGuiRenderer::Render()
@@ -138,6 +196,7 @@ void ImGuiRendererImpl::SetupContext()
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     (void)io;
+    io.ConfigFlags = ImGuiConfigFlags_DockingEnable;
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
