@@ -48,9 +48,25 @@ void ImGuiRenderer::NewFrame()
 
 void ImGuiRenderer::Draw()
 {
-    ImGui::Begin("Elixir Engine Editor");  // Create a window called "Hello, world!" and append into it.
-    ImGui::Text( "Se esse texto for possível de ser visto\nquer dizer que a separação funcionou e que\nagora posso desenhar o ImGui e meus objetos\nde forma separada e que os 4 meses\nde trabalho não foram em vão ;)");  // Display some text (you can use a format strings too)
-    ImGui::End();
+    ImGui::BeginMainMenuBar();
+    if (ImGui::BeginMenu("Engine"))
+    {
+        if (ImGui::MenuItem("Exit"))
+        {
+            glfwSetWindowShouldClose(Window::GetWindow(), GLFW_TRUE);
+        };
+        ImGui::EndMenu();
+    }
+//    if (ImGui::MenuItem("Engine"))
+//    {
+//        ImGui::MenuItem("Diego");
+//    }
+    ImGui::EndMainMenuBar();
+
+//    ImGui::Begin("Elixir Engine Editor");  // Create a window called "Hello, world!" and append into it.
+//    ImGui::Text( "Se esse texto for possível de ser visto\nquer dizer que a separação funcionou e que\nagora posso desenhar o ImGui e meus objetos\nde forma separada e que os 4 meses\nde trabalho não foram em vão ;)");  // Display some text (you can use a format strings too)
+//    ImGui::ColorPicker3("Background Color", color);
+//    ImGui::End();
 }
 
 void ImGuiRenderer::Render()
