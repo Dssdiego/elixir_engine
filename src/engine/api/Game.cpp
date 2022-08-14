@@ -19,7 +19,6 @@ void Game::Init(EngineConfig* pConfig)
     EngineRenderer::Init();
     ImGuiRenderer::Init();
 //    Renderer::Init(GraphicsBackend::VULKAN);
-//    EditorInterface::Init();
 //    CGeforceNow::Init();
 }
 
@@ -64,7 +63,7 @@ void Game::Draw()
     EngineRenderer::BeginFrame();
     ImGuiRenderer::NewFrame();
 
-//        RenderSystem::RenderGameObjects(commandBuffer, gameObjects);
+//    RenderSystem::RenderGameObjects(commandBuffer, gameObjects);
 
     ImGuiRenderer::Render();
     EngineRenderer::EndFrame();
@@ -77,7 +76,6 @@ void Game::Cleanup()
     ImGuiRenderer::Shutdown();
     SceneSystem::Shutdown();
     EngineRenderer::Shutdown();
-//    EditorInterface::Shutdown();
 //    Renderer::Shutdown();
     Input::Shutdown();
     AudioEngine::Shutdown();
