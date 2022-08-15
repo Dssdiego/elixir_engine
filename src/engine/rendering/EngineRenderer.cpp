@@ -171,7 +171,9 @@ void EngineRendererImpl::BeginSwapChainRenderPass()
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
-    VkRect2D scissor {{0, 0}, VulkanSwapchain::GetSwapChainExtent()};
+    VkRect2D scissor{};
+    scissor.offset = {0, 0};
+    scissor.extent = VulkanSwapchain::GetSwapChainExtent();
 
     vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
     vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
