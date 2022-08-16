@@ -18,7 +18,7 @@ struct Vertex {
     // vertex binding describes at which rate to load data from memory throughout the vertices
     //   it specifies the number of bytes between data entries and whether
     //   to move to the next data entry after each vertex or after each instance
-    static VkVertexInputBindingDescription getBindingDescription() {
+    static VkVertexInputBindingDescription GetBindingDescription() {
         VkVertexInputBindingDescription bindingDescription{};
         bindingDescription.binding = 0; // index of the binding in the array of bindings
         bindingDescription.stride = sizeof(Vertex); // number of bytes from one entry to the next
@@ -29,7 +29,7 @@ struct Vertex {
 
     // an attribute description struct describes how to extract a vertex attribute from a chunk of vertex data
     //  originating from a binding description
-    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions()
+    static std::array<VkVertexInputAttributeDescription, 3> GetAttributeDescriptions()
     {
         std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
         attributeDescriptions[0].binding = 0; // which binding the per-vertex data comes

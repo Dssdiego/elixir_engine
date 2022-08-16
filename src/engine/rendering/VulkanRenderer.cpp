@@ -863,8 +863,8 @@ void CVulkanRendererImpl::CreateGraphicsPipeline()
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{}; // type of vertex data that will be passed to the vertex shader
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-    auto bindingDescription = Vertex::getBindingDescription();
-    auto attributeDescriptions = Vertex::getAttributeDescriptions();
+    auto bindingDescription = Vertex::GetBindingDescription();
+    auto attributeDescriptions = Vertex::GetAttributeDescriptions();
 
     // bindings: spacing between data and whether the data is per-vertex or per-instance
     vertexInputInfo.vertexBindingDescriptionCount = 1;

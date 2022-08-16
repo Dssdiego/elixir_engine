@@ -63,7 +63,7 @@ void Game::Draw()
     EngineRenderer::BeginFrame();
     ImGuiRenderer::NewFrame();
 
-//    RenderSystem::RenderGameObjects(commandBuffer, gameObjects);
+//    RenderSystem::RenderGameObjects(gameObjects);
 
     ImGuiRenderer::Render();
     EngineRenderer::EndFrame();
