@@ -5,10 +5,12 @@
 #ifndef VULKAN_ENGINE_VULKANPIPELINE_H
 #define VULKAN_ENGINE_VULKANPIPELINE_H
 
-#include "VulkanDevice.h"
-#include "Shader.h"
 #include <vulkan/vulkan.h>
 #include <string>
+
+#include "VulkanDevice.h"
+#include "Shader.h"
+#include "Vertex.h"
 
 struct VulkanPipelineImpl
 {
