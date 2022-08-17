@@ -3,6 +3,7 @@
 //
 
 #include "VulkanPipeline.h"
+#include "VulkanSwapchain.h"
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
@@ -33,8 +34,11 @@ VulkanPipelineImpl::VulkanPipelineImpl()
 
 VulkanPipelineImpl::~VulkanPipelineImpl()
 {
+    Logger::Debug("Destroying shader modules");
     vkDestroyShaderModule(VulkanDevice::GetDevice(), vertShaderModule, nullptr);
     vkDestroyShaderModule(VulkanDevice::GetDevice(), fragShaderModule, nullptr);
+
+    Logger::Debug("Destroying graphics pipeline");
     vkDestroyPipeline(VulkanDevice::GetDevice(), graphicsPipeline, nullptr);
 }
 
@@ -63,7 +67,7 @@ void VulkanPipelineImpl::CreateGraphicsPipeline()
 
     VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
-    // SECTION: Vertex Input and Assembly
+    // SECTION: Vertex Input
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{}; // type of vertex data that will be passed to the vertex shader
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
@@ -79,13 +83,36 @@ void VulkanPipelineImpl::CreateGraphicsPipeline()
     vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
     vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
-    // vertex input assembly
-    VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
-    inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST; // because we want to draw a triangle for now
-    inputAssembly.primitiveRestartEnable = VK_FALSE;
+    // we create the rest of our graphics pipeline with the default configuration:
+    //  -> Viewport from (0,0) to max of the screen
+    //  -> Filled polygons (no wireframe, clockwise)
+    //  -> No multisampling enabled
+    //  -> Depth testing in VK_COMPARE_OP_LESS (lower depth = closer)
+    //  -> "Normal/Tipical" color blending (combines the color returned from the fragment shader to the framebuffer color)
+    FillDefaultPipelineConfig();
 
-    // TODO: Continue here --> ...
+    // pipeline definition
+    VkGraphicsPipelineCreateInfo pipelineInfo{};
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipelineInfo.stageCount = 2;
+    pipelineInfo.pStages = shaderStages;
+    pipelineInfo.pVertexInputState = &vertexInputInfo;
+    pipelineInfo.pInputAssemblyState = &pipelineConfig.inputAssemblyInfo;
+    pipelineInfo.pViewportState = &pipelineConfig.viewportInfo;
+    pipelineInfo.pRasterizationState = &pipelineConfig.rasterizationInfo;
+    pipelineInfo.pMultisampleState = &pipelineConfig.multisampleInfo;
+    pipelineInfo.pDepthStencilState = &pipelineConfig.depthStencilInfo;
+    pipelineInfo.pColorBlendState = &pipelineConfig.colorBlendInfo;
+    pipelineInfo.pDynamicState = nullptr; // optional
+    pipelineInfo.layout = vkPipelineLayout; // TODO: Where will we get the pipeline layout? It should be passed by some kind of render system?
+    pipelineInfo.renderPass = VulkanSwapchain::GetRenderPass();
+    pipelineInfo.subpass = 0; // not using subpasses for now
+    pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // optional
+    pipelineInfo.basePipelineIndex = -1; // optional
+
+    VK_CHECK(vkCreateGraphicsPipelines(VulkanDevice::GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline));
+
+    Logger::Debug("Graphics pipeline created");
 }
 
 //
@@ -102,7 +129,102 @@ void VulkanPipelineImpl::CreateShaderModule(const std::vector<char> &shaderCode,
     VK_CHECK(vkCreateShaderModule(VulkanDevice::GetDevice(), &createInfo, nullptr, shaderModule));
 }
 
+void VulkanPipelineImpl::FillDefaultPipelineConfig()
+{
+    // SECTION: Input Assembly
+    pipelineConfig.inputAssemblyInfo =
+    {
+            VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+            nullptr,
+            0,
+            VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, // because we want to draw a triangle for now
+            false
+    };
 
+    // SECTION: Viewport
+    pipelineConfig.viewportInfo =
+    {
+            VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+            nullptr,
+            0,
+            1, // REVIEW: More than one viewport makes a split screen game?
+            nullptr, // viewport is defined by the dynamic states (below)
+            1,
+            nullptr // scissor is defined by the dynamic states (below)
+    };
 
+    // SECTION: Rasterization
+    pipelineConfig.rasterizationInfo =
+    {
+            VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+            nullptr,
+            0,
+            false,
+            false, // setting this to VK_TRUE disabled any output to the framebuffer
+            VK_POLYGON_MODE_FILL,
+            VK_CULL_MODE_BACK_BIT, // for now, we'll always cull the back face
+            VK_FRONT_FACE_CLOCKWISE, // order for faces to be considered front-facing (in our case is counter clockwise because of MVP Y-flip in the shader)
+            false,
+            0.0f,
+            0.0f,
+            0.0f,
+            1.0f
+    };
 
+    // SECTION: Multisampling
+    pipelineConfig.multisampleInfo =
+    {
+            VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+            nullptr,
+            0,
+            VK_SAMPLE_COUNT_1_BIT,
+            false,
+            1.0f,
+            nullptr,
+            false,
+            false
+    };
+
+    // SECTION: Depth and Stencil Testing
+    pipelineConfig.depthStencilInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    pipelineConfig.depthStencilInfo.depthTestEnable = VK_TRUE; // if the depth of new fragments should be compared to the depth buffer (to check if they should be discarded)
+    pipelineConfig.depthStencilInfo.depthWriteEnable = VK_TRUE; // if the new depth of fragments that pass the depth test should actually be written to the depth buffer (useful for drawing transparent objects)
+    pipelineConfig.depthStencilInfo.depthCompareOp = VK_COMPARE_OP_LESS; // right now, lower depth = closer
+    pipelineConfig.depthStencilInfo.depthBoundsTestEnable = VK_FALSE;
+    pipelineConfig.depthStencilInfo.stencilTestEnable = VK_FALSE;
+
+    // SECTION: Color Blending
+    pipelineConfig.colorBlendAttachment =
+    {
+            true,
+            VK_BLEND_FACTOR_SRC_ALPHA,
+            VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+            VK_BLEND_OP_ADD,
+            VK_BLEND_FACTOR_SRC_ALPHA,
+            VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+            VK_BLEND_OP_SUBTRACT,
+            VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT
+    };
+
+    pipelineConfig.colorBlendInfo = {
+            VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+            nullptr,
+            0,
+            false,
+            VK_LOGIC_OP_COPY,
+            1,
+            &pipelineConfig.colorBlendAttachment,
+            {0.0f, 0.0f, 0.0f, 0.0f}
+    };
+
+    // SECTION: Dynamic States (Viewport and Scissor)
+    pipelineConfig.dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+
+    pipelineConfig.dynamicStateInfo = {
+            VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+            nullptr,
+            0,
+            static_cast<uint32_t>(pipelineConfig.dynamicStateEnables.size())
+    };
+}
 
