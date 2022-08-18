@@ -5,6 +5,11 @@
 #ifndef VULKAN_ENGINE_VULKANPIPELINE_H
 #define VULKAN_ENGINE_VULKANPIPELINE_H
 
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
+
 #include <vulkan/vulkan.h>
 #include <string>
 
@@ -12,7 +17,15 @@
 #include "Shader.h"
 #include "Vertex.h"
 
-struct PipelineConfig {
+struct SimplePushConstantData
+{
+    glm::mat2 transform{1.f};
+    glm::vec2 offset;
+    alignas(16) glm::vec3 color;
+};
+
+struct PipelineConfig
+{
     // REVIEW: Delete any operators?
     VkPipelineViewportStateCreateInfo viewportInfo;
     VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
@@ -39,20 +52,23 @@ struct VulkanPipelineImpl
     VkShaderModule fragShaderModule;
 
     PipelineConfig pipelineConfig;
+    VkPipelineLayout pipelineLayout;
 
     // Methods
     void CreateGraphicsPipeline();
 
     // Helpers
     void CreateShaderModule(const std::vector<char> &shaderCode, VkShaderModule *shaderModule);
+    void CreatePipelineLayout();
     void FillDefaultPipelineConfig();
 };
 
 class VulkanPipeline
 {
-    // TODO: Make it possible to pass a custom pipeline config at the creation of the pipeline
-    void Init();
-    void Shutdown();
+public:
+    // REVIEW: Make it possible to pass a custom pipeline config at the creation of the pipeline?
+    static void Init();
+    static void Shutdown();
 };
 
 

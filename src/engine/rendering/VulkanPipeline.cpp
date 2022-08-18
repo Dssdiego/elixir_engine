@@ -29,6 +29,7 @@ void VulkanPipeline::Shutdown()
 
 VulkanPipelineImpl::VulkanPipelineImpl()
 {
+    CreatePipelineLayout();
     CreateGraphicsPipeline();
 }
 
@@ -37,6 +38,9 @@ VulkanPipelineImpl::~VulkanPipelineImpl()
     Logger::Debug("Destroying shader modules");
     vkDestroyShaderModule(VulkanDevice::GetDevice(), vertShaderModule, nullptr);
     vkDestroyShaderModule(VulkanDevice::GetDevice(), fragShaderModule, nullptr);
+
+    Logger::Debug("Destroying pipeline layout");
+    vkDestroyPipelineLayout(VulkanDevice::GetDevice(), pipelineLayout, nullptr);
 
     Logger::Debug("Destroying graphics pipeline");
     vkDestroyPipeline(VulkanDevice::GetDevice(), graphicsPipeline, nullptr);
@@ -104,7 +108,7 @@ void VulkanPipelineImpl::CreateGraphicsPipeline()
     pipelineInfo.pDepthStencilState = &pipelineConfig.depthStencilInfo;
     pipelineInfo.pColorBlendState = &pipelineConfig.colorBlendInfo;
     pipelineInfo.pDynamicState = nullptr; // optional
-    pipelineInfo.layout = vkPipelineLayout; // TODO: Where will we get the pipeline layout? It should be passed by some kind of render system?
+    pipelineInfo.layout = pipelineConfig.pipelineLayout;
     pipelineInfo.renderPass = VulkanSwapchain::GetRenderPass();
     pipelineInfo.subpass = 0; // not using subpasses for now
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // optional
@@ -127,6 +131,27 @@ void VulkanPipelineImpl::CreateShaderModule(const std::vector<char> &shaderCode,
     createInfo.pCode = reinterpret_cast<const uint32_t*>(shaderCode.data());
 
     VK_CHECK(vkCreateShaderModule(VulkanDevice::GetDevice(), &createInfo, nullptr, shaderModule));
+
+    Logger::Debug("Created shader module");
+}
+
+void VulkanPipelineImpl::CreatePipelineLayout()
+{
+    VkPushConstantRange pushConstantRange{};
+    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+    pushConstantRange.offset = 0;
+    pushConstantRange.size = sizeof(SimplePushConstantData);
+
+    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipelineLayoutInfo.setLayoutCount = 0;
+    pipelineLayoutInfo.pSetLayouts = nullptr;
+    pipelineLayoutInfo.pushConstantRangeCount = 1;
+    pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
+
+    VK_CHECK(vkCreatePipelineLayout(VulkanDevice::GetDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout));
+
+    Logger::Debug("Created pipeline layout");
 }
 
 void VulkanPipelineImpl::FillDefaultPipelineConfig()
@@ -226,5 +251,7 @@ void VulkanPipelineImpl::FillDefaultPipelineConfig()
             0,
             static_cast<uint32_t>(pipelineConfig.dynamicStateEnables.size())
     };
-}
 
+    // SECTION: Pipeline Layout
+    pipelineConfig.pipelineLayout = pipelineLayout;
+}
