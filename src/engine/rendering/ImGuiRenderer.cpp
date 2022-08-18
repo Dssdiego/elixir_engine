@@ -159,6 +159,8 @@ ImGuiRendererImpl::~ImGuiRendererImpl()
 {
     Logger::Debug("Destroying ImGuiRenderer");
 
+    vkDeviceWaitIdle(VulkanDevice::GetDevice());
+
     vkDestroyDescriptorPool(VulkanDevice::GetDevice(), descriptorPool, nullptr);
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
