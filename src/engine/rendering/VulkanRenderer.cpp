@@ -13,7 +13,7 @@
 #include <TracyVulkan.hpp>
 #include "Window.h"
 #include "../profiling/Logger.h"
-#include "Vertex.h"
+#include "shapes/Vertex.h"
 #include "Shader.h"
 #include "VulkanContext.h"
 #include "../common/Config.h"

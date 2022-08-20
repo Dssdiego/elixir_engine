@@ -15,7 +15,7 @@
 
 #include "VulkanDevice.h"
 #include "Shader.h"
-#include "Vertex.h"
+#include "shapes/Vertex.h"
 
 struct SimplePushConstantData
 {
