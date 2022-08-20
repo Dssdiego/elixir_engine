@@ -49,8 +49,8 @@ VulkanPipelineImpl::~VulkanPipelineImpl()
 void VulkanPipelineImpl::CreateGraphicsPipeline()
 {
     // SECTION: Shaders
-    auto vertShaderCode = Shader::ReadFile("assets/shaders/vert.spv");
-    auto fragShaderCode = Shader::ReadFile("assets/shaders/frag.spv");
+    auto vertShaderCode = Shader::ReadFile("assets/shaders/shape_vert.spv");
+    auto fragShaderCode = Shader::ReadFile("assets/shaders/shape_frag.spv");
 
     CreateShaderModule(vertShaderCode, &vertShaderModule);
     CreateShaderModule(fragShaderCode, &fragShaderModule);
