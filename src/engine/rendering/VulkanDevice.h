@@ -53,6 +53,13 @@ struct VulkanDeviceImpl
     bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
 
+    void CreateBuffer(
+            VkDeviceSize size,
+            VkBufferUsageFlags usage,
+            VkMemoryPropertyFlags properties,
+            VkBuffer &buffer,
+            VkDeviceMemory &bufferMemory);
+
     // command buffer single time commands
     VkCommandBuffer BeginSingleTimeCommands();
     void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
@@ -107,13 +114,15 @@ public:
 //    VkFormat FindSupportedFormat(
 //            const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 //
-//    // Buffer Helper Functions
-//    void CreateBuffer(
-//            VkDeviceSize size,
-//            VkBufferUsageFlags usage,
-//            VkMemoryPropertyFlags properties,
-//            VkBuffer &buffer,
-//            VkDeviceMemory &bufferMemory);
+    // Buffer Helper Functions
+    static void CreateBuffer(
+            VkDeviceSize size,
+            VkBufferUsageFlags usage,
+            VkMemoryPropertyFlags properties,
+            VkBuffer &buffer,
+            VkDeviceMemory &bufferMemory);
+
+    // Commands
     static VkCommandBuffer BeginSingleTimeCommands();
     static void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
 //    void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);

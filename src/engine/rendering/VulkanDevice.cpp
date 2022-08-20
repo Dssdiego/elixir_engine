@@ -113,6 +113,12 @@ SwapChainSupportDetails VulkanDevice::GetSwapChainSupport()
     return mVulkanDeviceImpl->QuerySwapChainSupport(mVulkanDeviceImpl->physicalDevice);
 }
 
+void VulkanDevice::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
+                                VkBuffer &buffer, VkDeviceMemory &bufferMemory)
+{
+    mVulkanDeviceImpl->CreateBuffer(size, usage, properties, buffer, bufferMemory);
+}
+
 //
 // Implementation
 //
@@ -536,4 +542,29 @@ bool VulkanDeviceImpl::CheckDeviceExtensionSupport(VkPhysicalDevice device)
     }
 
     return requiredExtensions.empty();
+}
+
+void VulkanDeviceImpl::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
+                                    VkBuffer &buffer, VkDeviceMemory &bufferMemory)
+{
+    VkBufferCreateInfo bufferInfo{};
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.size = size; // size of the buffer in bytes
+    bufferInfo.usage = usage; // which purposes the data in the buffer is going to be used
+    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE; // only used by the graphics queue, so it can have exclusive access
+
+    VK_CHECK(vkCreateBuffer(device, &bufferInfo, nullptr, &buffer));
+
+    VkMemoryRequirements memRequirements;
+    vkGetBufferMemoryRequirements(device, buffer, &memRequirements);
+
+    VkMemoryAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirements.size;
+    allocInfo.memoryTypeIndex = FindMemoryType(memRequirements.memoryTypeBits, properties);
+    // TODO: Implement "FindMemoryTipe" method
+
+    VK_CHECK(vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory));
+
+    vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
