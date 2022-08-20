@@ -9,7 +9,8 @@
 
 class Triangle : public BaseShape
 {
-
+public:
+    void Create();
 };
 
 
