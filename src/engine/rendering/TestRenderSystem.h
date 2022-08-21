@@ -13,7 +13,8 @@ struct TestRenderSystemImpl
     TestRenderSystemImpl();
     ~TestRenderSystemImpl();
 
-    void RenderGameObjects(std::vector<int> &gameObjects);
+//    void RenderGameObjects(std::vector<int> &gameObjects);
+    void RenderGameObjects();
 };
 
 class TestRenderSystem

@@ -4,6 +4,7 @@
 
 #include "Game.h"
 #include "../rendering/ImGuiRenderer.h"
+#include "../rendering/TestRenderSystem.h"
 
 /*
  * Methods
@@ -18,6 +19,7 @@ void Game::Init(EngineConfig* pConfig)
     Input::Init();
     EngineRenderer::Init();
     ImGuiRenderer::Init();
+    TestRenderSystem::Init();
 //    Renderer::Init(GraphicsBackend::VULKAN);
 //    CGeforceNow::Init();
 }
@@ -63,6 +65,8 @@ void Game::Draw()
     EngineRenderer::BeginFrame();
     ImGuiRenderer::NewFrame();
 
+    TestRenderSystem::RenderGameObjects();
+
 //    RenderSystem::RenderGameObjects(gameObjects);
 
     ImGuiRenderer::Render();
@@ -73,6 +77,7 @@ void Game::Cleanup()
 {
     // destroy engine systems
 //    CGeforceNow::Shutdown();
+    TestRenderSystem::Shutdown();
     ImGuiRenderer::Shutdown();
     SceneSystem::Shutdown();
     EngineRenderer::Shutdown();
