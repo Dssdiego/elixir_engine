@@ -36,6 +36,8 @@ public:
     Shape shape{}; // TODO: Change this so that we can pass any shape we want ;)
     glm::vec3 color{};
 
+    uint32_t GetId() { return id; }
+
     static GameObject Create() {
         return GameObject{id++};
     }
