@@ -4,8 +4,19 @@
 
 #pragma once
 
+#include "stb/stb_image.h"
+#include <string>
+#include <vulkan/vulkan.h>
 
+class Texture
+{
+public:
+    void Create(const std::string& imagePath);
 
-class Texture {
+private:
+    int width, height, channels;
+    stbi_uc* pixels;
 
+    VkImage textureImage;
+    VkDeviceMemory textureImageMemory;
 };
