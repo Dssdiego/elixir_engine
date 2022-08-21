@@ -6,6 +6,7 @@
 #include "VulkanPipeline.h"
 #include "shapes/Triangle.h"
 #include "shapes/Quad.h"
+#include "shapes/TexturedQuad.h"
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
@@ -48,13 +49,19 @@ TestRenderSystemImpl::TestRenderSystemImpl()
 
     // load quad test game object
     auto quad = GameObject::Create();
-    quad.color = {0.f, 0.f, 1.f};
+    quad.color = {1.f, 1.f, 0.f};
     quad.shape = Quad();
     quad.transform.position = {0.35f, -0.2f};
     quad.transform.rotation = 0.f;
     quad.transform.scale = {0.8f, 0.8f};
 
     // load textured quad test game object
+//    auto texQuad = GameObject::Create();
+//    texQuad.color = {1.f, 1.f, 1.f};
+//    texQuad.shape = TexturedQuad("../../assets/textures/statue/jpg");
+//    texQuad.transform.position = {-0.35f, -0.2f};
+//    texQuad.transform.rotation = 0.f;
+//    texQuad.transform.scale = {0.5f, 0.5f};
 
     gameObjects.push_back(triangle);
     gameObjects.push_back(quad);
