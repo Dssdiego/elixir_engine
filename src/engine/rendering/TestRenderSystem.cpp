@@ -4,8 +4,8 @@
 
 #include "TestRenderSystem.h"
 #include "VulkanPipeline.h"
-#include "EngineRenderer.h"
 #include "shapes/Triangle.h"
+#include "shapes/Quad.h"
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
@@ -27,8 +27,7 @@ void TestRenderSystem::Shutdown()
 
 void TestRenderSystem::RenderGameObjects()
 {
-    // TODO: Continue here
-//    mTestRenderSystemImpl->RenderGameObjects();
+    mTestRenderSystemImpl->RenderGameObjects();
 }
 
 //
@@ -38,40 +37,59 @@ void TestRenderSystem::RenderGameObjects()
 TestRenderSystemImpl::TestRenderSystemImpl()
 {
     VulkanPipeline::Init();
+
+    // load triangle test game object
+    auto triangle = GameObject::Create();
+    triangle.color = {1.0f, 0.f, 0.f};
+    triangle.shape = Triangle();
+    triangle.transform.position = {0.f, 0.f};
+    triangle.transform.rotation = 0.0f;
+    triangle.transform.scale = {1.0f, 1.0f};
+
+    // load quad test game object
+    auto quad = GameObject::Create();
+    quad.color = {0.f, 0.f, 1.f};
+    quad.shape = Quad();
+    quad.transform.position = {0.35f, -0.2f};
+    quad.transform.rotation = 0.f;
+    quad.transform.scale = {0.8f, 0.8f};
+
+    gameObjects.push_back(triangle);
+    gameObjects.push_back(quad);
 }
 
 TestRenderSystemImpl::~TestRenderSystemImpl()
 {
+    for (auto &obj : gameObjects)
+    {
+        obj.shape.Destroy();
+    }
+
     VulkanPipeline::Shutdown();
 }
 
-// REVIEW: Probably the render system knows too much about vulkan and pushing constants
-//          Perhaps this is a responsibility for the EngineRenderer?
 void TestRenderSystemImpl::RenderGameObjects()
 {
-    Triangle triangle = Triangle();
-    triangle.Draw();
+    VulkanPipeline::Bind();
 
-    // TODO: Go to each object in the array and render it
-//    for (auto &obj : gameObjects)
-//    {
-//        auto commandBuffer = EngineRenderer::GetCurrentCommandBuffer();
-//
-//        SimplePushConstantData push{};
-////        push.offset = obj.transform2d.translation;
-////        push.color = obj.color;
-////        push.transform = obj.transform2d.mat2();
-//
-//        vkCmdPushConstants(
-//                commandBuffer,
-//                nullptr,
-//                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-//                0,
-//                sizeof(SimplePushConstantData),
-//                &push
-//        );
+    for (auto &obj : gameObjects)
+    {
+        auto commandBuffer = EngineRenderer::GetCurrentCommandBuffer();
 
-//        obj.model.bind();
-//        obj.model.draw();
-//    }
+        PushConstantData push{};
+        push.offset = obj.transform.position;
+        push.color = obj.color;
+        push.transform = obj.transform.mat2();
+
+        vkCmdPushConstants(
+                commandBuffer,
+                VulkanPipeline::GetPipelineLayout(),
+                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                0,
+                sizeof(PushConstantData),
+                &push
+        );
+
+        obj.shape.Draw();
+    }
 }

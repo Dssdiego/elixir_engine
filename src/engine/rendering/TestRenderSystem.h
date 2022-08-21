@@ -7,13 +7,15 @@
 
 #include <iostream>
 #include <vector>
+#include "../common/GameObject.h"
 
 struct TestRenderSystemImpl
 {
     TestRenderSystemImpl();
     ~TestRenderSystemImpl();
 
-//    void RenderGameObjects(std::vector<int> &gameObjects);
+    std::vector<GameObject> gameObjects;
+
     void RenderGameObjects();
 };
 
