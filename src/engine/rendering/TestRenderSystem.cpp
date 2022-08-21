@@ -54,6 +54,8 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     quad.transform.rotation = 0.f;
     quad.transform.scale = {0.8f, 0.8f};
 
+    // load textured quad test game object
+
     gameObjects.push_back(triangle);
     gameObjects.push_back(quad);
 }
