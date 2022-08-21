@@ -17,7 +17,7 @@
 #include "Shader.h"
 #include "shapes/Vertex.h"
 
-struct SimplePushConstantData
+struct PushConstantData
 {
     glm::mat2 transform{1.f};
     glm::vec2 offset;
@@ -61,6 +61,7 @@ struct VulkanPipelineImpl
     void CreateShaderModule(const std::vector<char> &shaderCode, VkShaderModule *shaderModule);
     void CreatePipelineLayout();
     void FillDefaultPipelineConfig();
+    void Bind();
 };
 
 class VulkanPipeline
@@ -68,7 +69,10 @@ class VulkanPipeline
 public:
     // REVIEW: Make it possible to pass a custom pipeline config at the creation of the pipeline?
     static void Init();
+    static void Bind();
     static void Shutdown();
+
+    static VkPipelineLayout GetPipelineLayout();
 };
 
 

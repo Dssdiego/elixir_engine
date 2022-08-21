@@ -4,6 +4,7 @@
 
 #include "VulkanPipeline.h"
 #include "VulkanSwapchain.h"
+#include "EngineRenderer.h"
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
@@ -18,9 +19,19 @@ void VulkanPipeline::Init()
     mVulkanPipelineImpl = new VulkanPipelineImpl;
 }
 
+void VulkanPipeline::Bind()
+{
+    mVulkanPipelineImpl->Bind();
+}
+
 void VulkanPipeline::Shutdown()
 {
     delete mVulkanPipelineImpl;
+}
+
+VkPipelineLayout VulkanPipeline::GetPipelineLayout()
+{
+    return mVulkanPipelineImpl->pipelineLayout;
 }
 
 //
@@ -35,6 +46,9 @@ VulkanPipelineImpl::VulkanPipelineImpl()
 
 VulkanPipelineImpl::~VulkanPipelineImpl()
 {
+    // TODO: We need to wait for commands to complete before destroying the pipeline
+    vkDeviceWaitIdle(VulkanDevice::GetDevice());
+
     Logger::Debug("Destroying shader modules");
     vkDestroyShaderModule(VulkanDevice::GetDevice(), vertShaderModule, nullptr);
     vkDestroyShaderModule(VulkanDevice::GetDevice(), fragShaderModule, nullptr);
@@ -49,8 +63,8 @@ VulkanPipelineImpl::~VulkanPipelineImpl()
 void VulkanPipelineImpl::CreateGraphicsPipeline()
 {
     // SECTION: Shaders
-    auto vertShaderCode = Shader::ReadFile("assets/shaders/vert.spv");
-    auto fragShaderCode = Shader::ReadFile("assets/shaders/frag.spv");
+    auto vertShaderCode = Shader::ReadFile("assets/shaders/shape_vert.spv");
+    auto fragShaderCode = Shader::ReadFile("assets/shaders/shape_frag.spv");
 
     CreateShaderModule(vertShaderCode, &vertShaderModule);
     CreateShaderModule(fragShaderCode, &fragShaderModule);
@@ -140,7 +154,7 @@ void VulkanPipelineImpl::CreatePipelineLayout()
     VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
     pushConstantRange.offset = 0;
-    pushConstantRange.size = sizeof(SimplePushConstantData);
+    pushConstantRange.size = sizeof(PushConstantData);
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -263,4 +277,9 @@ void VulkanPipelineImpl::FillDefaultPipelineConfig()
 
     // SECTION: Pipeline Layout
     pipelineConfig.pipelineLayout = pipelineLayout;
+}
+
+void VulkanPipelineImpl::Bind()
+{
+    vkCmdBindPipeline(EngineRenderer::GetCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 }
