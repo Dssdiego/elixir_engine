@@ -4,26 +4,28 @@
 
 #include "Triangle.h"
 
+Triangle::Triangle()
+{
+    CreateShape();
+}
+
 void Triangle::CreateShape()
 {
-    auto colorWhite = glm::vec3(1.0f, 1.0f, 1.0f);
-
     vertices = {
-            {{-0.5f, -0.5f, 0.0f}, colorWhite, { 0.0f, 0.0f}},
-            {{0.5f, -0.5f, 0.0f}, colorWhite, { 1.0f, 0.0f}},
-            {{0.5f, 0.5f, 0.0f}, colorWhite, { 1.0f, 1.0f}},
-            {{-0.5f, 0.5f, 0.0f}, colorWhite, { 0.0f, 1.0f}},
+            {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+            {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
     };
 
-    BaseShape::CreateShape();
+    Shape::CreateShape();
 }
 
 void Triangle::Draw()
 {
-    BaseShape::Draw();
+    Shape::Draw();
 }
 
 void Triangle::Destroy()
 {
-    BaseShape::Destroy();
+    Shape::Destroy();
 }

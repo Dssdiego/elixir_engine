@@ -5,17 +5,16 @@
 #ifndef VULKAN_ENGINE_TRIANGLE_H
 #define VULKAN_ENGINE_TRIANGLE_H
 
-#include "BaseShape.h"
+#include "Shape.h"
 
-class Triangle : public BaseShape
+class Triangle : public Shape
 {
 public:
+    Triangle();
+
     void CreateShape() override;
-
-    void Destroy() override;
-
-    void Create();
     void Draw() override;
+    void Destroy() override;
 };
 
 
