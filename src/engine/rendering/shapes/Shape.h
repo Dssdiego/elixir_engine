@@ -2,15 +2,15 @@
 // Created by Diego S. Seabra on 20/08/22.
 //
 
-#ifndef VULKAN_ENGINE_BASESHAPE_H
-#define VULKAN_ENGINE_BASESHAPE_H
+#ifndef VULKAN_ENGINE_SHAPE_H
+#define VULKAN_ENGINE_SHAPE_H
 
 #include "../VulkanDevice.h"
 #include "../EngineRenderer.h"
 #include "Vertex.h"
 #include <vector>
 
-class BaseShape
+class Shape
 {
 public:
     virtual void CreateShape();
@@ -31,4 +31,4 @@ private:
 };
 
 
-#endif //VULKAN_ENGINE_BASESHAPE_H
+#endif //VULKAN_ENGINE_SHAPE_H

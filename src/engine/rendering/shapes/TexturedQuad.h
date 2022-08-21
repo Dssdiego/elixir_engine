@@ -5,9 +5,9 @@
 #ifndef VULKAN_ENGINE_TEXTUREDQUAD_H
 #define VULKAN_ENGINE_TEXTUREDQUAD_H
 
-#include "BaseShape.h"
+#include "Shape.h"
 
-class TexturedQuad : public BaseShape
+class TexturedQuad : public Shape
 {
 
 };

@@ -2,24 +2,24 @@
 // Created by Diego S. Seabra on 20/08/22.
 //
 
-#include "BaseShape.h"
+#include "Shape.h"
 
 //
 // Public/External
 //
 
-void BaseShape::CreateShape()
+void Shape::CreateShape()
 {
     CreateVertexBuffers();
 }
 
-void BaseShape::Draw()
+void Shape::Draw()
 {
     Bind();
     vkCmdDraw(EngineRenderer::GetCurrentCommandBuffer(), vertexCount, 1, 0, 0);
 }
 
-void BaseShape::Destroy()
+void Shape::Destroy()
 {
     vkDestroyBuffer(VulkanDevice::GetDevice(), vertexBuffer, nullptr);
     vkFreeMemory(VulkanDevice::GetDevice(), vertexBufferMemory, nullptr);
@@ -29,7 +29,7 @@ void BaseShape::Destroy()
 // Private
 //
 
-void BaseShape::CreateVertexBuffers()
+void Shape::CreateVertexBuffers()
 {
     vertexCount = static_cast<uint32_t>(vertices.size());
     assert(vertexCount >= 3 && "Vertex count must be at least 3 so that we can draw triangles ;)");
@@ -50,7 +50,7 @@ void BaseShape::CreateVertexBuffers()
     vkUnmapMemory(VulkanDevice::GetDevice(), vertexBufferMemory);
 }
 
-void BaseShape::Bind()
+void Shape::Bind()
 {
     VkBuffer buffers[] = {vertexBuffer};
     VkDeviceSize offsets[] = {0};
