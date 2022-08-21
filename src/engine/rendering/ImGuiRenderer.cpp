@@ -8,6 +8,7 @@
 #include "VulkanDevice.h"
 #include "VulkanSwapchain.h"
 #include "EngineRenderer.h"
+#include "TestRenderSystem.h"
 
 // checking for vulkan error
 static void check_vk_result(VkResult err) {
@@ -53,83 +54,28 @@ void ImGuiRenderer::NewFrame()
 
 void ImGuiRenderer::Draw()
 {
-    bool show_demo = true;
-    ImGui::ShowDemoWindow(&show_demo);
+//    bool show_demo = true;
+//    ImGui::ShowDemoWindow(&show_demo);
 
-    const ImGuiWindowFlags mainWindowFlags =
-            ImGuiWindowFlags_NoDocking |
-            ImGuiWindowFlags_NoTitleBar |
-            ImGuiWindowFlags_NoCollapse |
-            ImGuiWindowFlags_NoResize |
-            ImGuiWindowFlags_NoMove |
-            ImGuiWindowFlags_NoBringToFrontOnFocus |
-            ImGuiWindowFlags_NoNavFocus |
-            ImGuiWindowFlags_MenuBar;
-//
-    ImGuiViewport* viewport = ImGui::GetMainViewport();
-    ImGui::SetNextWindowPos(viewport->WorkPos);
-    ImGui::SetNextWindowSize(viewport->WorkSize);
-    ImGui::SetNextWindowViewport(viewport->ID);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-
-    // Main Window BEGIN
-    ImGui::Begin("Main Window", nullptr, mainWindowFlags);
-    ImGui::DockSpace(ImGui::GetID("Dockspace"), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
-
-    // Main Menu Bar
+    ImGui::Begin("Inspector");
+    if (ImGui::TreeNode("GameObjects"))
     {
-        ImGui::BeginMenuBar();
-        if (ImGui::BeginMenu("Engine"))
+        for (auto& obj : *TestRenderSystem::GetGameObjects())
         {
-            if (ImGui::MenuItem("Exit"))
+            if (ImGui::TreeNode((void*)(intptr_t) obj.id, "[%d] %s", obj.id, obj.name.c_str()))
             {
-                glfwSetWindowShouldClose(Window::GetWindow(), GLFW_TRUE);
-            };
-            ImGui::EndMenu();
+                ImGui::InputFloat2("position", obj.transform.position);
+                ImGui::InputFloat("rotation", &obj.transform.rotation, 0.1f, 1.0f, "%.3f");
+                ImGui::InputFloat2("scale", obj.transform.scale);
+                ImGui::ColorEdit3("color", obj.color);
+
+                ImGui::TreePop();
+            }
         }
-        ImGui::EndMenuBar();
+        ImGui::TreePop();
     }
 
-    // Scene
-    {
-        ImGui::Begin("Scene");
-        ImGui::Text("This is inside the scene");
-        ImGui::End();
-    }
-
-    // Viewport
-    {
-        ImGui::Begin("Viewport");
-        ImGui::Text("This is inside the viewport");
-        ImGui::End();
-    }
-
-    // Inspector
-    {
-        ImGui::Begin("Inspector");
-        ImGui::Text("This is inside the inspector");
-        ImGui::End();
-    }
-
-    // Console
-    {
-        ImGui::Begin("Console");
-        ImGui::Text("This is inside the console");
-        ImGui::End();
-    }
-
-    // Assets
-    {
-        ImGui::Begin("Assets");
-        ImGui::Text("This is inside the assets");
-        ImGui::End();
-    }
-
-    // Main Windows END
     ImGui::End();
-
-    ImGui::PopStyleVar(2);
 }
 
 void ImGuiRenderer::Render()

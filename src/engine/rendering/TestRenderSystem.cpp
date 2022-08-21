@@ -31,6 +31,11 @@ void TestRenderSystem::RenderGameObjects()
     mTestRenderSystemImpl->RenderGameObjects();
 }
 
+std::vector<GameObject>* TestRenderSystem::GetGameObjects()
+{
+    return mTestRenderSystemImpl->GetGameObjects();
+}
+
 //
 // Implementation
 //
@@ -41,19 +46,32 @@ TestRenderSystemImpl::TestRenderSystemImpl()
 
     // load triangle test game object
     auto triangle = GameObject::Create();
-    triangle.color = {1.0f, 0.f, 0.f};
+    triangle.id = 0;
+    triangle.name = "Triangle";
+    triangle.color[0] = 1.0f;
+    triangle.color[1] = 0.0f;
+    triangle.color[2] = 0.0f;
     triangle.shape = Triangle();
-    triangle.transform.position = {0.f, 0.f};
+    triangle.transform.position[0] = 0.f;
+    triangle.transform.position[1] = 0.f;
     triangle.transform.rotation = 0.0f;
-    triangle.transform.scale = {1.0f, 1.0f};
+    triangle.transform.scale[0] = 1.0f;
+    triangle.transform.scale[1] = 1.0f;
+    // FIXME: Make sure we can use glm::vec2 and glm::vec3 with ImGui without converting the original field type!
 
     // load quad test game object
     auto quad = GameObject::Create();
-    quad.color = {1.f, 1.f, 0.f};
+    quad.id = 1;
+    quad.name = "Quad";
+    quad.color[0] = 1.0f;
+    quad.color[1] = 1.0f;
+    quad.color[2] = 0.0f;
     quad.shape = Quad();
-    quad.transform.position = {0.35f, -0.2f};
+    quad.transform.position[0] = 0.35f;
+    quad.transform.position[1] = -0.2f;
     quad.transform.rotation = 0.f;
-    quad.transform.scale = {0.8f, 0.8f};
+    quad.transform.scale[0] = 0.8f;
+    quad.transform.scale[1] = 0.8f;
 
     // load textured quad test game object
 //    auto texQuad = GameObject::Create();
@@ -86,8 +104,8 @@ void TestRenderSystemImpl::RenderGameObjects()
         auto commandBuffer = EngineRenderer::GetCurrentCommandBuffer();
 
         PushConstantData push{};
-        push.offset = obj.transform.position;
-        push.color = obj.color;
+        push.offset = glm::vec2(obj.transform.position[0], obj.transform.position[1]);
+        push.color = glm::vec3(obj.color[0], obj.color[1], obj.color[2]);
         push.transform = obj.transform.mat2();
 
         vkCmdPushConstants(
@@ -101,4 +119,9 @@ void TestRenderSystemImpl::RenderGameObjects()
 
         obj.shape.Draw();
     }
+}
+
+std::vector<GameObject>* TestRenderSystemImpl::GetGameObjects()
+{
+    return &gameObjects;
 }

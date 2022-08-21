@@ -17,6 +17,7 @@ struct TestRenderSystemImpl
     std::vector<GameObject> gameObjects;
 
     void RenderGameObjects();
+    std::vector<GameObject>* GetGameObjects();
 };
 
 class TestRenderSystem
@@ -26,6 +27,7 @@ public:
     static void Shutdown();
 
     static void RenderGameObjects();
+    static std::vector<GameObject>* GetGameObjects();
 };
 
 

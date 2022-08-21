@@ -14,8 +14,10 @@
 #include "../rendering/shapes/Triangle.h"
 
 struct Transform2D {
-    glm::vec2 position{};
-    glm::vec2 scale{1.f, 1.f};
+    float position[2];
+    float scale[2];
+//    glm::vec2 position{};
+//    glm::vec2 scale{1.f, 1.f};
     float rotation; // REVIEW: In degrees? Radians? Euler angles? What is more intuitive?
 
     // 2D Transformation matrix (for rotationa and scale calculations)
@@ -24,7 +26,7 @@ struct Transform2D {
         const float cosine = glm::cos(rotation);
         glm::mat2 rotMatrix{{cosine, sine}, {-sine, cosine}};
 
-        glm::mat2 scaleMat{{scale.x, .0f}, {.0f, scale.y}};
+        glm::mat2 scaleMat{{scale[0], .0f}, {.0f, scale[1]}};
         return rotMatrix * scaleMat;
     };
 };
@@ -32,20 +34,22 @@ struct Transform2D {
 class GameObject
 {
 public:
+    uint32_t id = 0;
+    std::string name = "";
+
     Transform2D transform{};
     Shape shape{}; // TODO: Change this so that we can pass any shape we want ;)
-    glm::vec3 color{};
+    float color[3]{};
+//    glm::vec3 color{};
 
-    uint32_t GetId() { return id; }
+//    uint32_t GetId() { return id; }
 
     static GameObject Create() {
-        return GameObject{id++};
+        return GameObject{};
     }
 
 private:
-    inline static uint32_t id = 0;
-
-    GameObject(uint32_t objId){ id = objId; }
+    GameObject(){}
 };
 
 

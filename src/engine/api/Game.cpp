@@ -63,13 +63,13 @@ void Game::Run()
 void Game::Draw()
 {
     EngineRenderer::BeginFrame();
-//    ImGuiRenderer::NewFrame();
+    ImGuiRenderer::NewFrame();
 
     TestRenderSystem::RenderGameObjects();
 
 //    RenderSystem::RenderGameObjects(gameObjects);
 
-//    ImGuiRenderer::Render();
+    ImGuiRenderer::Render();
     EngineRenderer::EndFrame();
 }
 
