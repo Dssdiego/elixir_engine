@@ -9,8 +9,15 @@
 
 class TexturedQuad : public Shape
 {
+public:
+    TexturedQuad();
+
+    void CreateShape() override;
+    void Draw() override;
+    void Destroy() override;
+
+private:
 
 };
-
 
 #endif //VULKAN_ENGINE_TEXTUREDQUAD_H
