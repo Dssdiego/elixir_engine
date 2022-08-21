@@ -5,11 +5,16 @@
 #ifndef VULKAN_ENGINE_QUAD_H
 #define VULKAN_ENGINE_QUAD_H
 
-#include "BaseShape.h"
+#include "Shape.h"
 
-class Quad : public BaseShape
+class Quad : public Shape
 {
+public:
+    Quad();
 
+    void CreateShape() override;
+    void Draw() override;
+    void Destroy() override;
 };
 
 
