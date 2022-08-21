@@ -52,6 +52,7 @@ struct VulkanDeviceImpl
 //    void HasGflwRequiredInstanceExtensions();
     bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
+    uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
     void CreateBuffer(
             VkDeviceSize size,
