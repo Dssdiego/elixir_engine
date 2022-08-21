@@ -11,6 +11,9 @@
 class Texture
 {
 public:
+    Texture(const std::string &imagePath);
+    ~Texture();
+
     void Create(const std::string& imagePath);
 
 private:

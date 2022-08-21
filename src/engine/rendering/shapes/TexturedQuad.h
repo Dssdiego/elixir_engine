@@ -6,18 +6,21 @@
 #define VULKAN_ENGINE_TEXTUREDQUAD_H
 
 #include "Shape.h"
+#include "../Texture.h"
 
 class TexturedQuad : public Shape
 {
 public:
-    TexturedQuad();
+    TexturedQuad(const std::string &imagePath);
 
     void CreateShape() override;
     void Draw() override;
     void Destroy() override;
 
 private:
+    Texture texture{nullptr};
 
+    void CreateTexture(const std::string &imagePath);
 };
 
 #endif //VULKAN_ENGINE_TEXTUREDQUAD_H

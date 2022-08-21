@@ -5,6 +5,17 @@
 #include "Texture.h"
 #include "VulkanDevice.h"
 
+Texture::Texture(const std::string &imagePath)
+{
+    Create(imagePath);
+}
+
+Texture::~Texture()
+{
+    vkDestroyImage(VulkanDevice::GetDevice(), textureImage, nullptr);
+    vkFreeMemory(VulkanDevice::GetDevice(), textureImageMemory, nullptr);
+}
+
 void Texture::Create(const std::string& imagePath)
 {
     // reading the image with the stbi library

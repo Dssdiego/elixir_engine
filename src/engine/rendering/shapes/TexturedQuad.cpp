@@ -4,9 +4,10 @@
 
 #include "TexturedQuad.h"
 
-TexturedQuad::TexturedQuad()
+TexturedQuad::TexturedQuad(const std::string &imagePath)
 {
     CreateShape();
+    CreateTexture(imagePath);
 }
 
 void TexturedQuad::CreateShape()
@@ -34,4 +35,13 @@ void TexturedQuad::Draw()
 void TexturedQuad::Destroy()
 {
     Shape::Destroy();
+}
+
+//
+// Private
+//
+
+void TexturedQuad::CreateTexture(const std::string &imagePath)
+{
+    texture = Texture(imagePath);
 }
