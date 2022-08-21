@@ -107,7 +107,7 @@ void VulkanPipelineImpl::CreateGraphicsPipeline()
     pipelineInfo.pMultisampleState = &pipelineConfig.multisampleInfo;
     pipelineInfo.pDepthStencilState = &pipelineConfig.depthStencilInfo;
     pipelineInfo.pColorBlendState = &pipelineConfig.colorBlendInfo;
-    pipelineInfo.pDynamicState = nullptr; // optional
+    pipelineInfo.pDynamicState = &pipelineConfig.dynamicStateInfo;
     pipelineInfo.layout = pipelineConfig.pipelineLayout;
     pipelineInfo.renderPass = VulkanSwapchain::GetRenderPass();
     pipelineInfo.subpass = 0; // not using subpasses for now
@@ -211,12 +211,20 @@ void VulkanPipelineImpl::FillDefaultPipelineConfig()
     };
 
     // SECTION: Depth and Stencil Testing
-    pipelineConfig.depthStencilInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-    pipelineConfig.depthStencilInfo.depthTestEnable = VK_TRUE; // if the depth of new fragments should be compared to the depth buffer (to check if they should be discarded)
-    pipelineConfig.depthStencilInfo.depthWriteEnable = VK_TRUE; // if the new depth of fragments that pass the depth test should actually be written to the depth buffer (useful for drawing transparent objects)
-    pipelineConfig.depthStencilInfo.depthCompareOp = VK_COMPARE_OP_LESS; // right now, lower depth = closer
-    pipelineConfig.depthStencilInfo.depthBoundsTestEnable = VK_FALSE;
-    pipelineConfig.depthStencilInfo.stencilTestEnable = VK_FALSE;
+    pipelineConfig.depthStencilInfo = {
+            VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+            nullptr,
+            0,
+            true,
+            true,
+            VK_COMPARE_OP_LESS,
+            false,
+            false,
+            {},
+            {},
+            0.0f,
+            1.0f
+    };
 
     // SECTION: Color Blending
     pipelineConfig.colorBlendAttachment =
@@ -249,7 +257,8 @@ void VulkanPipelineImpl::FillDefaultPipelineConfig()
             VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
             nullptr,
             0,
-            static_cast<uint32_t>(pipelineConfig.dynamicStateEnables.size())
+            static_cast<uint32_t>(pipelineConfig.dynamicStateEnables.size()),
+            pipelineConfig.dynamicStateEnables.data()
     };
 
     // SECTION: Pipeline Layout
