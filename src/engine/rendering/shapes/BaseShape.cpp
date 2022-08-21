@@ -13,6 +13,12 @@ void BaseShape::CreateShape()
     CreateVertexBuffers();
 }
 
+void BaseShape::Draw()
+{
+    Bind();
+    vkCmdDraw(EngineRenderer::GetCurrentCommandBuffer(), vertexCount, 1, 0, 0);
+}
+
 void BaseShape::Destroy()
 {
     vkDestroyBuffer(VulkanDevice::GetDevice(), vertexBuffer, nullptr);
@@ -28,7 +34,7 @@ void BaseShape::CreateVertexBuffers()
     vertexCount = static_cast<uint32_t>(vertices.size());
     assert(vertexCount >= 3 && "Vertex count must be at least 3 so that we can draw triangles ;)");
 
-    VkDeviceSize bufferSize = sizeof(vertices[0] * vertexCount);
+    VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
 
     VulkanDevice::CreateBuffer(
             bufferSize,
@@ -42,4 +48,11 @@ void BaseShape::CreateVertexBuffers()
     vkMapMemory(VulkanDevice::GetDevice(), vertexBufferMemory, 0, bufferSize, 0, &data);
     memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
     vkUnmapMemory(VulkanDevice::GetDevice(), vertexBufferMemory);
+}
+
+void BaseShape::Bind()
+{
+    VkBuffer buffers[] = {vertexBuffer};
+    VkDeviceSize offsets[] = {0};
+    vkCmdBindVertexBuffers(EngineRenderer::GetCurrentCommandBuffer(), 0, 1, buffers, offsets);
 }

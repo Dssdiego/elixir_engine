@@ -10,7 +10,12 @@
 class Triangle : public BaseShape
 {
 public:
+    void CreateShape() override;
+
+    void Destroy() override;
+
     void Create();
+    void Draw() override;
 };
 
 
