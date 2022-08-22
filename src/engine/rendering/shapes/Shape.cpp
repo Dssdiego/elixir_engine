@@ -8,7 +8,27 @@
 // Public/External
 //
 
-void Shape::CreateShape()
+Shape::Shape(ShapeType type)
+{
+    switch (type)
+    {
+        case ShapeType::Triangle:
+            DefineTriangle();
+            break;
+
+        case ShapeType::Square:
+            DefineSquare();
+            break;
+
+        case ShapeType::Circle:
+            DefineCircle();
+            break;
+    }
+
+    MakeShape();
+}
+
+void Shape::MakeShape()
 {
     CreateVertexBuffers();
 }
@@ -55,4 +75,51 @@ void Shape::Bind()
     VkBuffer buffers[] = {vertexBuffer};
     VkDeviceSize offsets[] = {0};
     vkCmdBindVertexBuffers(EngineRenderer::GetCurrentCommandBuffer(), 0, 1, buffers, offsets);
+}
+
+//
+// Shape Definition
+//
+
+void Shape::DefineTriangle()
+{
+    vertices = {
+            {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f, 0.f}},
+            {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f, 0.f}},
+            {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f, 0.f}}
+    };
+
+}
+
+void Shape::DefineSquare()
+{
+    vertices = {
+            {{-0.5f, -0.5f}, {0.f, 0.f, 0.f, 0.f}},
+            {{0.5f, -0.5f}, {0.f, 0.f, 0.f, 0.f}},
+            {{0.5f, 0.5f}, {0.f, 0.f, 0.f, 0.f}},
+
+            {{-0.5f, -0.5f}, {0.f, 0.f, 0.f, 0.f}},
+            {{0.5f, 0.5f}, {0.f, 0.f, 0.f, 0.f}},
+            {{-0.5f, 0.5f}, {0.f, 0.f, 0.f, 0.f}},
+    };
+}
+
+void Shape::DefineCircle()
+{
+    int numSides = 64;
+
+    std::vector<Vertex> uniqueVertices{};
+
+    for (int i = 0; i < numSides; i++) {
+        float angle = i * glm::two_pi<float>() / numSides;
+        uniqueVertices.push_back({{glm::cos(angle), glm::sin(angle)}});
+    }
+
+    uniqueVertices.push_back({}); // adding center vertex at (0,0)
+
+    for (int i = 0; i < numSides; i++) {
+        vertices.push_back(uniqueVertices[i]);
+        vertices.push_back(uniqueVertices[(i + 1) % numSides]);
+        vertices.push_back(uniqueVertices[numSides]);
+    }
 }

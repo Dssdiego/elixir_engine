@@ -4,9 +4,6 @@
 
 #include "TestRenderSystem.h"
 #include "VulkanPipeline.h"
-#include "shapes/Triangle.h"
-#include "shapes/Quad.h"
-#include "shapes/TexturedQuad.h"
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
@@ -52,7 +49,7 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     triangle.color[1] = 0.f;
     triangle.color[2] = 0.f;
     triangle.color[3] = 1.f;
-    triangle.shape = Triangle();
+    triangle.shape = Shape(ShapeType::Triangle);
     triangle.transform.position[0] = 0.f;
     triangle.transform.position[1] = 0.f;
     triangle.transform.rotation = 0.0f;
@@ -68,21 +65,29 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     quad.color[1] = 1.f;
     quad.color[2] = 0.f;
     quad.color[3] = 1.f;
-    quad.shape = Quad();
+    quad.shape = Shape(ShapeType::Square);
     quad.transform.position[0] = 0.35f;
     quad.transform.position[1] = -0.2f;
     quad.transform.rotation = 0.f;
     quad.transform.scale[0] = 0.8f;
     quad.transform.scale[1] = 0.8f;
 
-    // load textured quad test game object
-//    auto texQuad = GameObject::Create();
-//    texQuad.color = {1.f, 1.f, 1.f};
-//    texQuad.shape = TexturedQuad("../../assets/textures/statue/jpg");
-//    texQuad.transform.position = {-0.35f, -0.2f};
-//    texQuad.transform.rotation = 0.f;
-//    texQuad.transform.scale = {0.5f, 0.5f};
+    // load circle test game object
+    auto circle = GameObject::Create();
+    circle.id = 2;
+    circle.name = "Circle";
+    circle.color[0] = 0.f;
+    circle.color[1] = 0.f;
+    circle.color[2] = 1.f;
+    circle.color[3] = 1.f;
+    circle.shape = Shape(ShapeType::Circle);
+    circle.transform.position[0] = -0.35f;
+    circle.transform.position[1] = -0.2f;
+    circle.transform.rotation = 0.f;
+    circle.transform.scale[0] = 0.3f;
+    circle.transform.scale[1] = 0.35f;
 
+    gameObjects.push_back(circle);
     gameObjects.push_back(triangle);
     gameObjects.push_back(quad);
 }

@@ -11,7 +11,6 @@
 
 #include <memory>
 #include "../rendering/shapes/Shape.h"
-#include "../rendering/shapes/Triangle.h"
 
 struct Transform2D {
     float position[2];
@@ -38,7 +37,7 @@ public:
     std::string name = "";
 
     Transform2D transform{};
-    Shape shape{}; // TODO: Change this so that we can pass any shape we want ;)
+    Shape shape{ShapeType::Triangle}; // TODO: Change this so that we can pass any shape we want ;)
     float color[4]{};
 //    glm::vec3 color{};
 
