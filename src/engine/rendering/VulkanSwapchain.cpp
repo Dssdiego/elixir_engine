@@ -35,11 +35,23 @@ uint32_t VulkanSwapchain::GetNumberOfFramesInFlight()
 
 void VulkanSwapchain::Recreate()
 {
+    // handling window minimization
+    int width, height = 0;
+    glfwGetFramebufferSize(Window::GetWindow(), &width, &height);
+    while (width == 0 || height == 0) // window is minimized, wait for it to be on the foreground again
+    {
+        glfwGetFramebufferSize(Window::GetWindow(), &width, &height);
+        glfwWaitEvents();
+    }
+
+    // don't touch resources that may still be in use
     vkDeviceWaitIdle(VulkanDevice::GetDevice());
 
     // when trying to recreate the swapchain, check if it already exists. if exists, we shut it down and we create it again
     if (mVulkanSwapChainImpl->swapChain != nullptr)
     {
+        Logger::Debug("Recreating swap chain...");
+
         Shutdown();
         Init();
     } else {
