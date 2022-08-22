@@ -48,9 +48,10 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     auto triangle = GameObject::Create();
     triangle.id = 0;
     triangle.name = "Triangle";
-    triangle.color[0] = 1.0f;
-    triangle.color[1] = 0.0f;
-    triangle.color[2] = 0.0f;
+    triangle.color[0] = 1.f;
+    triangle.color[1] = 0.f;
+    triangle.color[2] = 0.f;
+    triangle.color[3] = 1.f;
     triangle.shape = Triangle();
     triangle.transform.position[0] = 0.f;
     triangle.transform.position[1] = 0.f;
@@ -63,9 +64,10 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     auto quad = GameObject::Create();
     quad.id = 1;
     quad.name = "Quad";
-    quad.color[0] = 1.0f;
-    quad.color[1] = 1.0f;
-    quad.color[2] = 0.0f;
+    quad.color[0] = 1.f;
+    quad.color[1] = 1.f;
+    quad.color[2] = 0.f;
+    quad.color[3] = 1.f;
     quad.shape = Quad();
     quad.transform.position[0] = 0.35f;
     quad.transform.position[1] = -0.2f;
@@ -105,7 +107,7 @@ void TestRenderSystemImpl::RenderGameObjects()
 
         PushConstantData push{};
         push.offset = glm::vec2(obj.transform.position[0], obj.transform.position[1]);
-        push.color = glm::vec3(obj.color[0], obj.color[1], obj.color[2]);
+        push.color = glm::vec4(obj.color[0], obj.color[1], obj.color[2], obj.color[3]);
         push.transform = obj.transform.mat2();
 
         vkCmdPushConstants(

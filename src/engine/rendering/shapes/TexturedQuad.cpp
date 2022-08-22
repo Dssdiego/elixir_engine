@@ -12,13 +12,13 @@ TexturedQuad::TexturedQuad()
 void TexturedQuad::CreateShape()
 {
     vertices = {
-            {{-0.5f, -0.5f}, {0.0f, 0.0f, 0.0f}},
-            {{0.5f, -0.5f}, {0.0f, 0.0f, 0.0f}},
-            {{0.5f, 0.5f}, {0.0f, 0.0f, 0.0f}},
+            {{-0.5f, -0.5f}, {0.0f, 0.0f, 0.0f, 0.0f}},
+            {{0.5f, -0.5f}, {0.0f, 0.0f, 0.0f, 0.f}},
+            {{0.5f, 0.5f}, {0.0f, 0.0f, 0.0f, 0.f}},
 
-            {{-0.5f, -0.5f}, {0.0f, 0.0f, 0.0f}},
-            {{0.5f, 0.5f}, {0.0f, 0.0f, 0.0f}},
-            {{-0.5f, 0.5f}, {0.0f, 0.0f, 0.0f}},
+            {{-0.5f, -0.5f}, {0.0f, 0.0f, 0.0f, 0.f}},
+            {{0.5f, 0.5f}, {0.0f, 0.0f, 0.0f, 0.f}},
+            {{-0.5f, 0.5f}, {0.0f, 0.0f, 0.0f, 0.f}},
     };
 
     // TODO: Use indices here so that we don't draw duplicated vertices! ;)

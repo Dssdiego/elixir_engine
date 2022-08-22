@@ -21,7 +21,7 @@ struct PushConstantData
 {
     glm::mat2 transform{1.f};
     glm::vec2 offset;
-    alignas(16) glm::vec3 color;
+    alignas(32) glm::vec4 color;
 };
 
 struct PipelineConfig

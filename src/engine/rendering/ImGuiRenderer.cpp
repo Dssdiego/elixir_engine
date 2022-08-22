@@ -67,7 +67,7 @@ void ImGuiRenderer::Draw()
                 ImGui::InputFloat2("position", obj.transform.position);
                 ImGui::InputFloat("rotation", &obj.transform.rotation, 0.1f, 1.0f, "%.3f");
                 ImGui::InputFloat2("scale", obj.transform.scale);
-                ImGui::ColorEdit3("color", obj.color);
+                ImGui::ColorEdit4("color", obj.color);
 
                 ImGui::TreePop();
             }

@@ -155,7 +155,7 @@ void EngineRendererImpl::BeginSwapChainRenderPass()
     renderPassBeginInfo.renderArea.extent = VulkanSwapchain::GetSwapChainExtent();
 
     std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = Color::GetAsVulkanClear(Color::Black);
+    clearValues[0].color = Color::GetAsVulkanClear(Color::Background);
     clearValues[1].depthStencil = {1.0f, 0};
 
     renderPassBeginInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());

@@ -39,7 +39,7 @@ public:
 
     Transform2D transform{};
     Shape shape{}; // TODO: Change this so that we can pass any shape we want ;)
-    float color[3]{};
+    float color[4]{};
 //    glm::vec3 color{};
 
 //    uint32_t GetId() { return id; }

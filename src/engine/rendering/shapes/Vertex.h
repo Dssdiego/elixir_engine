@@ -7,12 +7,13 @@
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 #include <vulkan/vulkan.h>
 #include <array>
 
 struct Vertex {
     glm::vec2 pos;
-    glm::vec3 color;
+    glm::vec4 color;
 //    glm::vec2 texCoord;
     // NOTE: Disabling texture coordinates for now
     // TODO: Re-enable texture coordinates
@@ -43,7 +44,7 @@ struct Vertex {
 
         attributeDescriptions[1].binding = 0; // which binding the per-vertex data comes
         attributeDescriptions[1].location = 1; // location directive of the input in the vertex shader
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT; // inColor is a vec3
+        attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT; // color is a vec4
         attributeDescriptions[1].offset = offsetof(Vertex, color);
 
         // NOTE: Disabling texture coordinates for now
