@@ -18,7 +18,7 @@
 enum ShapeType {
     Triangle,
     Circle,
-    Square
+    Quad
 };
 
 class Shape
@@ -35,7 +35,7 @@ protected:
 private:
     void DefineTriangle();
     void DefineCircle();
-    void DefineSquare();
+    void DefineQuad();
 
     void MakeShape();
     void CreateVertexBuffers();

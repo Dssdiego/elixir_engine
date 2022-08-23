@@ -30,7 +30,6 @@ public:
     static const Color Cyan;
     static const Color Background;
 
-private:
     float r, g, b, a;
 };
 

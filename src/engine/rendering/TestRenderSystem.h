@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include "../common/GameObject.h"
+#include "../rendering/Sprite.h"
 
 struct TestRenderSystemImpl
 {

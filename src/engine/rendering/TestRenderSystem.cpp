@@ -67,7 +67,7 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     quad.color[1] = 1.f;
     quad.color[2] = 0.f;
     quad.color[3] = 1.f;
-    quad.shape = Shape(ShapeType::Square);
+    quad.shape = Shape(ShapeType::Quad);
     quad.transform.position[0] = 0.35f;
     quad.transform.position[1] = -0.2f;
     quad.transform.position[2] = 0.f;
@@ -93,6 +93,11 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     circle.transform.scale[1] = 0.35f;
     circle.transform.scale[2] = 0.35f;
 
+    auto sprite = Sprite();
+    sprite.id = 3;
+    sprite.name = "A simple sprite";
+
+    gameObjects.push_back(sprite);
     gameObjects.push_back(circle);
     gameObjects.push_back(triangle);
     gameObjects.push_back(quad);

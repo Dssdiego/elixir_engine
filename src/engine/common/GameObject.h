@@ -46,7 +46,7 @@ public:
         return GameObject{};
     }
 
-private:
+protected:
     GameObject(){}
 };
 

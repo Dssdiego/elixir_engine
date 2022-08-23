@@ -16,8 +16,8 @@ Shape::Shape(ShapeType type)
             DefineTriangle();
             break;
 
-        case ShapeType::Square:
-            DefineSquare();
+        case ShapeType::Quad:
+            DefineQuad();
             break;
 
         case ShapeType::Circle:
@@ -91,7 +91,7 @@ void Shape::DefineTriangle()
 
 }
 
-void Shape::DefineSquare()
+void Shape::DefineQuad()
 {
     vertices = {
             {{-0.5f, -0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}},

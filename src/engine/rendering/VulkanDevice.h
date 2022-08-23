@@ -55,9 +55,6 @@ struct VulkanDeviceImpl
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
     void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
-    void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
-    void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-    void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 
     // command buffer single time commands
     VkCommandBuffer BeginSingleTimeCommands();
@@ -108,29 +105,18 @@ public:
     static uint32_t GetPresentQueueFamilyIdx();
 
     static SwapChainSupportDetails GetSwapChainSupport();
-//    uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+    static uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 //    QueueFamilyIndices FindPhysicalQueueFamilies() { return FindQueueFamilies(physicalDevice); }
 //    VkFormat FindSupportedFormat(
 //            const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 //
     // Helper Functions
     static void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
-    static void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
-    static void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-    static void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 
     // Commands
     static VkCommandBuffer BeginSingleTimeCommands();
     static void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
 //    void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-//    void CopyBufferToImage(
-//            VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount);
-//
-//    void CreateImageWithInfo(
-//            const VkImageCreateInfo &imageInfo,
-//            VkMemoryPropertyFlags properties,
-//            VkImage &image,
-//            VkDeviceMemory &imageMemory);
 
     VkPhysicalDeviceProperties properties;
 };
