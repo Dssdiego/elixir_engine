@@ -8,26 +8,25 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <memory>
 #include "../rendering/shapes/Shape.h"
 
 struct Transform2D {
-    float position[2];
-    float scale[2];
+    float position[3];
+    float scale[3];
 //    glm::vec2 position{};
 //    glm::vec2 scale{1.f, 1.f};
     float rotation; // REVIEW: In degrees? Radians? Euler angles? What is more intuitive?
 
-    // 2D Transformation matrix (for rotationa and scale calculations)
-    glm::mat2 mat2() {
-        const float sine = glm::sin(rotation);
-        const float cosine = glm::cos(rotation);
-        glm::mat2 rotMatrix{{cosine, sine}, {-sine, cosine}};
-
-        glm::mat2 scaleMat{{scale[0], .0f}, {.0f, scale[1]}};
-        return rotMatrix * scaleMat;
-    };
+    glm::mat4 mat4()
+    {
+        auto transform = glm::translate(glm::mat4{1.f}, glm::vec3{position[0], position[1], position[2]});
+        transform = glm::rotate(transform, glm::radians(rotation), glm::vec3(0.0f, 0.0f, 1.0f));
+        transform = glm::scale(transform, glm::vec3{scale[0], scale[1], scale[2]});
+        return transform;
+    }
 };
 
 class GameObject

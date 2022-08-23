@@ -8,11 +8,12 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <glm/glm.hpp>
 #include <vulkan/vulkan.h>
 #include <array>
 
 struct Vertex {
-    glm::vec2 pos;
+    glm::vec3 pos;
     glm::vec4 color;
 //    glm::vec2 texCoord;
     // NOTE: Disabling texture coordinates for now
@@ -39,7 +40,7 @@ struct Vertex {
         std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
         attributeDescriptions[0].binding = 0; // which binding the per-vertex data comes
         attributeDescriptions[0].location = 0; // location directive of the input in the vertex shader
-        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT; // inPosition is a vec3 (same enumeration as color formats)
+        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT; // position is a vec3
         attributeDescriptions[0].offset = offsetof(Vertex, pos);
 
         attributeDescriptions[1].binding = 0; // which binding the per-vertex data comes

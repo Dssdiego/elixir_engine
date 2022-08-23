@@ -84,9 +84,9 @@ void Shape::Bind()
 void Shape::DefineTriangle()
 {
     vertices = {
-            {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f, 0.f}},
-            {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f, 0.f}},
-            {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f, 0.f}}
+            {{0.0f, -0.5f, 0.f}, {1.0f, 0.0f, 0.0f, 0.f}},
+            {{0.5f, 0.5f, 0.f}, {0.0f, 1.0f, 0.0f, 0.f}},
+            {{-0.5f, 0.5f, 0.f}, {0.0f, 0.0f, 1.0f, 0.f}}
     };
 
 }
@@ -94,13 +94,13 @@ void Shape::DefineTriangle()
 void Shape::DefineSquare()
 {
     vertices = {
-            {{-0.5f, -0.5f}, {0.f, 0.f, 0.f, 0.f}},
-            {{0.5f, -0.5f}, {0.f, 0.f, 0.f, 0.f}},
-            {{0.5f, 0.5f}, {0.f, 0.f, 0.f, 0.f}},
+            {{-0.5f, -0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}},
+            {{0.5f, -0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}},
+            {{0.5f, 0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}},
 
-            {{-0.5f, -0.5f}, {0.f, 0.f, 0.f, 0.f}},
-            {{0.5f, 0.5f}, {0.f, 0.f, 0.f, 0.f}},
-            {{-0.5f, 0.5f}, {0.f, 0.f, 0.f, 0.f}},
+            {{-0.5f, -0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}},
+            {{0.5f, 0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}},
+            {{-0.5f, 0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}},
     };
 }
 
@@ -112,7 +112,7 @@ void Shape::DefineCircle()
 
     for (int i = 0; i < numSides; i++) {
         float angle = i * glm::two_pi<float>() / numSides;
-        uniqueVertices.push_back({{glm::cos(angle), glm::sin(angle)}});
+        uniqueVertices.push_back({{glm::cos(angle), glm::sin(angle), 0.f}});
     }
 
     uniqueVertices.push_back({}); // adding center vertex at (0,0)
