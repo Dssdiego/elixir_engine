@@ -3,7 +3,6 @@
 //
 
 #include "VulkanSwapchain.h"
-#include "VulkanDevice.h"
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
@@ -115,7 +114,6 @@ VulkanSwapChainImpl::~VulkanSwapChainImpl()
         swapChain = nullptr;
     }
 
-    // TODO: Destroy depth images (image view, image and free memory)
     Logger::Debug("Destroying depth image");
     vkDestroyImageView(VulkanDevice::GetDevice(), depthImageView, nullptr);
     vkDestroyImage(VulkanDevice::GetDevice(), depthImage, nullptr);
@@ -294,7 +292,7 @@ void VulkanSwapChainImpl::CreateDepthResources()
     //         How it would change on our render pass?
     VkFormat depthFormat = FindDepthFormat();
 
-    CreateImage(swapChainExtent.width, swapChainExtent.height,
+    VulkanImage::CreateImage(swapChainExtent.width, swapChainExtent.height,
                 depthFormat, VK_IMAGE_TILING_OPTIMAL,
                 VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage,
@@ -549,61 +547,6 @@ VkFormat VulkanSwapChainImpl::FindSupportedFormat(const std::vector<VkFormat> &c
 
     Logger::Error("failed to find supported format", "");
     throw std::runtime_error("failed to find supported format");
-}
-
-void VulkanSwapChainImpl::CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
-                                      VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage &image,
-                                      VkDeviceMemory &imageMemory)
-{
-    // REVIEW: I stopped here
-    VkImageCreateInfo imageInfo{};
-    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    imageInfo.imageType = VK_IMAGE_TYPE_2D;
-    imageInfo.extent.width = width;
-    imageInfo.extent.height = height;
-    imageInfo.extent.depth = 1; // how many texels are on each axis of the image
-    imageInfo.mipLevels = 1; // not using mipmapping for now
-    imageInfo.arrayLayers = 1; // texture is not an array
-    imageInfo.format = format; // same as the pixels in the buffer
-    imageInfo.tiling = tiling; // texels are laid out in an implementation defined order for optimal access
-    // NOTE: tiling can't be changed at a later time, layout can
-    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    imageInfo.usage = usage;
-    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT; // related to multisampling
-    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE; // the image will only be used by one queue family
-    imageInfo.flags = 0; // optional
-
-    VK_CHECK(vkCreateImage(VulkanDevice::GetDevice(), &imageInfo, nullptr, &image));
-
-    VkMemoryRequirements memRequirements;
-    vkGetImageMemoryRequirements(VulkanDevice::GetDevice(), image, &memRequirements);
-
-    VkMemoryAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex = FindMemoryType(memRequirements.memoryTypeBits, properties);
-
-    VK_CHECK(vkAllocateMemory(VulkanDevice::GetDevice(), &allocInfo, nullptr, &imageMemory));
-
-    vkBindImageMemory(VulkanDevice::GetDevice(), image, imageMemory, 0);
-
-}
-
-uint32_t VulkanSwapChainImpl::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
-{
-    // querying info about the available types of memory
-    VkPhysicalDeviceMemoryProperties memProperties;
-    vkGetPhysicalDeviceMemoryProperties(VulkanDevice::GetPhysicalDevice(), &memProperties);
-
-    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
-    {
-        if (typeFilter & (1 << i) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
-        {
-            return i;
-        }
-    }
-
-    throw std::runtime_error("failed to find a suitable memory type");
 }
 
 uint32_t VulkanSwapChainImpl::GetImageCount()

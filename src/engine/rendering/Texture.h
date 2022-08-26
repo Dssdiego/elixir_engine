@@ -5,6 +5,10 @@
 #pragma once
 
 #include "stb/stb_image.h"
+
+#include "VulkanDevice.h"
+#include "VulkanImage.h"
+
 #include <string>
 #include <vulkan/vulkan.h>
 
@@ -18,6 +22,7 @@ private:
     int width, height, channels;
     stbi_uc* pixels;
 
+    // FIXME: We don't need a sampler for every texture. Only a few of them should be enough
     VkSampler sampler;
 
     VkImage image;
@@ -29,10 +34,4 @@ private:
     // Vulkan image creation/definition
     void CreateTextureImage(const std::string &imagePath);
     void CreateTextureSampler();
-
-    // Helper Methods
-    void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
-    void CreateImageView(VkFormat format, VkImageAspectFlags aspectFlags);
-    void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-    void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 };

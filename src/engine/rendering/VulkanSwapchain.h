@@ -16,6 +16,9 @@
 #include <iostream>
 #include <array>
 
+#include "VulkanDevice.h"
+#include "VulkanImage.h"
+
 #include "../profiling/Logger.h"
 
 struct VulkanSwapChainImpl
@@ -40,10 +43,6 @@ struct VulkanSwapChainImpl
     VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
     VkFormat FindDepthFormat();
     VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
-    void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
-                     VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image,
-                     VkDeviceMemory& imageMemory);
-    uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     uint32_t GetImageCount();
     VkRenderPass GetRenderPass();
     VkFramebuffer GetFrameBuffer(int index);
