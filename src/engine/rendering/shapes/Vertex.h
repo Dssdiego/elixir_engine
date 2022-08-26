@@ -15,9 +15,7 @@
 struct Vertex {
     glm::vec3 pos;
     glm::vec4 color;
-//    glm::vec2 texCoord;
-    // NOTE: Disabling texture coordinates for now
-    // TODO: Re-enable texture coordinates
+    glm::vec2 uv;
 
     // vertex binding describes at which rate to load data from memory throughout the vertices
     //   it specifies the number of bytes between data entries and whether
@@ -33,11 +31,9 @@ struct Vertex {
 
     // an attribute description struct describes how to extract a vertex attribute from a chunk of vertex data
     //  originating from a binding description
-    // NOTE: Disabling texture coordinates for now
-    // TODO: Re-enable texture coordinates
-    static std::array<VkVertexInputAttributeDescription, 2> GetAttributeDescriptions()
+    static std::array<VkVertexInputAttributeDescription, 3> GetAttributeDescriptions()
     {
-        std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
+        std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
         attributeDescriptions[0].binding = 0; // which binding the per-vertex data comes
         attributeDescriptions[0].location = 0; // location directive of the input in the vertex shader
         attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT; // position is a vec3
@@ -48,12 +44,10 @@ struct Vertex {
         attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT; // color is a vec4
         attributeDescriptions[1].offset = offsetof(Vertex, color);
 
-        // NOTE: Disabling texture coordinates for now
-        // TODO: Re-enable texture coordinates
-//        attributeDescriptions[2].binding = 0; // which binding the per-vertex data comes
-//        attributeDescriptions[2].location = 2; // location directive of the input in the vertex shader
-//        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT; // texCoord is a vec2
-//        attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
+        attributeDescriptions[2].binding = 0; // which binding the per-vertex data comes
+        attributeDescriptions[2].location = 2; // location directive of the input in the vertex shader
+        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT; // uv is a vec2
+        attributeDescriptions[2].offset = offsetof(Vertex, uv);
 
         return attributeDescriptions;
     }

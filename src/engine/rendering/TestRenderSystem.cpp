@@ -77,28 +77,28 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     quad.transform.scale[2] = 0.8f;
 
     // load circle test game object
-    auto circle = GameObject::Create();
-    circle.id = 2;
-    circle.name = "Circle";
-    circle.color[0] = 0.f;
-    circle.color[1] = 0.f;
-    circle.color[2] = 1.f;
-    circle.color[3] = 1.f;
-    circle.shape = Shape(ShapeType::Circle);
-    circle.transform.position[0] = -0.35f;
-    circle.transform.position[1] = -0.2f;
-    circle.transform.position[2] = 0.0f;
-    circle.transform.rotation = 0.f;
-    circle.transform.scale[0] = 0.3f;
-    circle.transform.scale[1] = 0.35f;
-    circle.transform.scale[2] = 0.35f;
+//    auto circle = GameObject::Create();
+//    circle.id = 2;
+//    circle.name = "Circle";
+//    circle.color[0] = 0.f;
+//    circle.color[1] = 0.f;
+//    circle.color[2] = 1.f;
+//    circle.color[3] = 1.f;
+//    circle.shape = Shape(ShapeType::Circle);
+//    circle.transform.position[0] = -0.35f;
+//    circle.transform.position[1] = -0.2f;
+//    circle.transform.position[2] = 0.0f;
+//    circle.transform.rotation = 0.f;
+//    circle.transform.scale[0] = 0.3f;
+//    circle.transform.scale[1] = 0.35f;
+//    circle.transform.scale[2] = 0.35f;
 
     auto sprite = Sprite();
     sprite.id = 3;
     sprite.name = "A simple sprite";
 
     gameObjects.push_back(sprite);
-    gameObjects.push_back(circle);
+//    gameObjects.push_back(circle);
     gameObjects.push_back(triangle);
     gameObjects.push_back(quad);
 }

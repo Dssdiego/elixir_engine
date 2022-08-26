@@ -84,42 +84,44 @@ void Shape::Bind()
 void Shape::DefineTriangle()
 {
     vertices = {
-            {{0.0f, -0.5f, 0.f}, {1.0f, 0.0f, 0.0f, 0.f}},
-            {{0.5f, 0.5f, 0.f}, {0.0f, 1.0f, 0.0f, 0.f}},
-            {{-0.5f, 0.5f, 0.f}, {0.0f, 0.0f, 1.0f, 0.f}}
+            {{0.0f, -0.5f, 0.f}, {1.0f, 0.0f, 0.0f, 0.f}, {0.f, 0.f}},
+            {{0.5f, 0.5f, 0.f}, {0.0f, 1.0f, 0.0f, 0.f}, {0.f, 0.f}},
+            {{-0.5f, 0.5f, 0.f}, {0.0f, 0.0f, 1.0f, 0.f}, {0.f, 0.f}}
     };
 
 }
 
 void Shape::DefineQuad()
 {
+    // position (3) | color (4) | uv (2)
     vertices = {
-            {{-0.5f, -0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}},
-            {{0.5f, -0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}},
-            {{0.5f, 0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}},
+            {{-0.5f, -0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}, {0.f, 0.f}},
+            {{0.5f, -0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}, {1.f, 0.f}},
+            {{0.5f, 0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}, {1.f, 1.f}},
 
-            {{-0.5f, -0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}},
-            {{0.5f, 0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}},
-            {{-0.5f, 0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}},
+            {{-0.5f, -0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}, {0.f, 0.f}},
+            {{0.5f, 0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}, {1.f, 1.f}},
+            {{-0.5f, 0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}, {0.f, 1.f}},
     };
 }
 
+// TODO: Reimplement circle now that we have to consider UV coordinates
 void Shape::DefineCircle()
 {
-    int numSides = 64;
-
-    std::vector<Vertex> uniqueVertices{};
-
-    for (int i = 0; i < numSides; i++) {
-        float angle = i * glm::two_pi<float>() / numSides;
-        uniqueVertices.push_back({{glm::cos(angle), glm::sin(angle), 0.f}});
-    }
-
-    uniqueVertices.push_back({}); // adding center vertex at (0,0)
-
-    for (int i = 0; i < numSides; i++) {
-        vertices.push_back(uniqueVertices[i]);
-        vertices.push_back(uniqueVertices[(i + 1) % numSides]);
-        vertices.push_back(uniqueVertices[numSides]);
-    }
+//    int numSides = 64;
+//
+//    std::vector<Vertex> uniqueVertices{};
+//
+//    for (int i = 0; i < numSides; i++) {
+//        float angle = i * glm::two_pi<float>() / numSides;
+//        uniqueVertices.push_back({{glm::cos(angle), glm::sin(angle), 0.f}});
+//    }
+//
+//    uniqueVertices.push_back({}); // adding center vertex at (0,0)
+//
+//    for (int i = 0; i < numSides; i++) {
+//        vertices.push_back(uniqueVertices[i]);
+//        vertices.push_back(uniqueVertices[(i + 1) % numSides]);
+//        vertices.push_back(uniqueVertices[numSides]);
+//    }
 }
