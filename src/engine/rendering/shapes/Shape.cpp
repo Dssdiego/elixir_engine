@@ -30,26 +30,32 @@ Shape::Shape(ShapeType type)
 
 void Shape::MakeShape()
 {
-    CreateVertexBuffers();
+    CreateVertexBuffer();
+    CreateIndexBuffer();
 }
 
 void Shape::Draw()
 {
     Bind();
-    vkCmdDraw(EngineRenderer::GetCurrentCommandBuffer(), vertexCount, 1, 0, 0);
+    vkCmdDrawIndexed(EngineRenderer::GetCurrentCommandBuffer(), static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 }
 
 void Shape::Destroy()
 {
+    // vertex buffer
     vkDestroyBuffer(VulkanDevice::GetDevice(), vertexBuffer, nullptr);
     vkFreeMemory(VulkanDevice::GetDevice(), vertexBufferMemory, nullptr);
+
+    // index buffer
+    vkDestroyBuffer(VulkanDevice::GetDevice(), indexBuffer, nullptr);
+    vkFreeMemory(VulkanDevice::GetDevice(), indexBufferMemory, nullptr);
 }
 
 //
 // Private
 //
 
-void Shape::CreateVertexBuffers()
+void Shape::CreateVertexBuffer()
 {
     vertexCount = static_cast<uint32_t>(vertices.size());
     assert(vertexCount >= 3 && "Vertex count must be at least 3 so that we can draw triangles ;)");
@@ -70,11 +76,42 @@ void Shape::CreateVertexBuffers()
     vkUnmapMemory(VulkanDevice::GetDevice(), vertexBufferMemory);
 }
 
+void Shape::CreateIndexBuffer()
+{
+    VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+    VulkanDevice::CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
+                 stagingBufferMemory);
+
+    void* data;
+    vkMapMemory(VulkanDevice::GetDevice(), stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, indices.data(), (size_t) bufferSize);
+    vkUnmapMemory(VulkanDevice::GetDevice(), stagingBufferMemory);
+
+    VulkanDevice::CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT |
+                             VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer,
+                 indexBufferMemory);
+
+    VulkanDevice::CopyBuffer(stagingBuffer, indexBuffer, bufferSize);
+
+    vkDestroyBuffer(VulkanDevice::GetDevice(), stagingBuffer, nullptr);
+    vkFreeMemory(VulkanDevice::GetDevice(), stagingBufferMemory, nullptr);
+}
+
 void Shape::Bind()
 {
+    // bind the vertex buffer
     VkBuffer buffers[] = {vertexBuffer};
     VkDeviceSize offsets[] = {0};
     vkCmdBindVertexBuffers(EngineRenderer::GetCurrentCommandBuffer(), 0, 1, buffers, offsets);
+
+    // bind the index buffer
+    vkCmdBindIndexBuffer(EngineRenderer::GetCurrentCommandBuffer(), indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 }
 
 //
@@ -89,6 +126,9 @@ void Shape::DefineTriangle()
             {{-0.5f, 0.5f, 0.f}, {0.0f, 0.0f, 1.0f, 0.f}, {0.f, 0.f}}
     };
 
+    indices = {
+            0, 1, 2
+    };
 }
 
 void Shape::DefineQuad()
@@ -98,10 +138,11 @@ void Shape::DefineQuad()
             {{-0.5f, -0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}, {0.f, 0.f}},
             {{0.5f, -0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}, {1.f, 0.f}},
             {{0.5f, 0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}, {1.f, 1.f}},
+            {{-0.5f, 0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}, {0.f, 1.f}}
+    };
 
-            {{-0.5f, -0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}, {0.f, 0.f}},
-            {{0.5f, 0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}, {1.f, 1.f}},
-            {{-0.5f, 0.5f, 0.f}, {0.f, 0.f, 0.f, 0.f}, {0.f, 1.f}},
+    indices = {
+            0, 1, 2, 2, 3, 0
     };
 }
 

@@ -31,6 +31,7 @@ public:
 
 protected:
     std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
 
 private:
     void DefineTriangle();
@@ -38,11 +39,14 @@ private:
     void DefineQuad();
 
     void MakeShape();
-    void CreateVertexBuffers();
+    void CreateVertexBuffer();
+    void CreateIndexBuffer();
     void Bind();
 
     VkBuffer vertexBuffer;
+    VkBuffer indexBuffer;
     VkDeviceMemory vertexBufferMemory;
+    VkDeviceMemory indexBufferMemory;
 
     uint32_t vertexCount;
 };

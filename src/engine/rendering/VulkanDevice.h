@@ -116,7 +116,7 @@ public:
     // Commands
     static VkCommandBuffer BeginSingleTimeCommands();
     static void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
-//    void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+    static void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
     VkPhysicalDeviceProperties properties;
 };
