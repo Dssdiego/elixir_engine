@@ -21,6 +21,8 @@ Sprite::Sprite()
     color[1] = 1.0f;
     color[2] = 1.0f;
     color[3] = 1.0f;
+
+    texture.Create("assets/textures/statue.jpg");
 }
 
 Sprite::~Sprite()
