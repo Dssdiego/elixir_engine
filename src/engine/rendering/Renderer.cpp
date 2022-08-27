@@ -6,7 +6,7 @@
 #include "Renderer.h"
 #include "DirectXRenderer.h"
 #include "../profiling/Logger.h"
-#include "VulkanRenderer.h"
+#include "vulkan/VulkanRenderer.h"
 
 // TODO: Allow to change backends
 

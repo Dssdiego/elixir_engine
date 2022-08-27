@@ -9,9 +9,9 @@
 #include <vector>
 #include <set>
 #include <optional>
-#include "Window.h"
+#include "../Window.h"
 #include "VulkanCommon.h"
-#include "../profiling/Logger.h"
+#include "../../profiling/Logger.h"
 #include <cstring>
 
 #ifdef NDEBUG

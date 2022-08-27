@@ -6,8 +6,8 @@
 #include "EditorInterface.h"
 #include "../profiling/Logger.h"
 #include "../rendering/Window.h"
-#include "../rendering/VulkanContext.h"
-#include "../rendering/VulkanRenderer.h"
+#include "../rendering/vulkan/VulkanContext.h"
+#include "../rendering/vulkan/VulkanRenderer.h"
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one

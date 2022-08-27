@@ -10,7 +10,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
-#include "../VulkanDevice.h"
+#include "../vulkan/VulkanDevice.h"
 #include "../EngineRenderer.h"
 #include "Vertex.h"
 #include <vector>

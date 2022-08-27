@@ -7,8 +7,8 @@
 
 #include <cassert>
 #include <vulkan/vulkan.h>
-#include "VulkanSwapchain.h"
-#include "VulkanDevice.h"
+#include "vulkan/VulkanSwapchain.h"
+#include "vulkan/VulkanDevice.h"
 #include "../common/Color.h"
 
 struct EngineRendererImpl

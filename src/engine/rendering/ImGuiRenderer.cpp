@@ -3,10 +3,10 @@
 //
 
 #include "ImGuiRenderer.h"
-#include "VulkanContext.h"
+#include "vulkan/VulkanContext.h"
 #include "Window.h"
-#include "VulkanDevice.h"
-#include "VulkanSwapchain.h"
+#include "vulkan/VulkanDevice.h"
+#include "vulkan/VulkanSwapchain.h"
 #include "EngineRenderer.h"
 #include "TestRenderSystem.h"
 

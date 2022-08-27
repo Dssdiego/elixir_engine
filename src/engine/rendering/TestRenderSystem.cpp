@@ -3,7 +3,7 @@
 //
 
 #include "TestRenderSystem.h"
-#include "VulkanPipeline.h"
+#include "vulkan/VulkanPipeline.h"
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one

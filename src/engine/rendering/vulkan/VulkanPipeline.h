@@ -14,8 +14,8 @@
 #include <string>
 
 #include "VulkanDevice.h"
-#include "Shader.h"
-#include "shapes/Vertex.h"
+#include "../Shader.h"
+#include "../shapes/Vertex.h"
 
 struct PushConstantData
 {

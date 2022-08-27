@@ -6,8 +6,8 @@
 
 #include "stb/stb_image.h"
 
-#include "VulkanDevice.h"
-#include "VulkanImage.h"
+#include "vulkan/VulkanDevice.h"
+#include "vulkan/VulkanImage.h"
 
 #include <string>
 #include <vulkan/vulkan.h>

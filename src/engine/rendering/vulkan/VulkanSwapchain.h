@@ -19,7 +19,7 @@
 #include "VulkanDevice.h"
 #include "VulkanImage.h"
 
-#include "../profiling/Logger.h"
+#include "../../profiling/Logger.h"
 
 struct VulkanSwapChainImpl
 {
