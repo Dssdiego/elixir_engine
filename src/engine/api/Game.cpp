@@ -47,7 +47,7 @@ void Game::Run()
         }
 
         Window::Update();
-        glfwPollEvents();
+        Input::Update();
 
         Draw();
 
