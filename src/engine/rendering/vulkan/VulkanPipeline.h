@@ -46,20 +46,15 @@ struct VulkanPipelineImpl
     ~VulkanPipelineImpl();
 
     VkPipeline graphicsPipeline;
+    VkPipelineLayout graphicsPipelineLayout;
 
     VkShaderModule vertShaderModule;
     VkShaderModule fragShaderModule;
 
     PipelineConfig pipelineConfig;
-    VkPipelineLayout pipelineLayout;
-
-    // Methods
-    void CreateGraphicsPipeline();
 
     // Helpers
-    void CreateShaderModule(const std::vector<char> &shaderCode, VkShaderModule *shaderModule);
     void CreatePipelineLayout();
-    void FillDefaultPipelineConfig();
     void Bind();
 };
 
