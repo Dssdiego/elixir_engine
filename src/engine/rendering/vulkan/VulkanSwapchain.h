@@ -8,13 +8,13 @@
 #ifdef _WIN32
 #define NOMINMAX
 #include <Windows.h>
-#include <array>
 #endif
 
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <iostream>
 #include <array>
+#include <limits>
 
 #include "VulkanDevice.h"
 #include "VulkanImage.h"

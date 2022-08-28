@@ -6,7 +6,7 @@
 #define VULKAN_ENGINE_INPUT_H
 
 #include <cstdint>
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 
 //enum class Key {
 //
