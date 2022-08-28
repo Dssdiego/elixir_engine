@@ -13,9 +13,25 @@
 #include <vulkan/vulkan.h>
 #include <string>
 
+#include "VulkanSwapchain.h"
+#include "VulkanPipelineBuilder.h"
 #include "VulkanDevice.h"
+#include "../EngineRenderer.h"
 #include "../Shader.h"
 #include "../shapes/Vertex.h"
+
+// The combination of a pipeline and it's layout
+//struct PipelineSet
+//{
+//    VkPipeline pipeline;
+//    VkPipelineLayout layout;
+//};
+
+//enum BoundPipeline
+//{
+//    SHAPE,
+//    SPRITE
+//};
 
 struct PushConstantData
 {
@@ -23,37 +39,27 @@ struct PushConstantData
     alignas(32) glm::vec4 color;
 };
 
-struct PipelineConfig
-{
-    // REVIEW: Delete any operators?
-    VkPipelineViewportStateCreateInfo viewportInfo;
-    VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
-    VkPipelineRasterizationStateCreateInfo rasterizationInfo;
-    VkPipelineMultisampleStateCreateInfo multisampleInfo;
-    VkPipelineColorBlendAttachmentState colorBlendAttachment;
-    VkPipelineColorBlendStateCreateInfo colorBlendInfo;
-    VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
-    std::vector<VkDynamicState> dynamicStateEnables;
-    VkPipelineDynamicStateCreateInfo dynamicStateInfo;
-    VkPipelineLayout pipelineLayout = nullptr;
-    VkRenderPass renderPass = nullptr;
-    uint32_t subpass = 0;
-};
-
 struct VulkanPipelineImpl
 {
     VulkanPipelineImpl();
     ~VulkanPipelineImpl();
 
-    VkPipeline graphicsPipeline;
-    VkPipelineLayout graphicsPipelineLayout;
+//    BoundPipeline currentPipeline = BoundPipeline::SHAPE;
 
-    VkShaderModule vertShaderModule;
-    VkShaderModule fragShaderModule;
+    // Shape Pipeline
+    VkPipeline shapePipeline;
+    VkPipelineLayout shapePipelineLayout;
 
-    PipelineConfig pipelineConfig;
+    // Sprite Pipeline
+    VkPipeline spritePipeline;
+    VkPipelineLayout spritePipelineLayout;
+
+    // Pipeline builder
+    VulkanPipelineBuilder pipelineBuilder;
 
     // Helpers
+    void CreateShapePipeline();
+    void CreateSpritePipeline();
     void CreatePipelineLayout();
     void Bind();
 };

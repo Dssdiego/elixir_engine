@@ -48,68 +48,63 @@ VkPipeline VulkanPipelineBuilder::Build(PipelineBuilderConfig pipelineBuilderCon
     vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
     vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
-    // we create the rest of our graphics pipeline with the default configuration:
-    //  -> Viewport from (0,0) to max of the screen
-    //  -> Filled polygons (no wireframe, clockwise)
-    //  -> No multisampling enabled
-    //  -> Depth testing in VK_COMPARE_OP_LESS (lower depth = closer)
-    //  -> "Normal/Tipical" color blending (combines the color returned from the fragment shader to the framebuffer color)
     // SECTION: Input Assembly
     inputAssemblyInfo =
-            {
-                    VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
-                    nullptr,
-                    0,
-                    pipelineBuilderConfig.topology, // because we want to draw a triangle for now
-                    false
-            };
+    {
+            VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+            nullptr,
+            0,
+            pipelineBuilderConfig.topology, // because we want to draw a triangle for now
+            false
+    };
 
     // SECTION: Viewport
     viewportInfo =
-            {
-                    VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
-                    nullptr,
-                    0,
-                    1, // REVIEW: More than one viewport makes a split screen game?
-                    nullptr, // viewport is defined by the dynamic states (below)
-                    1,
-                    nullptr // scissor is defined by the dynamic states (below)
-            };
+    {
+            VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+            nullptr,
+            0,
+            1, // REVIEW: More than one viewport makes a split screen game?
+            nullptr, // viewport is defined by the dynamic states (below)
+            1,
+            nullptr // scissor is defined by the dynamic states (below)
+    };
 
     // SECTION: Rasterization
     rasterizationInfo =
-            {
-                    VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-                    nullptr,
-                    0,
-                    false,
-                    false, // setting this to VK_TRUE disabled any output to the framebuffer
-                    pipelineBuilderConfig.polygonMode,
-                    VK_CULL_MODE_BACK_BIT, // for now, we'll always cull the back face
-                    VK_FRONT_FACE_CLOCKWISE, // order for faces to be considered front-facing (in our case is counter clockwise because of MVP Y-flip in the shader)
-                    false,
-                    0.0f,
-                    0.0f,
-                    0.0f,
-                    1.0f
-            };
+    {
+            VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+            nullptr,
+            0,
+            false,
+            false, // setting this to VK_TRUE disabled any output to the framebuffer
+            pipelineBuilderConfig.polygonMode,
+            VK_CULL_MODE_BACK_BIT, // for now, we'll always cull the back face
+            VK_FRONT_FACE_CLOCKWISE, // order for faces to be considered front-facing (in our case is counter clockwise because of MVP Y-flip in the shader)
+            false,
+            0.0f,
+            0.0f,
+            0.0f,
+            1.0f
+    };
 
     // SECTION: Multisampling
     multisampleInfo =
-            {
-                    VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
-                    nullptr,
-                    0,
-                    VK_SAMPLE_COUNT_1_BIT,
-                    false,
-                    1.0f,
-                    nullptr,
-                    false,
-                    false
-            };
+    {
+            VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+            nullptr,
+            0,
+            VK_SAMPLE_COUNT_1_BIT,
+            false,
+            1.0f,
+            nullptr,
+            false,
+            false
+    };
 
     // SECTION: Depth and Stencil Testing
-    depthStencilInfo = {
+    depthStencilInfo =
+    {
             VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
             nullptr,
             0,
@@ -126,18 +121,19 @@ VkPipeline VulkanPipelineBuilder::Build(PipelineBuilderConfig pipelineBuilderCon
 
     // SECTION: Color Blending
     colorBlendAttachment =
-            {
-                    pipelineBuilderConfig.enableBlending,
-                    VK_BLEND_FACTOR_SRC_ALPHA,
-                    VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
-                    VK_BLEND_OP_ADD,
-                    VK_BLEND_FACTOR_SRC_ALPHA,
-                    VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
-                    VK_BLEND_OP_SUBTRACT,
-                    VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT
-            };
+    {
+            pipelineBuilderConfig.enableBlending,
+            VK_BLEND_FACTOR_SRC_ALPHA,
+            VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+            VK_BLEND_OP_ADD,
+            VK_BLEND_FACTOR_SRC_ALPHA,
+            VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+            VK_BLEND_OP_SUBTRACT,
+            VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT
+    };
 
-    colorBlendInfo = {
+    colorBlendInfo =
+    {
             VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
             nullptr,
             0,
@@ -151,7 +147,8 @@ VkPipeline VulkanPipelineBuilder::Build(PipelineBuilderConfig pipelineBuilderCon
     // SECTION: Dynamic States (Viewport and Scissor)
     dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
 
-    dynamicStateInfo = {
+    dynamicStateInfo =
+    {
             VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
             nullptr,
             0,
@@ -175,8 +172,8 @@ VkPipeline VulkanPipelineBuilder::Build(PipelineBuilderConfig pipelineBuilderCon
     pipelineInfo.layout = pipelineBuilderConfig.pipelineLayout;
     pipelineInfo.renderPass = VulkanSwapchain::GetRenderPass();
     pipelineInfo.subpass = 0; // not using subpasses for now
-    pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // optional
-    pipelineInfo.basePipelineIndex = -1; // optional
+    pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+    pipelineInfo.basePipelineIndex = -1;
 
     VkPipeline pipeline;
     VK_CHECK(vkCreateGraphicsPipelines(VulkanDevice::GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline));
@@ -200,5 +197,7 @@ void VulkanPipelineBuilder::CreateShaderModule(const std::vector<char> &shaderCo
 
 void VulkanPipelineBuilder::Cleanup()
 {
-    // TODO: Implement component cleanup
+    Logger::Debug("Destroying shader modules");
+    vkDestroyShaderModule(VulkanDevice::GetDevice(), vertShaderModule, nullptr);
+    vkDestroyShaderModule(VulkanDevice::GetDevice(), fragShaderModule, nullptr);
 }
