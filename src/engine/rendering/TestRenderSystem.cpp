@@ -122,13 +122,12 @@ void TestRenderSystemImpl::RenderGameObjects()
         auto commandBuffer = EngineRenderer::GetCurrentCommandBuffer();
 
         PushConstantData push{};
-//        push.offset = glm::vec2(obj.transform.position[0], obj.transform.position[1]);
         push.color = glm::vec4(obj.color[0], obj.color[1], obj.color[2], obj.color[3]);
         push.transform = obj.transform.mat4();
 
         vkCmdPushConstants(
                 commandBuffer,
-                VulkanPipeline::GetPipelineLayout(),
+                VulkanPipeline::GetCurrent().layout,
                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 0,
                 sizeof(PushConstantData),

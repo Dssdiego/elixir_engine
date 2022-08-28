@@ -49,7 +49,7 @@ struct VulkanPipelineImpl
     void CreatePipelineSets();
     void CreatePipelineLayout(VkPipelineLayout &layout);
     void SwitchToPipeline(uint32_t index);
-    PipelineSet GetCurrentPipeline();
+    PipelineSet GetCurrent();
     void Bind();
 };
 
@@ -62,7 +62,7 @@ public:
     static void Shutdown();
 
     static void SwitchToPipeline(uint32_t index);
-    static VkPipelineLayout GetPipelineLayout();
+    static PipelineSet GetCurrent();
 };
 
 

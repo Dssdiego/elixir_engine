@@ -9,6 +9,7 @@
 #include "vulkan/VulkanSwapchain.h"
 #include "EngineRenderer.h"
 #include "TestRenderSystem.h"
+#include "vulkan/VulkanPipeline.h"
 
 // checking for vulkan error
 static void check_vk_result(VkResult err) {
@@ -64,6 +65,7 @@ void ImGuiRenderer::Draw()
         {
             if (ImGui::TreeNode((void*)(intptr_t) obj.id, "[%d] %s", obj.id, obj.name.c_str()))
             {
+                ImGui::Text("Pipeline: %s", VulkanPipeline::GetCurrent().name.c_str());
                 ImGui::InputFloat3("position", obj.transform.position);
                 ImGui::InputFloat("rotation", &obj.transform.rotation, 0.1f, 1.0f, "%.3f");
                 ImGui::InputFloat3("scale", obj.transform.scale);

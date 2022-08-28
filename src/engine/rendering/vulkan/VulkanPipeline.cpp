@@ -27,15 +27,14 @@ void VulkanPipeline::Shutdown()
     delete mVulkanPipelineImpl;
 }
 
-// TODO: This should return the current pipeline layout (the pipeline layout of the current pipeline)
-VkPipelineLayout VulkanPipeline::GetPipelineLayout()
-{
-    return mVulkanPipelineImpl->GetCurrentPipeline().layout;
-}
-
 void VulkanPipeline::SwitchToPipeline(uint32_t index)
 {
     mVulkanPipelineImpl->SwitchToPipeline(index);
+}
+
+PipelineSet VulkanPipeline::GetCurrent()
+{
+    return mVulkanPipelineImpl->GetCurrent();
 }
 
 //
@@ -129,10 +128,10 @@ void VulkanPipelineImpl::CreatePipelineLayout(VkPipelineLayout &layout)
 
 void VulkanPipelineImpl::Bind()
 {
-    vkCmdBindPipeline(EngineRenderer::GetCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GetCurrentPipeline().pipeline);
+    vkCmdBindPipeline(EngineRenderer::GetCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GetCurrent().pipeline);
 }
 
-PipelineSet VulkanPipelineImpl::GetCurrentPipeline()
+PipelineSet VulkanPipelineImpl::GetCurrent()
 {
     return pipelineSets[currentPipelineIdx];
 }
