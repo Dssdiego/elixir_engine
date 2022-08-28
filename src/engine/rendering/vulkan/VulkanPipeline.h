@@ -11,6 +11,7 @@
 #include <glm/gtc/constants.hpp>
 
 #include <vulkan/vulkan.h>
+#include <sstream>
 #include <string>
 
 #include "VulkanSwapchain.h"
@@ -19,19 +20,6 @@
 #include "../EngineRenderer.h"
 #include "../Shader.h"
 #include "../shapes/Vertex.h"
-
-// The combination of a pipeline and it's layout
-//struct PipelineSet
-//{
-//    VkPipeline pipeline;
-//    VkPipelineLayout layout;
-//};
-
-//enum BoundPipeline
-//{
-//    SHAPE,
-//    SPRITE
-//};
 
 struct PushConstantData
 {
@@ -44,23 +32,24 @@ struct VulkanPipelineImpl
     VulkanPipelineImpl();
     ~VulkanPipelineImpl();
 
-//    BoundPipeline currentPipeline = BoundPipeline::SHAPE;
+    // builder
+    VulkanPipelineBuilder pipelineBuilder;
 
-    // Shape Pipeline
+    // sets
+    std::vector<PipelineSet> pipelineSets = {};
+    uint32_t currentPipelineIdx = 0;
+
+    // pipelines
     VkPipeline shapePipeline;
     VkPipelineLayout shapePipelineLayout;
-
-    // Sprite Pipeline
     VkPipeline spritePipeline;
     VkPipelineLayout spritePipelineLayout;
 
-    // Pipeline builder
-    VulkanPipelineBuilder pipelineBuilder;
-
     // Helpers
-    void CreateShapePipeline();
-    void CreateSpritePipeline();
-    void CreatePipelineLayout();
+    void CreatePipelineSets();
+    void CreatePipelineLayout(VkPipelineLayout &layout);
+    void SwitchToPipeline(uint32_t index);
+    PipelineSet GetCurrentPipeline();
     void Bind();
 };
 
@@ -72,6 +61,7 @@ public:
     static void Bind();
     static void Shutdown();
 
+    static void SwitchToPipeline(uint32_t index);
     static VkPipelineLayout GetPipelineLayout();
 };
 

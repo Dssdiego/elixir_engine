@@ -30,7 +30,12 @@ void VulkanPipeline::Shutdown()
 // TODO: This should return the current pipeline layout (the pipeline layout of the current pipeline)
 VkPipelineLayout VulkanPipeline::GetPipelineLayout()
 {
-    return mVulkanPipelineImpl->shapePipelineLayout;
+    return mVulkanPipelineImpl->GetCurrentPipeline().layout;
+}
+
+void VulkanPipeline::SwitchToPipeline(uint32_t index)
+{
+    mVulkanPipelineImpl->SwitchToPipeline(index);
 }
 
 //
@@ -39,7 +44,7 @@ VkPipelineLayout VulkanPipeline::GetPipelineLayout()
 
 VulkanPipelineImpl::VulkanPipelineImpl()
 {
-    CreateShapePipeline();
+    CreatePipelineSets();
 }
 
 VulkanPipelineImpl::~VulkanPipelineImpl()
@@ -49,40 +54,61 @@ VulkanPipelineImpl::~VulkanPipelineImpl()
 
     pipelineBuilder.Cleanup();
 
-    Logger::Debug("Destroying pipeline layout");
-    vkDestroyPipelineLayout(VulkanDevice::GetDevice(), shapePipelineLayout, nullptr);
+    for (auto &pipelineSet : pipelineSets)
+    {
+        std::stringstream ss;
+        ss << "Destroying pipeline '" << pipelineSet.name << "'...";
+        Logger::Debug(ss.str());
 
-    Logger::Debug("Destroying graphics pipeline");
-    vkDestroyPipeline(VulkanDevice::GetDevice(), shapePipeline, nullptr);
-}
+        Logger::Debug("Destroying pipeline layout");
+        vkDestroyPipelineLayout(VulkanDevice::GetDevice(), pipelineSet.layout, nullptr);
 
-void VulkanPipelineImpl::CreateShapePipeline()
-{
-    CreatePipelineLayout();
-
-    PipelineBuilderConfig config
-            {
-                    shapePipelineLayout,
-                    VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
-                    VK_POLYGON_MODE_FILL,
-                    VK_TRUE
-            };
-
-    // TODO: Clean up pipeline builder stuff after we are done with it
-    shapePipeline = pipelineBuilder.Build(config);
-}
-
-void VulkanPipelineImpl::CreateSpritePipeline()
-{
-
+        Logger::Debug("Destroying graphics pipeline");
+        vkDestroyPipeline(VulkanDevice::GetDevice(), pipelineSet.pipeline, nullptr);
+    }
 }
 
 //
 // Helpers
 //
 
+void VulkanPipelineImpl::CreatePipelineSets()
+{
+    PipelineSet shapePipelineSet
+    {
+            "shape",
+            shapePipeline,
+            shapePipelineLayout,
+            VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+            VK_POLYGON_MODE_FILL,
+            VK_TRUE
+    };
+
+    pipelineSets.push_back(shapePipelineSet);
+
+    PipelineSet spritePipelineSet
+    {
+            "sprite",
+            spritePipeline,
+            spritePipelineLayout,
+            VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+            VK_POLYGON_MODE_FILL,
+            VK_TRUE
+    };
+    pipelineSets.push_back(spritePipelineSet);
+
+    for (auto &pipelineSet : pipelineSets)
+    {
+        CreatePipelineLayout(pipelineSet.layout);
+        pipelineBuilder.Build(pipelineSet);
+    }
+
+    // we always start with the first created pipeline
+    currentPipelineIdx = 0;
+}
+
 // TODO: Make this method agnostic/dynamic
-void VulkanPipelineImpl::CreatePipelineLayout()
+void VulkanPipelineImpl::CreatePipelineLayout(VkPipelineLayout &layout)
 {
     VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -96,12 +122,23 @@ void VulkanPipelineImpl::CreatePipelineLayout()
     pipelineLayoutInfo.pushConstantRangeCount = 1;
     pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 
-    VK_CHECK(vkCreatePipelineLayout(VulkanDevice::GetDevice(), &pipelineLayoutInfo, nullptr, &shapePipelineLayout));
+    VK_CHECK(vkCreatePipelineLayout(VulkanDevice::GetDevice(), &pipelineLayoutInfo, nullptr, &layout));
 
     Logger::Debug("Created pipeline layout");
 }
 
 void VulkanPipelineImpl::Bind()
 {
-    vkCmdBindPipeline(EngineRenderer::GetCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, shapePipeline);
+    vkCmdBindPipeline(EngineRenderer::GetCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GetCurrentPipeline().pipeline);
+}
+
+PipelineSet VulkanPipelineImpl::GetCurrentPipeline()
+{
+    return pipelineSets[currentPipelineIdx];
+}
+
+// TODO: Allow to swtich pipelines based on the pipeline name
+void VulkanPipelineImpl::SwitchToPipeline(uint32_t index)
+{
+    currentPipelineIdx = index;
 }

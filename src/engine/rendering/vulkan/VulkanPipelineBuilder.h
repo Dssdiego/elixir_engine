@@ -7,6 +7,10 @@
 
 #include <vulkan/vulkan.h>
 #include <vector>
+#include "../Shader.h"
+#include "VulkanCommon.h"
+#include "VulkanSwapchain.h"
+#include "../shapes/Vertex.h"
 
 struct PipelineBuilderConfig
 {
@@ -21,10 +25,8 @@ struct PipelineBuilderConfig
 class VulkanPipelineBuilder
 {
 public:
-//    VkPipelineLayout pipelineLayout = nullptr;
-
-    VkPipeline Build(PipelineBuilderConfig pipelineBuilderConfig);
-//    VkPipeline Build();
+//    VkPipeline Build(PipelineBuilderConfig pipelineBuilderConfig);
+    void Build(PipelineSet set);
     void Cleanup();
 
 private:

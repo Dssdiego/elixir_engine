@@ -3,11 +3,9 @@
 //
 
 #include "VulkanPipelineBuilder.h"
-#include "VulkanPipeline.h"
-#include "VulkanSwapchain.h"
 
-VkPipeline VulkanPipelineBuilder::Build(PipelineBuilderConfig pipelineBuilderConfig)
-//VkPipeline VulkanPipelineBuilder::Build()
+//VkPipeline VulkanPipelineBuilder::Build(PipelineBuilderConfig pipelineBuilderConfig)
+void VulkanPipelineBuilder::Build(PipelineSet pipelineSet)
 {
     // SECTION: Shaders
     auto vertShaderCode = Shader::ReadFile("assets/shaders/shape_vert.spv");
@@ -54,7 +52,7 @@ VkPipeline VulkanPipelineBuilder::Build(PipelineBuilderConfig pipelineBuilderCon
             VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
             nullptr,
             0,
-            pipelineBuilderConfig.topology, // because we want to draw a triangle for now
+            pipelineSet.topology, // because we want to draw a triangle for now
             false
     };
 
@@ -78,7 +76,7 @@ VkPipeline VulkanPipelineBuilder::Build(PipelineBuilderConfig pipelineBuilderCon
             0,
             false,
             false, // setting this to VK_TRUE disabled any output to the framebuffer
-            pipelineBuilderConfig.polygonMode,
+            pipelineSet.polygonMode,
             VK_CULL_MODE_BACK_BIT, // for now, we'll always cull the back face
             VK_FRONT_FACE_CLOCKWISE, // order for faces to be considered front-facing (in our case is counter clockwise because of MVP Y-flip in the shader)
             false,
@@ -122,7 +120,7 @@ VkPipeline VulkanPipelineBuilder::Build(PipelineBuilderConfig pipelineBuilderCon
     // SECTION: Color Blending
     colorBlendAttachment =
     {
-            pipelineBuilderConfig.enableBlending,
+            pipelineSet.enableBlending,
             VK_BLEND_FACTOR_SRC_ALPHA,
             VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
             VK_BLEND_OP_ADD,
@@ -169,18 +167,15 @@ VkPipeline VulkanPipelineBuilder::Build(PipelineBuilderConfig pipelineBuilderCon
     pipelineInfo.pDepthStencilState = &depthStencilInfo;
     pipelineInfo.pColorBlendState = &colorBlendInfo;
     pipelineInfo.pDynamicState = &dynamicStateInfo;
-    pipelineInfo.layout = pipelineBuilderConfig.pipelineLayout;
+    pipelineInfo.layout = pipelineSet.layout;
     pipelineInfo.renderPass = VulkanSwapchain::GetRenderPass();
     pipelineInfo.subpass = 0; // not using subpasses for now
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.basePipelineIndex = -1;
 
-    VkPipeline pipeline;
-    VK_CHECK(vkCreateGraphicsPipelines(VulkanDevice::GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline));
+    VK_CHECK(vkCreateGraphicsPipelines(VulkanDevice::GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipelineSet.pipeline));
 
     Logger::Debug("Custom pipeline created");
-
-    return pipeline;
 }
 
 void VulkanPipelineBuilder::CreateShaderModule(const std::vector<char> &shaderCode, VkShaderModule *shaderModule)

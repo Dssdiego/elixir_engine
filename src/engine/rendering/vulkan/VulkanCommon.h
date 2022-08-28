@@ -22,4 +22,17 @@ struct SwapChainSupportDetails {
     std::vector<VkPresentModeKHR> presentModes;
 };
 
+// The combination of a pipeline and it's layout
+struct PipelineSet
+{
+//    std::string vertexShaderFilePath;
+//    std::string fragmentShaderFilePath;
+    std::string name;
+    VkPipeline &pipeline;
+    VkPipelineLayout &layout;
+    VkPrimitiveTopology topology;
+    VkPolygonMode polygonMode;
+    VkBool32 enableBlending;
+};
+
 #endif //VULKAN_ENGINE_VULKANCOMMON_H
