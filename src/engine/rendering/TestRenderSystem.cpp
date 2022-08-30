@@ -57,6 +57,7 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     triangle.transform.scale[0] = 1.0f;
     triangle.transform.scale[1] = 1.0f;
     triangle.transform.scale[2] = 1.0f;
+    triangle.pipeline = "shape";
     // FIXME: Make sure we can use glm::vec2 and glm::vec3 with ImGui without converting the original field type!
 
     // load quad test game object
@@ -75,6 +76,7 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     quad.transform.scale[0] = 0.8f;
     quad.transform.scale[1] = 0.8f;
     quad.transform.scale[2] = 0.8f;
+    quad.pipeline = "shape";
 
     // load circle test game object
 //    auto circle = GameObject::Create();
@@ -96,6 +98,7 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     auto sprite = Sprite();
     sprite.id = 3;
     sprite.name = "A simple sprite";
+    sprite.pipeline = "sprite";
 
     gameObjects.push_back(sprite);
 //    gameObjects.push_back(circle);
@@ -115,11 +118,17 @@ TestRenderSystemImpl::~TestRenderSystemImpl()
 
 void TestRenderSystemImpl::RenderGameObjects()
 {
-    VulkanPipeline::Bind();
-
     for (auto &obj : gameObjects)
     {
         auto commandBuffer = EngineRenderer::GetCurrentCommandBuffer();
+
+        if (obj.pipeline == "shape")
+            VulkanPipeline::SwitchToPipeline(0);
+
+        if (obj.pipeline == "sprite")
+            VulkanPipeline::SwitchToPipeline(1);
+
+        VulkanPipeline::Bind();
 
         PushConstantData push{};
         push.color = glm::vec4(obj.color[0], obj.color[1], obj.color[2], obj.color[3]);

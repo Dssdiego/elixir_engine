@@ -35,6 +35,7 @@ public:
     uint32_t id = 0;
     std::string name = "";
 
+    std::string pipeline = "";
     Transform2D transform{};
     Shape shape{ShapeType::Triangle}; // TODO: Change this so that we can pass any shape we want ;)
     float color[4]{};
