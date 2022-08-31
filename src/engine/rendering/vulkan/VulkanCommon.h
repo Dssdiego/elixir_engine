@@ -22,12 +22,12 @@ struct SwapChainSupportDetails {
     std::vector<VkPresentModeKHR> presentModes;
 };
 
-// The combination of a pipeline and it's layout
+// Everything we need to build a pipeline (shader, pipeline object, layout, topology, polygon mode and blending)
 struct PipelineSet
 {
-//    std::string vertexShaderFilePath;
-//    std::string fragmentShaderFilePath;
     std::string name;
+    std::string vertexShader;
+    std::string fragmentShader;
     VkPipeline &pipeline;
     VkPipelineLayout &layout;
     VkPrimitiveTopology topology;

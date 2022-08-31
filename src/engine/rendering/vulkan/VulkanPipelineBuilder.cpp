@@ -8,8 +8,8 @@
 void VulkanPipelineBuilder::Build(PipelineSet pipelineSet)
 {
     // SECTION: Shaders
-    auto vertShaderCode = Shader::ReadFile("assets/shaders/shape_vert.spv");
-    auto fragShaderCode = Shader::ReadFile("assets/shaders/shape_frag.spv");
+    auto vertShaderCode = Shader::ReadFile(pipelineSet.vertexShader);
+    auto fragShaderCode = Shader::ReadFile(pipelineSet.fragmentShader);
 
     CreateShaderModule(vertShaderCode, &vertShaderModule);
     CreateShaderModule(fragShaderCode, &fragShaderModule);
