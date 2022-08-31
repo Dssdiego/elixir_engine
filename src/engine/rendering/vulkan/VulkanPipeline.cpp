@@ -76,8 +76,8 @@ void VulkanPipelineImpl::CreatePipelineSets()
     PipelineSet shapePipelineSet
     {
             "shape",
-            "assets/shaders/shape_vert.spv",
-            "assets/shaders/shape_frag.spv",
+            "assets/shaders/shape.vert.spv",
+            "assets/shaders/shape.frag.spv",
             shapePipeline,
             shapePipelineLayout,
             VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
@@ -90,8 +90,8 @@ void VulkanPipelineImpl::CreatePipelineSets()
     PipelineSet spritePipelineSet
     {
             "sprite",
-            "assets/shaders/sprite_vert.spv",
-            "assets/shaders/sprite_frag.spv",
+            "assets/shaders/sprite.vert.spv",
+            "assets/shaders/sprite.frag.spv",
             spritePipeline,
             spritePipelineLayout,
             VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,

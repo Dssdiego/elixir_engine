@@ -120,10 +120,22 @@ endif()
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "Elixir Engine")
 
 # asset copying
+# TODO: Execute asset copying AFTER shader compilation
 add_custom_target(copy_assets
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_LIST_DIR}/copy-assets.cmake
         )
 add_dependencies(${PROJECT_NAME} copy_assets)
+
+# shader compilation (before every build) - not working properly
+file(GLOB SHADERS ${CMAKE_SOURCE_DIR}/src/engine/assets/shaders/*.frag ${CMAKE_SOURCE_DIR}/src/engine/assets/shaders/*.vert)
+#file(GLOB SHADERS_SPV ${CMAKE_SOURCE_DIR}/src/engine/assets/shaders/*.spv)
+#foreach(spv ${SHADERS_SPV})
+#    list(REMOVE_ITEM ${SHADERS_SPV} spv)
+#endforeach()
+foreach(shader ${SHADERS})
+    add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
+            COMMAND glslc -c ${shader} -o ${shader}.spv)
+endforeach()
 
 # TODO: Use rcedit after cmake build to change windows executable details
 # TODO: Package project with CPACK
