@@ -16,6 +16,6 @@ layout(push_constant) uniform Push {
 
 // shader code
 void main() {
-//    outColor = push.color;
-    outColor = push.color * texture(texSampler, uv);
+    outColor = push.color;
+//    outColor = push.color * texture(texSampler, uv);
 }
