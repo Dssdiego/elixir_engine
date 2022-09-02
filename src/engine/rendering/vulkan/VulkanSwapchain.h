@@ -47,6 +47,7 @@ struct VulkanSwapChainImpl
     VkRenderPass GetRenderPass();
     VkFramebuffer GetFrameBuffer(int index);
     VkExtent2D GetSwapChainExtent();
+    float GetAspectRatio();
 
     // variables
     VkFormat swapChainImageFormat;
@@ -85,6 +86,8 @@ public:
 
     static uint32_t GetImageCount();
     static uint32_t GetNumberOfFramesInFlight();
+
+    static float GetAspectRatio();
 
     static VkResult AcquireNextImage(uint32_t *imageIndex);
     static VkResult SubmitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex);

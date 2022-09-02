@@ -215,5 +215,3 @@ void EngineRendererImpl::EndFrame()
     // updating the current frame index (for the command buffers)
     currentFrameIndex = (currentFrameIndex + 1) % VulkanSwapchain::GetNumberOfFramesInFlight();
 }
-
-

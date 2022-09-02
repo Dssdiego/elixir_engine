@@ -4,6 +4,7 @@
 
 #include "TestRenderSystem.h"
 #include "vulkan/VulkanPipeline.h"
+#include "Camera.h"
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
@@ -118,6 +119,10 @@ TestRenderSystemImpl::~TestRenderSystemImpl()
 
 void TestRenderSystemImpl::RenderGameObjects()
 {
+    // using ortographic projection (updating every frame so it matches the window width and height)
+    float aspect = VulkanSwapchain::GetAspectRatio();
+    Camera::SetOrtographicProjection(-aspect, aspect, -1, 1, -1, 1);
+
     for (auto &obj : gameObjects)
     {
         auto commandBuffer = EngineRenderer::GetCurrentCommandBuffer();
@@ -132,7 +137,7 @@ void TestRenderSystemImpl::RenderGameObjects()
 
         PushConstantData push{};
         push.color = glm::vec4(obj.color[0], obj.color[1], obj.color[2], obj.color[3]);
-        push.transform = obj.transform.mat4();
+        push.transform = Camera::GetProjection() * obj.transform.mat4(); // FIXME: We should be passing the projection matrix and the model transformation matrix inside the shader (not at a CPU "level")
 
         vkCmdPushConstants(
                 commandBuffer,

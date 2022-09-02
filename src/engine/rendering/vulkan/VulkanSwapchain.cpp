@@ -84,6 +84,11 @@ VkExtent2D VulkanSwapchain::GetSwapChainExtent()
     return mVulkanSwapChainImpl->GetSwapChainExtent();
 }
 
+float VulkanSwapchain::GetAspectRatio()
+{
+    return mVulkanSwapChainImpl->GetAspectRatio();
+}
+
 //
 // Implementation
 //
@@ -567,4 +572,9 @@ VkFramebuffer VulkanSwapChainImpl::GetFrameBuffer(int index)
 VkExtent2D VulkanSwapChainImpl::GetSwapChainExtent()
 {
     return swapChainExtent;
+}
+
+float VulkanSwapChainImpl::GetAspectRatio()
+{
+    return swapChainExtent.width / swapChainExtent.height;
 }
