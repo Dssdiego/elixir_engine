@@ -5,6 +5,7 @@
 #include "Game.h"
 #include "../rendering/ImGuiRenderer.h"
 #include "../rendering/TestRenderSystem.h"
+#include "../rendering/text/Font.h"
 
 /*
  * Methods
@@ -20,6 +21,7 @@ void Game::Init(EngineConfig* pConfig)
     EngineRenderer::Init();
     ImGuiRenderer::Init();
     TestRenderSystem::Init();
+    Font::LoadFont();
 //    Renderer::Init(GraphicsBackend::VULKAN);
 //    CGeforceNow::Init();
 }

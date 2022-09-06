@@ -45,6 +45,13 @@ else()
             )
 endif()
 
+# Free Type
+set(FREETYPE_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/thirdparty/freetype/inc")
+if(WIN32)
+    set(FREETYPE_LIBRARY "${CMAKE_SOURCE_DIR}/thirdparty/freetype/lib/freetype.lib" )
+    file(COPY "${CMAKE_SOURCE_DIR}/thirdparty/freetype/lib/freetype.dll" DESTINATION ${CMAKE_BINARY_DIR})
+endif()
+
 # Geforce NOW
 set(GEFORCE_NOW_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/thirdparty/geforce_now/include")
 #set(GEFORCE_NOW_LIBRARY
@@ -102,6 +109,7 @@ if(WIN32)
             imgui
             TracyClient
             ${FMOD_LIBRARY}
+            ${FREETYPE_LIBRARY}
     )
 else()
     target_link_libraries(
