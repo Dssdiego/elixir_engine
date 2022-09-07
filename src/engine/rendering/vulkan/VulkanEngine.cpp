@@ -46,7 +46,7 @@ int VulkanEngine::GetFrameIndex()
     return mEngineRendererImpl->GetFrameIndex();
 }
 
-void VulkanEngine::UpdateUniformBuffer(GlobalUbo *ubo)
+void VulkanEngine::UpdateUniformBuffer(UniformBufferObject *ubo)
 {
     mEngineRendererImpl->UpdateUniformBuffer(ubo);
 }
@@ -87,7 +87,7 @@ EngineRendererImpl::~EngineRendererImpl()
 void EngineRendererImpl::CreateUniformBuffer()
 {
     globalUboBuffer = std::make_unique<VulkanBuffer>(
-          sizeof(GlobalUbo),
+          sizeof(UniformBufferObject),
           VulkanSwapchain::GetNumberOfFramesInFlight(),
           VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
@@ -248,7 +248,7 @@ void EngineRendererImpl::EndFrame()
     currentFrameIndex = (currentFrameIndex + 1) % VulkanSwapchain::GetNumberOfFramesInFlight();
 }
 
-void EngineRendererImpl::UpdateUniformBuffer(GlobalUbo *ubo)
+void EngineRendererImpl::UpdateUniformBuffer(UniformBufferObject *ubo)
 {
     globalUboBuffer->WriteToIndex(ubo, currentFrameIndex);
     globalUboBuffer->FlushIndex(currentFrameIndex);

@@ -128,8 +128,10 @@ TestRenderSystemImpl::~TestRenderSystemImpl()
 void TestRenderSystemImpl::RenderGameObjects()
 {
     // update uniform buffer with new data
-    GlobalUbo ubo{};
-    ubo.projectView = Camera::GetProjection() * Camera::GetView();
+    UniformBufferObject ubo{};
+    ubo.model = glm::mat4(1.f);
+    ubo.view = Camera::GetView();
+    ubo.projection = Camera::GetProjection();
     VulkanEngine::UpdateUniformBuffer(&ubo);
 
     // render objects

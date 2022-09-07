@@ -13,10 +13,12 @@
 #include "../../common/Color.h"
 #include "VulkanBuffer.h"
 
-// global uniform buffer object
-struct GlobalUbo
+struct UniformBufferObject
 {
-    glm::mat4 projectView{1.f};
+//    glm::mat4 projectView{1.f};
+    alignas(16) glm::mat4 model;
+    alignas(16) glm::mat4 view;
+    alignas(16) glm::mat4 projection;
 };
 
 struct EngineRendererImpl
@@ -30,13 +32,14 @@ struct EngineRendererImpl
     int currentFrameIndex{0};
     bool frameHasStarted{false};
 
+    // TODO: Make use of multiple uniform buffers
     std::unique_ptr<VulkanBuffer> globalUboBuffer;
 
     VkCommandBuffer GetCurrentCommandBuffer();
     int GetFrameIndex();
 
     void CreateUniformBuffer();
-    void UpdateUniformBuffer(GlobalUbo *ubo);
+    void UpdateUniformBuffer(UniformBufferObject *ubo);
     void CreateCommandBuffers();
     void FreeCommandBuffers();
 
@@ -57,7 +60,7 @@ public:
     static VkCommandBuffer BeginFrame();
     static void EndFrame();
 
-    static void UpdateUniformBuffer(GlobalUbo *ubo);
+    static void UpdateUniformBuffer(UniformBufferObject *ubo);
 };
 
 
