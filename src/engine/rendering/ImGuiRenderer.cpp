@@ -10,6 +10,7 @@
 #include "EngineRenderer.h"
 #include "TestRenderSystem.h"
 #include "vulkan/VulkanPipeline.h"
+#include "Camera.h"
 
 // checking for vulkan error
 static void check_vk_result(VkResult err) {
@@ -58,6 +59,7 @@ void ImGuiRenderer::Draw()
 //    bool show_demo = true;
 //    ImGui::ShowDemoWindow(&show_demo);
 
+    // Game object inspector
     ImGui::Begin("Inspector");
     if (ImGui::TreeNode("GameObjects"))
     {
@@ -77,6 +79,13 @@ void ImGuiRenderer::Draw()
         ImGui::TreePop();
     }
 
+    ImGui::End();
+
+    // Camera inspector
+    ImGui::Begin("Camera");
+    static float position[3] = {0.f, 0.f, 0.f};
+    ImGui::InputFloat3("position", position);
+    Camera::SetWorldPosition(glm::vec3(position[0], position[1], position[2]));
     ImGui::End();
 }
 

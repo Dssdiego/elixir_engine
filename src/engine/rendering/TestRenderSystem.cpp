@@ -105,6 +105,14 @@ TestRenderSystemImpl::TestRenderSystemImpl()
 //    gameObjects.push_back(circle);
     gameObjects.push_back(triangle);
     gameObjects.push_back(quad);
+
+    // Setting camera properties
+    // using ortographic projection (updating every frame so it matches the window width and height)
+    float aspect = VulkanSwapchain::GetAspectRatio();
+//    Camera::SetPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10.f);
+    Camera::SetOrtographicProjection(-aspect, aspect, -1, 1, -1, 1);
+    Camera::SetWorldPosition(glm::vec3(0.f));
+    Camera::SetViewDirection(Camera::GetWorldPosition(), Camera::GetWorldDirection()); // camera at "origin", pointing "forward" at the Z axis
 }
 
 TestRenderSystemImpl::~TestRenderSystemImpl()
@@ -119,10 +127,6 @@ TestRenderSystemImpl::~TestRenderSystemImpl()
 
 void TestRenderSystemImpl::RenderGameObjects()
 {
-    // using ortographic projection (updating every frame so it matches the window width and height)
-    float aspect = VulkanSwapchain::GetAspectRatio();
-    Camera::SetOrtographicProjection(-aspect, aspect, -1, 1, -1, 1);
-
     for (auto &obj : gameObjects)
     {
         auto commandBuffer = EngineRenderer::GetCurrentCommandBuffer();
@@ -135,9 +139,12 @@ void TestRenderSystemImpl::RenderGameObjects()
 
         VulkanPipeline::Bind();
 
+        // FIXME: We should be passing the "MVP" matrices inside the shader (not at a CPU "level")
+        auto projectionView = Camera::GetProjection() * Camera::GetView();
+
         PushConstantData push{};
         push.color = glm::vec4(obj.color[0], obj.color[1], obj.color[2], obj.color[3]);
-        push.transform = Camera::GetProjection() * obj.transform.mat4(); // FIXME: We should be passing the projection matrix and the model transformation matrix inside the shader (not at a CPU "level")
+        push.transform = projectionView * obj.transform.mat4();
 
         vkCmdPushConstants(
                 commandBuffer,

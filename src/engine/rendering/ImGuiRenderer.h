@@ -5,6 +5,7 @@
 #ifndef VULKAN_ENGINE_IMGUIRENDERER_H
 #define VULKAN_ENGINE_IMGUIRENDERER_H
 
+#include <glm/gtc/type_ptr.hpp>
 #include <vulkan/vulkan.h>
 #include <imgui.h>
 #include <imgui_impl_vulkan.h>

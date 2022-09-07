@@ -15,10 +15,29 @@ public:
     static void SetOrtographicProjection(float left, float right, float top, float bottom, float near, float far);
     static void SetPerspectiveProjection(float fovy, float aspect, float near, float far);
 
+    static void SetViewDirection(glm::vec3 position, glm::vec3 direction, glm::vec3 up = glm::vec3(0.f, -1.f, 0.f));
+    static void SetViewTarget(glm::vec3 position, glm::vec3 target, glm::vec3 up = glm::vec3(0.f, -1.f, 0.f));
+    static void SetViewYXZ(glm::vec3 position, glm::vec3 rotation);
+
+    inline static glm::vec3 GetWorldPosition() { return worldPosition; };
+    inline static glm::vec3 *GetWorldPositionRef() { return &worldPosition; };
+    inline static void SetWorldPosition(glm::vec3 position) {
+        worldPosition = position;
+        SetViewDirection(worldPosition, worldDirection);
+    };
+
+    inline static glm::vec3 GetWorldDirection() { return worldDirection; };
+    inline static void SetWorldDirection(glm::vec3 direction) { worldDirection = direction; };
+
     static const glm::mat4 &GetProjection();
+    static const glm::mat4 &GetView();
 
 private:
     inline static glm::mat4 projectionMatrix{1.f};
+    inline static glm::mat4 viewMatrix{1.f};
+
+    inline static glm::vec3 worldPosition = glm::vec3(0.f);
+    inline static glm::vec3 worldDirection = glm::vec3(0.f, 0.f, 1.f);
 };
 
 

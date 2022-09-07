@@ -29,6 +29,7 @@ public:
 
     static void RenderGameObjects();
     static std::vector<GameObject>* GetGameObjects();
+
 };
 
 
