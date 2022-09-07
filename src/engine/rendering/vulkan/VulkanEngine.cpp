@@ -65,7 +65,7 @@ EngineRendererImpl::EngineRendererImpl()
     // REVIEW: Recreate swapchain on renderer init?
 
     CreateCommandBuffers();
-    CreateUniformBuffer();
+    CreateUniformBuffers();
 }
 
 EngineRendererImpl::~EngineRendererImpl()
@@ -75,25 +75,35 @@ EngineRendererImpl::~EngineRendererImpl()
     // waiting for the device to finish operations before exiting and destroying stuff
     vkDeviceWaitIdle(VulkanDevice::GetDevice());
 
-    // FIXME: This is a smart pointer and we shouldn't have to make null manually!
-    globalUboBuffer->Destroy();
-    globalUboBuffer = nullptr;
+    uint32_t swapChainImageCount = VulkanSwapchain::GetImageCount();
+    for (size_t i = 0; i < swapChainImageCount; i++)
+    {
+        uniformBuffers[i]->Destroy();
+        uniformBuffers[i] = nullptr;
+    }
     FreeCommandBuffers();
 
     VulkanSwapchain::Shutdown();
     VulkanDevice::Shutdown();
 }
 
-void EngineRendererImpl::CreateUniformBuffer()
+void EngineRendererImpl::CreateUniformBuffers()
 {
-    globalUboBuffer = std::make_unique<VulkanBuffer>(
-          sizeof(UniformBufferObject),
-          VulkanSwapchain::GetNumberOfFramesInFlight(),
-          VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-          VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-          VulkanDevice::GetProperties().limits.minUniformBufferOffsetAlignment
-    );
-    globalUboBuffer->Map();
+    VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+    uint32_t swapChainImageCount = VulkanSwapchain::GetImageCount();
+
+    uniformBuffers.resize(swapChainImageCount);
+
+    for (size_t i = 0; i < swapChainImageCount; i++)
+    {
+        uniformBuffers[i] = std::make_unique<VulkanBuffer>(
+              sizeof(UniformBufferObject),
+              1,
+              VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+        );
+        uniformBuffers[i]->Map();
+    }
 }
 
 void EngineRendererImpl::CreateCommandBuffers()
@@ -250,6 +260,8 @@ void EngineRendererImpl::EndFrame()
 
 void EngineRendererImpl::UpdateUniformBuffer(UniformBufferObject *ubo)
 {
-    globalUboBuffer->WriteToIndex(ubo, currentFrameIndex);
-    globalUboBuffer->FlushIndex(currentFrameIndex);
+    uniformBuffers[currentFrameIndex]->WriteToIndex(ubo, currentFrameIndex);
+    // NOTE: we don't need to flush at a given index because of the "COHERENT_HOST_BIT" in the buffer flag
+//    uniformBuffers[currentFrameIndex]->Flush();
+//    globalUboBuffer->FlushIndex(currentFrameIndex);
 }

@@ -32,14 +32,14 @@ struct EngineRendererImpl
     int currentFrameIndex{0};
     bool frameHasStarted{false};
 
-    // TODO: Make use of multiple uniform buffers
-    std::unique_ptr<VulkanBuffer> globalUboBuffer;
+    std::vector<std::unique_ptr<VulkanBuffer>> uniformBuffers;
 
     VkCommandBuffer GetCurrentCommandBuffer();
     int GetFrameIndex();
 
-    void CreateUniformBuffer();
+    void CreateUniformBuffers();
     void UpdateUniformBuffer(UniformBufferObject *ubo);
+
     void CreateCommandBuffers();
     void FreeCommandBuffers();
 
