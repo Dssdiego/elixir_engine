@@ -22,10 +22,12 @@ public:
 //    VulkanBuffer &operator=(const VulkanBuffer&) = delete;
 
     void WriteToBuffer(void* data, VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+    void WriteToIndex(void* data, int index);
+    VkResult Flush(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+    VkResult FlushIndex(int index);
+
     VkResult Map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
     void UnMap();
-
-    VkResult MapToMemory();
 
     VkBufferUsageFlags GetUsageFlags() const { return usageFlags; }
     VkDeviceSize Size() const { return bufferSize; }

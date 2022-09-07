@@ -113,6 +113,11 @@ SwapChainSupportDetails VulkanDevice::GetSwapChainSupport()
     return mVulkanDeviceImpl->QuerySwapChainSupport(mVulkanDeviceImpl->physicalDevice);
 }
 
+VkPhysicalDeviceProperties VulkanDevice::GetProperties()
+{
+    return mVulkanDeviceImpl->GetProperties();
+}
+
 void VulkanDevice::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
                                 VkBuffer &buffer, VkDeviceMemory &bufferMemory)
 {
@@ -265,11 +270,10 @@ void VulkanDeviceImpl::PickPhysicalDevice()
         throw std::runtime_error("failed to find a suitable GPU");
     }
 
-    VkPhysicalDeviceProperties props;
-    vkGetPhysicalDeviceProperties(physicalDevice, &props);
+    vkGetPhysicalDeviceProperties(physicalDevice, &properties);
 
     // getting vulkan version
-    uint32_t vulkanVersion = props.apiVersion;
+    uint32_t vulkanVersion = properties.apiVersion;
     uint32_t vulkanVMajor = VK_API_VERSION_MAJOR(vulkanVersion);
     uint32_t vulkanVMinor = VK_API_VERSION_MINOR(vulkanVersion);
     uint32_t vulkanVPatch = VK_API_VERSION_PATCH(vulkanVersion);
@@ -277,7 +281,7 @@ void VulkanDeviceImpl::PickPhysicalDevice()
     std::stringstream ssVulkanVersion;
     ssVulkanVersion << "Vulkan Version: " << vulkanVMajor << "." << vulkanVMinor << "." << vulkanVPatch;
 
-    Logger::Info("GPU: " + std::string(props.deviceName));
+    Logger::Info("GPU: " + std::string(properties.deviceName));
     Logger::Info(ssVulkanVersion.str());
 
     Logger::Debug("Picked physical device");
@@ -561,6 +565,11 @@ bool VulkanDeviceImpl::CheckDeviceExtensionSupport(VkPhysicalDevice device)
     }
 
     return requiredExtensions.empty();
+}
+
+VkPhysicalDeviceProperties VulkanDeviceImpl::GetProperties()
+{
+    return properties;
 }
 
 void VulkanDeviceImpl::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,

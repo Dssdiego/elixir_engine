@@ -69,8 +69,6 @@ void Game::Draw()
 
     TestRenderSystem::RenderGameObjects();
 
-//    RenderSystem::RenderGameObjects(gameObjects);
-
     ImGuiRenderer::Render();
     VulkanEngine::EndFrame();
 }

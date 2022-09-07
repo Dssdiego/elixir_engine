@@ -66,7 +66,28 @@ void VulkanBuffer::WriteToBuffer(void *data, VkDeviceSize size, VkDeviceSize off
 
 void VulkanBuffer::Destroy()
 {
+    Logger::Debug("Destroying Vulkan Buffer...");
     UnMap();
     vkDestroyBuffer(VulkanDevice::GetDevice(), buffer, nullptr);
     vkFreeMemory(VulkanDevice::GetDevice(), memory, nullptr);
+}
+
+VkResult VulkanBuffer::FlushIndex(int index)
+{
+    return Flush(alignmentSize, index * alignmentSize);
+}
+
+VkResult VulkanBuffer::Flush(VkDeviceSize size, VkDeviceSize offset)
+{
+    VkMappedMemoryRange mappedRange = {};
+    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+    mappedRange.memory = memory;
+    mappedRange.offset = offset;
+    mappedRange.size = size;
+    return vkFlushMappedMemoryRanges(VulkanDevice::GetDevice(), 1, &mappedRange);
+}
+
+void VulkanBuffer::WriteToIndex(void *data, int index)
+{
+    WriteToBuffer(data, instanceSize, index * alignmentSize);
 }

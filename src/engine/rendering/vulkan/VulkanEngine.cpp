@@ -41,6 +41,16 @@ void VulkanEngine::EndFrame()
     mEngineRendererImpl->EndFrame();
 }
 
+int VulkanEngine::GetFrameIndex()
+{
+    return mEngineRendererImpl->GetFrameIndex();
+}
+
+void VulkanEngine::UpdateUniformBuffer(GlobalUbo *ubo)
+{
+    mEngineRendererImpl->UpdateUniformBuffer(ubo);
+}
+
 //
 // Implementation
 //
@@ -55,6 +65,7 @@ EngineRendererImpl::EngineRendererImpl()
     // REVIEW: Recreate swapchain on renderer init?
 
     CreateCommandBuffers();
+    CreateUniformBuffer();
 }
 
 EngineRendererImpl::~EngineRendererImpl()
@@ -64,10 +75,25 @@ EngineRendererImpl::~EngineRendererImpl()
     // waiting for the device to finish operations before exiting and destroying stuff
     vkDeviceWaitIdle(VulkanDevice::GetDevice());
 
+    // FIXME: This is a smart pointer and we shouldn't have to make null manually!
+    globalUboBuffer->Destroy();
+    globalUboBuffer = nullptr;
     FreeCommandBuffers();
 
     VulkanSwapchain::Shutdown();
     VulkanDevice::Shutdown();
+}
+
+void EngineRendererImpl::CreateUniformBuffer()
+{
+    globalUboBuffer = std::make_unique<VulkanBuffer>(
+          sizeof(GlobalUbo),
+          VulkanSwapchain::GetNumberOfFramesInFlight(),
+          VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+          VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+          VulkanDevice::GetProperties().limits.minUniformBufferOffsetAlignment
+    );
+    globalUboBuffer->Map();
 }
 
 void EngineRendererImpl::CreateCommandBuffers()
@@ -103,6 +129,12 @@ VkCommandBuffer EngineRendererImpl::GetCurrentCommandBuffer()
 
     // REVIEW: Assert the frame is already started? We can't get command buffer when a frame is not in progress!
     return commandBuffers[currentFrameIndex];
+}
+
+int EngineRendererImpl::GetFrameIndex()
+{
+    assert(frameHasStarted && "Cannot get frame index when frame is not in progress");
+    return currentFrameIndex;
 }
 
 VkCommandBuffer EngineRendererImpl::BeginFrame()
@@ -214,4 +246,10 @@ void EngineRendererImpl::EndFrame()
 
     // updating the current frame index (for the command buffers)
     currentFrameIndex = (currentFrameIndex + 1) % VulkanSwapchain::GetNumberOfFramesInFlight();
+}
+
+void EngineRendererImpl::UpdateUniformBuffer(GlobalUbo *ubo)
+{
+    globalUboBuffer->WriteToIndex(ubo, currentFrameIndex);
+    globalUboBuffer->FlushIndex(currentFrameIndex);
 }

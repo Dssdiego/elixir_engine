@@ -54,6 +54,7 @@ struct VulkanDeviceImpl
     SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
+    VkPhysicalDeviceProperties GetProperties();
     void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
 
     // command buffer single time commands
@@ -70,6 +71,8 @@ struct VulkanDeviceImpl
     VkSurfaceKHR surface;
     VkQueue graphicsQueue;
     VkQueue presentQueue;
+
+    VkPhysicalDeviceProperties properties;
 
 //    std::optional<uint32_t> graphicsFamilyIdx;
 //    std::optional<uint32_t> presentFamilyIdx;
@@ -111,14 +114,13 @@ public:
 //            const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 //
     // Helper Functions
+    static VkPhysicalDeviceProperties GetProperties();
     static void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
 
     // Commands
     static VkCommandBuffer BeginSingleTimeCommands();
     static void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
     static void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-
-    VkPhysicalDeviceProperties properties;
 };
 
 
