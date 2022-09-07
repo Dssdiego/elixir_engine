@@ -3,6 +3,7 @@
 //
 
 #include "Texture.h"
+#include "vulkan/VulkanBuffer.h"
 
 //
 // Constructor/Destructor
@@ -35,6 +36,7 @@ void Texture::CreateTextureImage(const std::string &imagePath)
 
     // calculating the size of the image (in vulkan terms)
     VkDeviceSize imageSize = width * height * 4;
+    uint32_t imageCount = sizeof(pixels[0]);
 
     // checking if the image data was filled (e.g. we have pixel data)
     if (!pixels)
@@ -44,18 +46,14 @@ void Texture::CreateTextureImage(const std::string &imagePath)
     }
 
     // creating a buffer to upload the texure to the GPU
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
-
-    VulkanDevice::CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                               VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
-                               stagingBufferMemory);
-
-    void* data;
-    vkMapMemory(VulkanDevice::GetDevice(), stagingBufferMemory, 0, imageSize, 0, &data);
-    memcpy(data, pixels, static_cast<size_t>(imageSize));
-    vkUnmapMemory(VulkanDevice::GetDevice(), stagingBufferMemory);
+    VulkanBuffer stagingBuffer(
+            imageSize,
+            imageCount,
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+    );
+    stagingBuffer.Map();
+    stagingBuffer.WriteToBuffer((void *) pixels);
 
     // texture image is now mapped on the GPU so we don't need it's data representation anymore
     stbi_image_free(pixels);
@@ -69,17 +67,13 @@ void Texture::CreateTextureImage(const std::string &imagePath)
     VulkanImage::TransitionImageLayout(image, VK_FORMAT_R8G8B8A8_SRGB,
                           VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
-    VulkanImage::CopyBufferToImage(stagingBuffer, image,
+    VulkanImage::CopyBufferToImage(stagingBuffer.GetBuffer(), image,
                       static_cast<uint32_t>(width),
                       static_cast<uint32_t>(height));
 
     VulkanImage::TransitionImageLayout(image, VK_FORMAT_R8G8B8A8_SRGB,
                           VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                           VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-    // destroying stuff because now the image is in the GPU
-    vkDestroyBuffer(VulkanDevice::GetDevice(), stagingBuffer, nullptr);
-    vkFreeMemory(VulkanDevice::GetDevice(), stagingBufferMemory, nullptr);
 }
 
 void Texture::CreateTextureSampler()
