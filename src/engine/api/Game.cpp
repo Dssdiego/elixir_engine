@@ -21,7 +21,7 @@ void Game::Init(EngineConfig* pConfig)
     EngineRenderer::Init();
     ImGuiRenderer::Init();
     TestRenderSystem::Init();
-    Font::LoadFont();
+//    Font::LoadFont();
 //    Renderer::Init(GraphicsBackend::VULKAN);
 //    CGeforceNow::Init();
 }
