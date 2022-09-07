@@ -7,7 +7,7 @@
 #include "Window.h"
 #include "vulkan/VulkanDevice.h"
 #include "vulkan/VulkanSwapchain.h"
-#include "EngineRenderer.h"
+#include "vulkan/VulkanEngine.h"
 #include "TestRenderSystem.h"
 #include "vulkan/VulkanPipeline.h"
 #include "Camera.h"
@@ -95,7 +95,7 @@ void ImGuiRenderer::Render()
     Draw();
     ImGui::Render();
     ImDrawData *drawdata = ImGui::GetDrawData();
-    ImGui_ImplVulkan_RenderDrawData(drawdata, EngineRenderer::GetCurrentCommandBuffer());
+    ImGui_ImplVulkan_RenderDrawData(drawdata, VulkanEngine::GetCurrentCommandBuffer());
 #endif
 }
 

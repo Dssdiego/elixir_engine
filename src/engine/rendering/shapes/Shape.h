@@ -11,7 +11,7 @@
 #include <glm/gtc/constants.hpp>
 
 #include "../vulkan/VulkanDevice.h"
-#include "../EngineRenderer.h"
+#include "../vulkan/VulkanEngine.h"
 #include "Vertex.h"
 #include "../vulkan/VulkanBuffer.h"
 #include <vector>

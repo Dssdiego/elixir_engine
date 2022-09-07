@@ -12,7 +12,7 @@
 #include "../input/Input.h"
 #include "../rendering/Window.h"
 #include "../rendering/Renderer.h"
-#include "../rendering/EngineRenderer.h"
+#include "../rendering/vulkan/VulkanEngine.h"
 #include "../gui/EditorInterface.h"
 #include "../profiling/Logger.h"
 #include "../scenes/SceneSystem.h"

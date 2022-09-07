@@ -17,7 +17,7 @@
 #include "VulkanSwapchain.h"
 #include "VulkanPipelineBuilder.h"
 #include "VulkanDevice.h"
-#include "../EngineRenderer.h"
+#include "VulkanEngine.h"
 #include "../Shader.h"
 #include "../shapes/Vertex.h"
 

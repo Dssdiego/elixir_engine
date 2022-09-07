@@ -18,7 +18,7 @@ void Game::Init(EngineConfig* pConfig)
     Window::Init(pConfig);
     AudioEngine::Init();
     Input::Init();
-    EngineRenderer::Init();
+    VulkanEngine::Init();
     ImGuiRenderer::Init();
     TestRenderSystem::Init();
 //    Font::LoadFont();
@@ -64,7 +64,7 @@ void Game::Run()
 
 void Game::Draw()
 {
-    EngineRenderer::BeginFrame();
+    VulkanEngine::BeginFrame();
     ImGuiRenderer::NewFrame();
 
     TestRenderSystem::RenderGameObjects();
@@ -72,7 +72,7 @@ void Game::Draw()
 //    RenderSystem::RenderGameObjects(gameObjects);
 
     ImGuiRenderer::Render();
-    EngineRenderer::EndFrame();
+    VulkanEngine::EndFrame();
 }
 
 void Game::Cleanup()
@@ -82,7 +82,7 @@ void Game::Cleanup()
     TestRenderSystem::Shutdown();
     ImGuiRenderer::Shutdown();
     SceneSystem::Shutdown();
-    EngineRenderer::Shutdown();
+    VulkanEngine::Shutdown();
 //    Renderer::Shutdown();
     Input::Shutdown();
     AudioEngine::Shutdown();

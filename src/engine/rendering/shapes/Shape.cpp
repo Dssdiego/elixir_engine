@@ -37,7 +37,7 @@ void Shape::MakeShape()
 void Shape::Draw()
 {
     Bind();
-    vkCmdDrawIndexed(EngineRenderer::GetCurrentCommandBuffer(), static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+    vkCmdDrawIndexed(VulkanEngine::GetCurrentCommandBuffer(), static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 }
 
 void Shape::Destroy()
@@ -111,10 +111,10 @@ void Shape::Bind()
     // bind the vertex buffer
     VkBuffer buffers[] = { vertexBuffer->GetBuffer() };
     VkDeviceSize offsets[] = {0};
-    vkCmdBindVertexBuffers(EngineRenderer::GetCurrentCommandBuffer(), 0, 1, buffers, offsets);
+    vkCmdBindVertexBuffers(VulkanEngine::GetCurrentCommandBuffer(), 0, 1, buffers, offsets);
 
     // bind the index buffer
-    vkCmdBindIndexBuffer(EngineRenderer::GetCurrentCommandBuffer(), indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+    vkCmdBindIndexBuffer(VulkanEngine::GetCurrentCommandBuffer(), indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
 }
 
 //

@@ -2,14 +2,14 @@
 // Created by Diego S. Seabra on 21/07/22.
 //
 
-#ifndef VULKAN_ENGINE_ENGINERENDERER_H
-#define VULKAN_ENGINE_ENGINERENDERER_H
+#ifndef VULKAN_ENGINE_VULKANENGINE_H
+#define VULKAN_ENGINE_VULKANENGINE_H
 
 #include <cassert>
 #include <vulkan/vulkan.h>
-#include "vulkan/VulkanSwapchain.h"
-#include "vulkan/VulkanDevice.h"
-#include "../common/Color.h"
+#include "VulkanSwapchain.h"
+#include "VulkanDevice.h"
+#include "../../common/Color.h"
 
 struct EngineRendererImpl
 {
@@ -33,7 +33,7 @@ struct EngineRendererImpl
     void EndFrame();
 };
 
-class EngineRenderer
+class VulkanEngine
 {
 public:
     static void Init();
@@ -45,4 +45,4 @@ public:
 };
 
 
-#endif //VULKAN_ENGINE_ENGINERENDERER_H
+#endif //VULKAN_ENGINE_VULKANENGINE_H

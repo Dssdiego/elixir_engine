@@ -132,7 +132,7 @@ void VulkanPipelineImpl::CreatePipelineLayout(VkPipelineLayout &layout)
 
 void VulkanPipelineImpl::Bind()
 {
-    vkCmdBindPipeline(EngineRenderer::GetCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GetCurrent().pipeline);
+    vkCmdBindPipeline(VulkanEngine::GetCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GetCurrent().pipeline);
 }
 
 PipelineSet VulkanPipelineImpl::GetCurrent()

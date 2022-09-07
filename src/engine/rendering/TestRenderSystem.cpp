@@ -129,7 +129,7 @@ void TestRenderSystemImpl::RenderGameObjects()
 {
     for (auto &obj : gameObjects)
     {
-        auto commandBuffer = EngineRenderer::GetCurrentCommandBuffer();
+        auto commandBuffer = VulkanEngine::GetCurrentCommandBuffer();
 
         if (obj.pipeline == "shape")
             VulkanPipeline::SwitchToPipeline(0);
