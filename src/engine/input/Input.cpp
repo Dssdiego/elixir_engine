@@ -5,6 +5,8 @@
 #include "Input.h"
 #include "../profiling/Profiler.h"
 #include "../profiling/Logger.h"
+#include "../rendering/Window.h"
+#include "../rendering/Camera.h"
 
 void Input::Init()
 {
@@ -19,4 +21,16 @@ void Input::Shutdown()
 void Input::Update()
 {
     glfwPollEvents();
+
+    if (glfwGetKey(Window::GetWindow(), GLFW_KEY_D))
+        Camera::MoveRight();
+
+    if (glfwGetKey(Window::GetWindow(), GLFW_KEY_A))
+        Camera::MoveLeft();
+
+    if (glfwGetKey(Window::GetWindow(), GLFW_KEY_W))
+        Camera::MoveUp();
+
+    if (glfwGetKey(Window::GetWindow(), GLFW_KEY_S))
+        Camera::MoveDown();
 }

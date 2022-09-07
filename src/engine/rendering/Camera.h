@@ -32,6 +32,12 @@ public:
     static const glm::mat4 &GetProjection();
     static const glm::mat4 &GetView();
 
+    // movement
+    inline static void MoveRight() { SetWorldPosition(glm::vec3(worldPosition.x + .1f, worldPosition.y, worldPosition.z)); }
+    inline static void MoveLeft() { SetWorldPosition(glm::vec3(worldPosition.x - .1f, worldPosition.y, worldPosition.z)); }
+    inline static void MoveUp() { SetWorldPosition(glm::vec3(worldPosition.x, worldPosition.y - .1f, worldPosition.z)); }
+    inline static void MoveDown() { SetWorldPosition(glm::vec3(worldPosition.x, worldPosition.y + .1f, worldPosition.z)); }
+
 private:
     inline static glm::mat4 projectionMatrix{1.f};
     inline static glm::mat4 viewMatrix{1.f};
