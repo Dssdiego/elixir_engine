@@ -1,0 +1,15 @@
+//
+// Created by Diego S. Seabra on 07/09/22.
+//
+
+#ifndef VULKAN_ENGINE_VULKANDESCRIPTORPOOL_H
+#define VULKAN_ENGINE_VULKANDESCRIPTORPOOL_H
+
+
+class VulkanDescriptorPool
+{
+
+};
+
+
+#endif //VULKAN_ENGINE_VULKANDESCRIPTORPOOL_H
