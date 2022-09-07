@@ -13,6 +13,7 @@
 #include "../vulkan/VulkanDevice.h"
 #include "../EngineRenderer.h"
 #include "Vertex.h"
+#include "../vulkan/VulkanBuffer.h"
 #include <vector>
 
 enum ShapeType {
@@ -43,12 +44,11 @@ private:
     void CreateIndexBuffer();
     void Bind();
 
-    VkBuffer vertexBuffer;
-    VkBuffer indexBuffer;
-    VkDeviceMemory vertexBufferMemory;
-    VkDeviceMemory indexBufferMemory;
+    std::shared_ptr<VulkanBuffer> vertexBuffer;
+    std::shared_ptr<VulkanBuffer> indexBuffer;
 
     uint32_t vertexCount;
+    uint32_t indexCount;
 };
 
 

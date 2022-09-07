@@ -42,13 +42,8 @@ void Shape::Draw()
 
 void Shape::Destroy()
 {
-    // vertex buffer
-    vkDestroyBuffer(VulkanDevice::GetDevice(), vertexBuffer, nullptr);
-    vkFreeMemory(VulkanDevice::GetDevice(), vertexBufferMemory, nullptr);
-
-    // index buffer
-    vkDestroyBuffer(VulkanDevice::GetDevice(), indexBuffer, nullptr);
-    vkFreeMemory(VulkanDevice::GetDevice(), indexBufferMemory, nullptr);
+   // we don't need to manually destroy the buffers because of the use of the unique ptr
+//   vertexBuffer.Destroy();
 }
 
 //
@@ -57,61 +52,69 @@ void Shape::Destroy()
 
 void Shape::CreateVertexBuffer()
 {
+    // REVIEW: Do we really need a staging buffer?
     vertexCount = static_cast<uint32_t>(vertices.size());
     assert(vertexCount >= 3 && "Vertex count must be at least 3 so that we can draw triangles ;)");
 
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
+    uint32_t vertexSize = sizeof(vertices[0]);
 
-    VulkanDevice::CreateBuffer(
-            bufferSize,
-            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            vertexBuffer,
-            vertexBufferMemory
+    VulkanBuffer stagingBuffer(
+            vertexSize,
+            vertexCount,
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+    );
+    stagingBuffer.Map();
+    stagingBuffer.WriteToBuffer((void *) vertices.data());
+
+    vertexBuffer = std::make_shared<VulkanBuffer>(
+            vertexSize,
+            vertexCount,
+            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
     );
 
-    void *data;
-    vkMapMemory(VulkanDevice::GetDevice(), vertexBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
-    vkUnmapMemory(VulkanDevice::GetDevice(), vertexBufferMemory);
+    VulkanDevice::CopyBuffer(stagingBuffer.GetBuffer(), vertexBuffer->GetBuffer(), bufferSize);
 }
 
 void Shape::CreateIndexBuffer()
 {
+    // REVIEW: Do we really need a staging buffer?
+    indexCount = static_cast<uint32_t>(indices.size());
+    assert(vertexCount > 0 && "Index count must be at least 1 so that we can draw triangles with indices ;)");
+
     VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+    uint32_t indexSize = sizeof(indices[0]);
 
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
-    VulkanDevice::CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
-                 stagingBufferMemory);
+    VulkanBuffer stagingBuffer(
+            indexSize,
+            indexCount,
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+    );
+    stagingBuffer.Map();
+    stagingBuffer.WriteToBuffer((void *) indices.data());
 
-    void* data;
-    vkMapMemory(VulkanDevice::GetDevice(), stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, indices.data(), (size_t) bufferSize);
-    vkUnmapMemory(VulkanDevice::GetDevice(), stagingBufferMemory);
+    indexBuffer = std::make_shared<VulkanBuffer>(
+            indexSize,
+            indexCount,
+            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+    );
 
-    VulkanDevice::CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT |
-                             VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer,
-                 indexBufferMemory);
-
-    VulkanDevice::CopyBuffer(stagingBuffer, indexBuffer, bufferSize);
-
-    vkDestroyBuffer(VulkanDevice::GetDevice(), stagingBuffer, nullptr);
-    vkFreeMemory(VulkanDevice::GetDevice(), stagingBufferMemory, nullptr);
+    VulkanDevice::CopyBuffer(stagingBuffer.GetBuffer(), indexBuffer->GetBuffer(), bufferSize);
 }
 
 void Shape::Bind()
 {
     // bind the vertex buffer
-    VkBuffer buffers[] = {vertexBuffer};
+    VkBuffer buffers[] = { vertexBuffer->GetBuffer() };
     VkDeviceSize offsets[] = {0};
     vkCmdBindVertexBuffers(EngineRenderer::GetCurrentCommandBuffer(), 0, 1, buffers, offsets);
 
     // bind the index buffer
-    vkCmdBindIndexBuffer(EngineRenderer::GetCurrentCommandBuffer(), indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+    vkCmdBindIndexBuffer(EngineRenderer::GetCurrentCommandBuffer(), indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
 }
 
 //
