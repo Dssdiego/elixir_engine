@@ -23,6 +23,13 @@ VulkanDescriptorSetLayout::VulkanDescriptorSetLayout(
     descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
 
     VK_CHECK(vkCreateDescriptorSetLayout(VulkanDevice::GetDevice(), &descriptorSetLayoutInfo, nullptr, &descriptorSetLayout));
+
+    Logger::Debug("Created descriptor set layout");
+}
+
+VulkanDescriptorSetLayout::~VulkanDescriptorSetLayout()
+{
+    vkDestroyDescriptorSetLayout(VulkanDevice::GetDevice(), descriptorSetLayout, nullptr);
 }
 
 //
@@ -48,3 +55,5 @@ std::unique_ptr<VulkanDescriptorSetLayout> VulkanDescriptorSetLayout::Build() co
 {
     return std::make_unique<VulkanDescriptorSetLayout>(bindings);
 }
+
+
