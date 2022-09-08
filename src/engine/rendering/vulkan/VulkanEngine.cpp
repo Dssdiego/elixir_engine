@@ -92,6 +92,21 @@ EngineRendererImpl::~EngineRendererImpl()
     VulkanDevice::Shutdown();
 }
 
+void EngineRendererImpl::CreateDescriptorPool()
+{
+    descriptorPool = VulkanDescriptorPool::Builder()
+            .SetMaxSets(VulkanSwapchain::GetNumberOfFramesInFlight())
+            .AddPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VulkanSwapchain::GetNumberOfFramesInFlight())
+//            .AddPoolSize(VK_DESCRIPTOR_TYPE_SAMPLER, VulkanSwapchain::GetNumberOfFramesInFlight())
+            .Build();
+
+    descriptorSetLayout = VulkanDescriptorSetLayout::Builder()
+            .AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+            .Build();
+
+    // REVIEW: TODO: Make a pool for samplers (to allow us to use textures?)
+}
+
 void EngineRendererImpl::CreateUniformBuffers()
 {
     VkDeviceSize bufferSize = sizeof(UniformBufferObject);
@@ -271,13 +286,4 @@ void EngineRendererImpl::UpdateUniformBuffer(UniformBufferObject *ubo)
 //    globalUboBuffer->FlushIndex(currentFrameIndex);
 }
 
-void EngineRendererImpl::CreateDescriptorPool()
-{
-    descriptorPool = VulkanDescriptorPool::Builder()
-            .SetMaxSets(VulkanSwapchain::GetNumberOfFramesInFlight())
-            .AddPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VulkanSwapchain::GetNumberOfFramesInFlight())
-//            .AddPoolSize(VK_DESCRIPTOR_TYPE_SAMPLER, VulkanSwapchain::GetNumberOfFramesInFlight())
-            .Build();
 
-    // REVIEW: TODO: Make a pool for samplers (to allow us to use textures?)
-}

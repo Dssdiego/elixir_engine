@@ -13,6 +13,7 @@
 #include "../../common/Color.h"
 #include "VulkanBuffer.h"
 #include "descriptors/VulkanDescriptorPool.h"
+#include "descriptors/VulkanDescriptorSetLayout.h"
 
 struct UniformBufferObject
 {
@@ -34,6 +35,7 @@ struct EngineRendererImpl
     bool frameHasStarted{false};
 
     std::unique_ptr<VulkanDescriptorPool> descriptorPool;
+    std::unique_ptr<VulkanDescriptorSetLayout> descriptorSetLayout;
     std::vector<std::unique_ptr<VulkanBuffer>> uniformBuffers;
 
     VkCommandBuffer GetCurrentCommandBuffer();

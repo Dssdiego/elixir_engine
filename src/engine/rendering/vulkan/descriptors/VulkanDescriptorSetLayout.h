@@ -12,9 +12,23 @@
 
 class VulkanDescriptorSetLayout
 {
-    friend class VulkanDescriptorWriter;
-
 public:
+    class Builder
+    {
+    public:
+        Builder &AddBinding(
+                uint32_t binding,
+                VkDescriptorType descriptorType,
+                VkShaderStageFlags stageFlags,
+                uint32_t count = 1
+        );
+
+        std::unique_ptr<VulkanDescriptorSetLayout> Build() const;
+
+    private:
+        std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings{};
+    };
+
     VulkanDescriptorSetLayout(const std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> &bindings);
     ~VulkanDescriptorSetLayout();
 
@@ -23,18 +37,11 @@ public:
 
     VkDescriptorSetLayout GetDescriptorSetLayout() const { return descriptorSetLayout; }
 
-    VulkanDescriptorSetLayout &AddBinding(
-            uint32_t binding,
-            VkDescriptorType descriptorType,
-            VkShaderStageFlags stageFlags,
-            uint32_t count = 1
-    );
-
-    std::unique_ptr<VulkanDescriptorSetLayout> Build() const;
-
 private:
     VkDescriptorSetLayout descriptorSetLayout;
     std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings{};
+
+    friend class VulkanDescriptorWriter;
 };
 
 

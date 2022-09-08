@@ -36,8 +36,8 @@ VulkanDescriptorSetLayout::~VulkanDescriptorSetLayout()
 // External
 //
 
-VulkanDescriptorSetLayout&
-VulkanDescriptorSetLayout::AddBinding(uint32_t binding, VkDescriptorType descriptorType, VkShaderStageFlags stageFlags,
+VulkanDescriptorSetLayout::Builder&
+VulkanDescriptorSetLayout::Builder::AddBinding(uint32_t binding, VkDescriptorType descriptorType, VkShaderStageFlags stageFlags,
                                       uint32_t count)
 {
     assert(bindings.count(binding) == 0 && "Binding already in use");
@@ -51,7 +51,7 @@ VulkanDescriptorSetLayout::AddBinding(uint32_t binding, VkDescriptorType descrip
     return *this;
 }
 
-std::unique_ptr<VulkanDescriptorSetLayout> VulkanDescriptorSetLayout::Build() const
+std::unique_ptr<VulkanDescriptorSetLayout> VulkanDescriptorSetLayout::Builder::Build() const
 {
     return std::make_unique<VulkanDescriptorSetLayout>(bindings);
 }
