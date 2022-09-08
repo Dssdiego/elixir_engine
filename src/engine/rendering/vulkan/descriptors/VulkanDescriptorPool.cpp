@@ -33,25 +33,25 @@ VulkanDescriptorPool::~VulkanDescriptorPool()
 // External
 //
 
-VulkanDescriptorPool &VulkanDescriptorPool::AddPoolSize(VkDescriptorType descriptorType, uint32_t count)
+VulkanDescriptorPool::Builder &VulkanDescriptorPool::Builder::AddPoolSize(VkDescriptorType descriptorType, uint32_t count)
 {
     poolSizes.push_back({descriptorType, count});
     return *this;
 }
 
-VulkanDescriptorPool &VulkanDescriptorPool::SetPoolFlags(VkDescriptorPoolCreateFlags flags)
+VulkanDescriptorPool::Builder &VulkanDescriptorPool::Builder::SetPoolFlags(VkDescriptorPoolCreateFlags flags)
 {
     poolFlags = flags;
     return *this;
 }
 
-VulkanDescriptorPool &VulkanDescriptorPool::SetMaxSets(uint32_t count)
+VulkanDescriptorPool::Builder &VulkanDescriptorPool::Builder::SetMaxSets(uint32_t count)
 {
     maxSets = count;
     return *this;
 }
 
-std::unique_ptr<VulkanDescriptorPool> VulkanDescriptorPool::Build() const
+std::unique_ptr<VulkanDescriptorPool> VulkanDescriptorPool::Builder::Build() const
 {
     return std::make_unique<VulkanDescriptorPool>(maxSets, poolFlags, poolSizes);
 }

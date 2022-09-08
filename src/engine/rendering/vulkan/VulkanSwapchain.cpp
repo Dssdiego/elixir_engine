@@ -27,6 +27,8 @@ uint32_t VulkanSwapchain::GetImageCount()
     return mVulkanSwapChainImpl->GetImageCount();
 }
 
+// FIXME: This method could be misleading!
+//  It isn't the current number of frames in flight but the MAX number!
 uint32_t VulkanSwapchain::GetNumberOfFramesInFlight()
 {
     return mVulkanSwapChainImpl->MAX_FRAMES_IN_FLIGHT;

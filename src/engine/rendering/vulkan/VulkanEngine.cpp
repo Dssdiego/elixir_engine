@@ -66,6 +66,7 @@ EngineRendererImpl::EngineRendererImpl()
 
     CreateCommandBuffers();
     CreateUniformBuffers();
+    CreateDescriptorPool();
 }
 
 EngineRendererImpl::~EngineRendererImpl()
@@ -75,6 +76,10 @@ EngineRendererImpl::~EngineRendererImpl()
     // waiting for the device to finish operations before exiting and destroying stuff
     vkDeviceWaitIdle(VulkanDevice::GetDevice());
 
+    // forcing the descriptor pool unique ptr to be destroyed | FIXME: We shouldn't have to do this manually!
+    descriptorPool = nullptr;
+
+    // forcing the uniform buffers unique ptr to be destroyed | FIXME: We shouldn't have to do this manually!
     uint32_t swapChainImageCount = VulkanSwapchain::GetImageCount();
     for (size_t i = 0; i < swapChainImageCount; i++)
     {
@@ -264,4 +269,15 @@ void EngineRendererImpl::UpdateUniformBuffer(UniformBufferObject *ubo)
     // NOTE: we don't need to flush at a given index because of the "COHERENT_HOST_BIT" in the buffer flag
 //    uniformBuffers[currentFrameIndex]->Flush();
 //    globalUboBuffer->FlushIndex(currentFrameIndex);
+}
+
+void EngineRendererImpl::CreateDescriptorPool()
+{
+    descriptorPool = VulkanDescriptorPool::Builder()
+            .SetMaxSets(VulkanSwapchain::GetNumberOfFramesInFlight())
+            .AddPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VulkanSwapchain::GetNumberOfFramesInFlight())
+//            .AddPoolSize(VK_DESCRIPTOR_TYPE_SAMPLER, VulkanSwapchain::GetNumberOfFramesInFlight())
+            .Build();
+
+    // REVIEW: TODO: Make a pool for samplers (to allow us to use textures?)
 }

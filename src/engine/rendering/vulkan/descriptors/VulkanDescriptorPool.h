@@ -11,22 +11,27 @@
 
 class VulkanDescriptorPool
 {
-    friend class VulkanDescriptorWriter;
-
 public:
-    VulkanDescriptorPool(
-        uint32_t maxSets,
-        VkDescriptorPoolCreateFlags poolFlags,
-        const std::vector<VkDescriptorPoolSize> &poolSizes);
-    ~VulkanDescriptorPool();
-
+    class Builder
+    {
+    public:
 //    VulkanDescriptorPool(const VulkanDescriptorPool &) = delete;
 //    VulkanDescriptorPool &operator=(const VulkanDescriptorPool &) = delete;
 
-    VulkanDescriptorPool &AddPoolSize(VkDescriptorType descriptorType, uint32_t count);
-    VulkanDescriptorPool &SetPoolFlags(VkDescriptorPoolCreateFlags flags);
-    VulkanDescriptorPool &SetMaxSets(uint32_t count);
-    std::unique_ptr<VulkanDescriptorPool> Build() const;
+        Builder &AddPoolSize(VkDescriptorType descriptorType, uint32_t count);
+        Builder &SetPoolFlags(VkDescriptorPoolCreateFlags flags);
+        Builder &SetMaxSets(uint32_t count);
+        std::unique_ptr<VulkanDescriptorPool> Build() const;
+
+
+    private:
+        std::vector<VkDescriptorPoolSize> poolSizes{};
+        uint32_t maxSets = 1000;
+        VkDescriptorPoolCreateFlags poolFlags = 0;
+    };
+
+    VulkanDescriptorPool(uint32_t maxSets, VkDescriptorPoolCreateFlags poolFlags, const std::vector<VkDescriptorPoolSize> &poolSizes);
+    ~VulkanDescriptorPool();
 
     bool AllocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet &descriptor) const;
     void FreeDescriptors(std::vector<VkDescriptorSet> &descriptors) const;
@@ -34,11 +39,9 @@ public:
     void ResetPool();
 
 private:
-    std::vector<VkDescriptorPoolSize> poolSizes{};
-    uint32_t maxSets = 1000;
-    VkDescriptorPoolCreateFlags poolFlags = 0;
-
     VkDescriptorPool descriptorPool;
+
+    friend class VulkanDescriptorWriter;
 };
 
 

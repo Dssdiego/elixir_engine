@@ -12,6 +12,7 @@
 #include "VulkanDevice.h"
 #include "../../common/Color.h"
 #include "VulkanBuffer.h"
+#include "descriptors/VulkanDescriptorPool.h"
 
 struct UniformBufferObject
 {
@@ -32,6 +33,7 @@ struct EngineRendererImpl
     int currentFrameIndex{0};
     bool frameHasStarted{false};
 
+    std::unique_ptr<VulkanDescriptorPool> descriptorPool;
     std::vector<std::unique_ptr<VulkanBuffer>> uniformBuffers;
 
     VkCommandBuffer GetCurrentCommandBuffer();
@@ -42,6 +44,8 @@ struct EngineRendererImpl
 
     void CreateCommandBuffers();
     void FreeCommandBuffers();
+
+    void CreateDescriptorPool();
 
     VkCommandBuffer BeginFrame();
     void BeginSwapChainRenderPass();
