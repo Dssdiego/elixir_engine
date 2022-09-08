@@ -11,6 +11,8 @@
 
 class VulkanDescriptorPool
 {
+    friend class VulkanDescriptorWriter;
+
 public:
     VulkanDescriptorPool(
         uint32_t maxSets,

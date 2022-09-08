@@ -12,6 +12,8 @@
 
 class VulkanDescriptorSetLayout
 {
+    friend class VulkanDescriptorWriter;
+
 public:
     VulkanDescriptorSetLayout(const std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> &bindings);
     ~VulkanDescriptorSetLayout();
