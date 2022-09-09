@@ -6,6 +6,13 @@
 #include "../VulkanDevice.h"
 
 //
+// Constructor
+//
+
+VulkanDescriptorWriter::VulkanDescriptorWriter(VulkanDescriptorSetLayout &setLayout, VulkanDescriptorPool &pool)
+    : setLayout{setLayout}, pool{pool} { }
+
+//
 // External
 //
 

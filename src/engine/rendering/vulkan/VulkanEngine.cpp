@@ -3,6 +3,7 @@
 //
 
 #include "VulkanEngine.h"
+#include "descriptors/VulkanDescriptorWriter.h"
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
@@ -76,8 +77,9 @@ EngineRendererImpl::~EngineRendererImpl()
     // waiting for the device to finish operations before exiting and destroying stuff
     vkDeviceWaitIdle(VulkanDevice::GetDevice());
 
-    // forcing the descriptor pool unique ptr to be destroyed | FIXME: We shouldn't have to do this manually!
+    // forcing descriptors unique_ptr's to be destroyed | FIXME: We shouldn't have to do this manually!
     descriptorPool = nullptr;
+    descriptorSetLayout = nullptr;
 
     // forcing the uniform buffers unique ptr to be destroyed | FIXME: We shouldn't have to do this manually!
     uint32_t swapChainImageCount = VulkanSwapchain::GetImageCount();
@@ -104,7 +106,16 @@ void EngineRendererImpl::CreateDescriptorPool()
             .AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
             .Build();
 
-    // REVIEW: TODO: Make a pool for samplers (to allow us to use textures?)
+    std::vector<VkDescriptorSet> descriptorSets(VulkanSwapchain::GetNumberOfFramesInFlight());
+    for (int i = 0; i < descriptorSets.size(); ++i)
+    {
+        auto bufferInfo = uniformBuffers[i]->DescriptorInfo();
+        VulkanDescriptorWriter(*descriptorSetLayout, *descriptorPool) // unique_ptr, accessing contents
+            .WriteBuffer(0, &bufferInfo)
+            .Build(descriptorSets[i]);
+    }
+
+    // REVIEW: TODO: Make a pool for samplers? (to allow us to use textures?)
 }
 
 void EngineRendererImpl::CreateUniformBuffers()

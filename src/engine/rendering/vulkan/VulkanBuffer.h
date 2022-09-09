@@ -29,6 +29,8 @@ public:
     VkResult Map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
     void UnMap();
 
+    VkDescriptorBufferInfo DescriptorInfo(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
+
     VkBufferUsageFlags GetUsageFlags() const { return usageFlags; }
     VkDeviceSize Size() const { return bufferSize; }
     VkBuffer GetBuffer() const { return buffer; }

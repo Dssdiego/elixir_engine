@@ -91,3 +91,8 @@ void VulkanBuffer::WriteToIndex(void *data, int index)
 {
     WriteToBuffer(data, instanceSize, index * alignmentSize);
 }
+
+VkDescriptorBufferInfo VulkanBuffer::DescriptorInfo(VkDeviceSize size, VkDeviceSize offset)
+{
+    return VkDescriptorBufferInfo{buffer, offset, size};
+}
