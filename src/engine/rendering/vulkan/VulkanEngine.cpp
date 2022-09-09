@@ -52,6 +52,11 @@ void VulkanEngine::UpdateUniformBuffer(UniformBufferObject *ubo)
     mEngineRendererImpl->UpdateUniformBuffer(ubo);
 }
 
+VkDescriptorSetLayout VulkanEngine::GetDescriptorSetLayout()
+{
+    return mEngineRendererImpl->descriptorSetLayout;
+}
+
 //
 // Implementation
 //
@@ -67,7 +72,7 @@ EngineRendererImpl::EngineRendererImpl()
 
     CreateCommandBuffers();
     CreateUniformBuffers();
-    CreateDescriptorPool();
+    CreateDescriptors();
 }
 
 EngineRendererImpl::~EngineRendererImpl()

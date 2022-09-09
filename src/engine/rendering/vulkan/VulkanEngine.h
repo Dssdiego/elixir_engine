@@ -47,7 +47,7 @@ struct EngineRendererImpl
     void CreateCommandBuffers();
     void FreeCommandBuffers();
 
-    void CreateDescriptorPool();
+    void CreateDescriptors();
 
     VkCommandBuffer BeginFrame();
     void BeginSwapChainRenderPass();
@@ -60,6 +60,8 @@ class VulkanEngine
 public:
     static void Init();
     static void Shutdown();
+
+    static VkDescriptorSetLayout GetDescriptorSetLayout();
 
     static VkCommandBuffer GetCurrentCommandBuffer();
     static int GetFrameIndex();
