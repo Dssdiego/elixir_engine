@@ -13,11 +13,15 @@
 
 #include "../../profiling/Logger.h"
 
+#ifdef _WIN32
+
 class Font
 {
 public:
     static void LoadFont();
 };
+
+#endif
 
 
 #endif //VULKAN_ENGINE_FONT_H

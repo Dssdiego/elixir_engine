@@ -4,6 +4,8 @@
 
 #include "Font.h"
 
+#ifdef _WIN32
+
 void Font::LoadFont()
 {
     FT_Library ft;
@@ -21,3 +23,4 @@ void Font::LoadFont()
     // setting the pixel font size to 48px
     FT_Set_Pixel_Sizes(face, 0 ,48); // setting the width to 0 lets the face dynamically calculate the width based on the given height
 }
+#endif
