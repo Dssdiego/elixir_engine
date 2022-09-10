@@ -54,7 +54,7 @@ void VulkanEngine::UpdateUniformBuffer(UniformBufferObject *ubo)
 
 VkDescriptorSetLayout VulkanEngine::GetDescriptorSetLayout()
 {
-    return mEngineRendererImpl->descriptorSetLayout;
+    return mEngineRendererImpl->descriptorSetLayout->GetDescriptorSetLayout();
 }
 
 //
@@ -99,7 +99,7 @@ EngineRendererImpl::~EngineRendererImpl()
     VulkanDevice::Shutdown();
 }
 
-void EngineRendererImpl::CreateDescriptorPool()
+void EngineRendererImpl::CreateDescriptors()
 {
     descriptorPool = VulkanDescriptorPool::Builder()
             .SetMaxSets(VulkanSwapchain::GetNumberOfFramesInFlight())
