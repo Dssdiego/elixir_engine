@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <cassert>
+#include <memory>
 
 class VulkanDescriptorSetLayout
 {
