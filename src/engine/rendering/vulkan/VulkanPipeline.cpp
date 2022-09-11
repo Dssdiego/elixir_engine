@@ -118,6 +118,7 @@ void VulkanPipelineImpl::CreatePipelineLayout(VkPipelineLayout &layout)
     pushConstantRange.offset = 0;
     pushConstantRange.size = sizeof(PushConstantData);
 
+    // TODO: Make it possible to pass any descriptor set layout we want in the pipeline
     std::vector<VkDescriptorSetLayout> descriptorSetLayouts{VulkanEngine::GetDescriptorSetLayout()};
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};

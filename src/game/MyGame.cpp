@@ -13,7 +13,7 @@ int main()
 //    std::cout << Config::GetSingleton() << std::endl;
     Game game;
     EngineConfig config {
-            "My Game",
+            "Card Game",
             {Config::GetWindowWidth(),
              Config::GetWindowHeight()},
             {320, 240},
