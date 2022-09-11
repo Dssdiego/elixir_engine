@@ -47,6 +47,14 @@ void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
         Camera::ZoomOut();
 }
 
+// NOTE: In screen coordinates
+void MousePositionCallback(GLFWwindow* window, double xpos, double ypos)
+{
+    std::stringstream ss;
+    ss << "[Mouse position callback]" << " | POS (X): " << xpos << " | POS (Y): " << ypos;
+    Logger::Info(ss.str());
+}
+
 void JoystickCallback(int jid, int event)
 {
     std::stringstream ss;
@@ -160,7 +168,10 @@ void Input::Shutdown()
 void Input::SetupGLFWCallbacks()
 {
     glfwSetKeyCallback(Window::GetWindow(), KeyCallback);
+
     glfwSetMouseButtonCallback(Window::GetWindow(), MouseButtonCallback);
     glfwSetScrollCallback(Window::GetWindow(), MouseScrollCallback);
+    glfwSetCursorPosCallback(Window::GetWindow(), MousePositionCallback);
+
     glfwSetJoystickCallback(JoystickCallback);
 }

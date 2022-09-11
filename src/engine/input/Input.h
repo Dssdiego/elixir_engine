@@ -233,6 +233,9 @@ public:
     static void Update();
     static void Shutdown();
 
+    // TODO: Implement
+//    static glm::vec2 GetMouseScreenPosition();
+
 //    inline static std::vector<Joystick> joysticks = {};
     // REVIEW: GLFW supports the maximum of 16 joysticks (perhaps we define this in a enum?)
     inline static std::vector<uint32_t> joysticks = {};
