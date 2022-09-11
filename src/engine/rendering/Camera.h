@@ -57,6 +57,19 @@ public:
         UpdateCameraPosition();
     }
 
+    // zoom
+    inline static void ZoomIn()
+    {
+        worldPosition.z += .1f; // REVIEW: This should me multiplied by the engine delta time?
+        UpdateCameraPosition();
+    }
+
+    inline static void ZoomOut()
+    {
+        worldPosition.z -= .1f; // REVIEW: This should me multiplied by the engine delta time?
+        UpdateCameraPosition();
+    }
+
 private:
     // TODO: Put the projection and view matrix in a single matrix
     inline static glm::mat4 projectionMatrix{1.f};

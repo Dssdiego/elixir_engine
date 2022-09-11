@@ -11,6 +11,7 @@
 //
 // Callbacks
 //
+
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     std::stringstream ss;
@@ -30,6 +31,20 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     Logger::Info(ss.str());
 //    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
 //        popup_menu();
+}
+
+void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    std::stringstream ss;
+    ss << "[Mouse scroll callback]" << " | OFFSET (X): " << xoffset << " | OFFSET (Y): " << yoffset;
+    Logger::Info(ss.str());
+
+    /* NOTE: Temporary */
+    if (yoffset == 1)
+        Camera::ZoomIn();
+
+    if (yoffset == -1)
+        Camera::ZoomOut();
 }
 
 void JoystickCallback(int jid, int event)
@@ -65,27 +80,27 @@ void JoystickCallback(int jid, int event)
     }
 
     // register the inputs of all connected joysticks
-    // FIXME: Joystick buttons not registering!
-    for (int i = 0; i < Input::joysticks.size(); ++i)
-    {
-        if (glfwJoystickIsGamepad(i))
-        {
-            if (glfwGetGamepadState(i, &state))
-            {
-                if (state.buttons[JoystickButton::DPAD_DOWN])
-                    Logger::Debug("DPAD DOWN");
-
-                if (state.buttons[JoystickButton::DPAD_UP])
-                    Logger::Debug("DPAD UP");
-
-                if (state.buttons[JoystickButton::DPAD_LEFT])
-                    Logger::Debug("DPAD LEFT");
-
-                if (state.buttons[JoystickButton::DPAD_RIGHT])
-                    Logger::Debug("DPAD RIGHT");
-            }
-        }
-    }
+    // FIXME: Joystick buttons are not being registered!
+//    for (int i = 0; i < Input::joysticks.size(); ++i)
+//    {
+//        if (glfwJoystickIsGamepad(i))
+//        {
+//            if (glfwGetGamepadState(i, &state))
+//            {
+//                if (state.buttons[JoystickButton::DPAD_DOWN])
+//                    Logger::Debug("DPAD DOWN");
+//
+//                if (state.buttons[JoystickButton::DPAD_UP])
+//                    Logger::Debug("DPAD UP");
+//
+//                if (state.buttons[JoystickButton::DPAD_LEFT])
+//                    Logger::Debug("DPAD LEFT");
+//
+//                if (state.buttons[JoystickButton::DPAD_RIGHT])
+//                    Logger::Debug("DPAD RIGHT");
+//            }
+//        }
+//    }
 }
 
 //
@@ -102,6 +117,8 @@ void Input::Init()
 void Input::Update()
 {
     glfwPollEvents();
+
+    /* NOTE: Temporary */
 
     // TODO: (WIP) Get from Input system instead of directly from the GLFW framework ;)
     if (glfwGetKey(Window::GetWindow(), GLFW_KEY_D))
@@ -123,6 +140,8 @@ void Input::Update()
         if (Camera::HasControl())
             Camera::MoveDown();
 
+    /* NOTE: Temporary END */
+
     // TODO: (WIP) Get from Input system instead of directly from the GLFW framework ;)
 //    if (glfwGetMouseButton(Window::GetWindow(), GLFW_MOUSE_BUTTON_MIDDLE))
 //        Logger::Info("Middle mouse click");
@@ -142,5 +161,6 @@ void Input::SetupGLFWCallbacks()
 {
     glfwSetKeyCallback(Window::GetWindow(), KeyCallback);
     glfwSetMouseButtonCallback(Window::GetWindow(), MouseButtonCallback);
+    glfwSetScrollCallback(Window::GetWindow(), MouseScrollCallback);
     glfwSetJoystickCallback(JoystickCallback);
 }
