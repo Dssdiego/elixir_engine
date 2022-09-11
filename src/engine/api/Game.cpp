@@ -6,6 +6,7 @@
 #include "../rendering/ImGuiRenderer.h"
 #include "../rendering/TestRenderSystem.h"
 #include "../rendering/text/Font.h"
+#include "../core/Time.h"
 
 /*
  * Methods
@@ -37,6 +38,9 @@ void Game::Run()
         double currentTime = Window::GetTime();
         double delta = currentTime - previousTime;
         frameCount++;
+
+        // REVIEW: Calculate delta inside a "Time" class?
+        Time::SetDelta(delta);
 
         // FPS calculation
         if (delta >= 2.0f) // we update the fps info every two seconds
