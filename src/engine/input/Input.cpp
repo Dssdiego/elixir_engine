@@ -23,14 +23,18 @@ void Input::Update()
     glfwPollEvents();
 
     if (glfwGetKey(Window::GetWindow(), GLFW_KEY_D))
-        Camera::MoveRight();
+        if (Camera::HasControl())
+            Camera::MoveRight();
 
     if (glfwGetKey(Window::GetWindow(), GLFW_KEY_A))
-        Camera::MoveLeft();
+        if (Camera::HasControl())
+            Camera::MoveLeft();
 
     if (glfwGetKey(Window::GetWindow(), GLFW_KEY_W))
-        Camera::MoveUp();
+        if (Camera::HasControl())
+            Camera::MoveUp();
 
     if (glfwGetKey(Window::GetWindow(), GLFW_KEY_S))
-        Camera::MoveDown();
+        if (Camera::HasControl())
+            Camera::MoveDown();
 }

@@ -29,6 +29,10 @@ public:
     inline static glm::vec3 GetWorldDirection() { return worldDirection; };
     inline static void SetWorldDirection(glm::vec3 direction) { worldDirection = direction; };
 
+    // controls whether the camera is being controlled by someone
+    inline static bool HasControl() { return takeControl; }
+    inline static bool takeControl = false;
+
     static const glm::mat4 &GetProjection();
     static const glm::mat4 &GetView();
 
@@ -39,6 +43,7 @@ public:
     inline static void MoveDown() { SetWorldPosition(glm::vec3(worldPosition.x, worldPosition.y + .1f, worldPosition.z)); }
 
 private:
+    // TODO: Put the projection and view matrix in a single matrix
     inline static glm::mat4 projectionMatrix{1.f};
     inline static glm::mat4 viewMatrix{1.f};
 

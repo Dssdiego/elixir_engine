@@ -80,13 +80,18 @@ void ImGuiRenderer::Draw()
     }
 
     ImGui::End();
+    // Game object inspector END
 
     // Camera inspector
     ImGui::Begin("Camera");
+    ImGui::Checkbox("Control Camera?", &Camera::takeControl);
+
     static float position[3] = {0.f, 0.f, 0.f};
     ImGui::InputFloat3("position", position);
     Camera::SetWorldPosition(glm::vec3(position[0], position[1], position[2]));
+
     ImGui::End();
+    // Camera inspector END
 }
 
 void ImGuiRenderer::Render()
