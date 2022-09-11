@@ -88,7 +88,8 @@ void ImGuiRenderer::Draw()
 
     static float position[3] = {0.f, 0.f, 0.f};
     ImGui::InputFloat3("position", position);
-    Camera::SetWorldPosition(glm::vec3(position[0], position[1], position[2]));
+    if (!Camera::HasControl())
+        Camera::SetWorldPosition(glm::vec3(position[0], position[1], position[2]));
 
     ImGui::End();
     // Camera inspector END
