@@ -10,6 +10,10 @@
 #include <glm/glm.hpp>
 #include "../core/Time.h"
 
+#include "Window.h"
+#include "../common/Utils.h"
+//#include "../profiling/Logger.h"
+
 class Camera
 {
 public:
@@ -34,6 +38,10 @@ public:
 
     static const glm::mat4 &GetProjection();
     static const glm::mat4 &GetView();
+
+    static glm::vec3 ScreenToWorldSpace(glm::vec2 screenCoordinates);
+
+    // TODO: Implement zNear and zFar in the camera class
 
     // movement
     inline static void MoveRight()

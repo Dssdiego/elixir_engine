@@ -3,10 +3,6 @@
 //
 
 #include "Input.h"
-#include "../profiling/Profiler.h"
-#include "../profiling/Logger.h"
-#include "../rendering/Window.h"
-#include "../rendering/Camera.h"
 
 //
 // Callbacks
@@ -52,6 +48,10 @@ void MousePositionCallback(GLFWwindow* window, double xpos, double ypos)
 {
     std::stringstream ss;
     ss << "[Mouse position callback]" << " | POS (X): " << xpos << " | POS (Y): " << ypos;
+
+    glm::vec2 mousePos = glm::vec2(xpos, ypos);
+    Camera::ScreenToWorldSpace(mousePos);
+
     Logger::Info(ss.str());
 }
 

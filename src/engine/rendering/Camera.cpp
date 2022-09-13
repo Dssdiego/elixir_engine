@@ -3,6 +3,7 @@
 //
 
 #include "Camera.h"
+#include <iostream>
 
 void Camera::SetOrtographicProjection(float left, float right, float top, float bottom, float near, float far)
 {
@@ -89,4 +90,35 @@ void Camera::SetViewYXZ(glm::vec3 position, glm::vec3 rotation)
     viewMatrix[3][0] = -glm::dot(u, position);
     viewMatrix[3][1] = -glm::dot(v, position);
     viewMatrix[3][2] = -glm::dot(w, position);
+}
+
+glm::vec3 Camera::ScreenToWorldSpace(glm::vec2 screenCoordinates)
+{
+    auto viewProjection = viewMatrix * projectionMatrix;
+    auto inverse = glm::inverse(viewProjection);
+
+    auto windowSize = Window::GetSize();
+
+    auto x = Utils::MapToRange((float) screenCoordinates.x, 0.f, (float) windowSize.width, -1.f, 1.f);
+    auto y = Utils::MapToRange((float) screenCoordinates.y, 0.f, (float) windowSize.height, -1.f, 1.f);
+    auto z = 1.f; // FIXME: This should get the camera zFar
+
+    auto result = glm::vec4(x, y, z, 1.f);
+
+    auto pos = result * inverse;
+
+    // accounting for the camera's position
+
+    // FIXME: Not working for perspective projections, only for orthographic projections
+//    pos.w = 1.0f / pos.w;
+    pos.x += worldPosition.x;
+    pos.y += worldPosition.y;
+//    pos.z *= worldPosition.z;
+
+//    std::stringstream ss;
+    std::cout << "[Screen to World Space] X: " << result.x << " | Y: " << result.y << std::endl;
+    std::cout << "[Screen to World Space >> POS] X: " << pos.x << " | Y: " << pos.y << std::endl;
+//    Logger::Debug(ss.str());
+
+    return result;
 }
