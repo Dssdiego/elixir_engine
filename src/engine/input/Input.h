@@ -18,7 +18,7 @@
 // Keyboard
 //
 
-enum class Keys
+enum Keys
 {
     UNKNOWN = -1,
     SPACE = 32,
@@ -77,10 +77,10 @@ enum class Keys
     BACKSPACE = 259,
     INSERT = 260,
     DEL = 261, // delete
-    RIGHT = 262,
-    LEFT = 263,
-    DOWN = 264,
-    UP = 265,
+    ARROW_RIGHT = 262,
+    ARROW_LEFT = 263,
+    ARROW_DOWN = 264,
+    ARROW_UP = 265,
     PAGE_UP = 266,
     PAGE_DOWN = 267,
     HOME = 268,
@@ -180,10 +180,10 @@ enum JoystickState
 
 enum JoystickButton
 {
-    A = 0,
-    B = 1,
-    X = 2,
-    Y = 3,
+    B_A = 0,
+    B_B = 1,
+    B_X = 2,
+    B_Y = 3,
     LEFT_BUMPER = 4,
     RIGHT_BUMPER = 5,
     BACK = 6,
@@ -238,6 +238,8 @@ public:
     static void Shutdown();
 
     static bool IsJoystickButtonPressed(JoystickButton joyButton);
+    static bool IsKeyboardKeyPressed(Keys key);
+    static bool IsMouseButtonPressed(MouseButton mouseButton);
 
     // TODO: Implement
 //    static glm::vec2 GetMouseScreenPosition();
@@ -246,10 +248,13 @@ public:
     // REVIEW: GLFW supports the maximum of 16 joysticks (perhaps we define this in a enum?)
     inline static std::vector<uint32_t> joysticks = {};
 
+    inline static bool keyboardKeys[512]; // FIXME: Get this number dynamically
+    inline static bool mouseButtons[8]; // FIXME: Get this number dynamically
+
 private:
     static void SetupGLFWCallbacks();
 
-    inline static bool joystickButtons[15];
+    inline static bool joystickButtons[15]; // FIXME: Get this number dynamically
 
 //    std::vector<uint32_t> keys = {};
 };

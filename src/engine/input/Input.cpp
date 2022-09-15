@@ -14,7 +14,10 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     ss << "[Key callback] " << "KEY: " << key << " | SCANCODE: " << scancode << " | ACTION: " << action << " | MODS: " << mods;
     Logger::Info(ss.str());
 
-    // TODO: Track state to "know" when we pressed and then released the key
+    if (action == GLFW_PRESS || action == GLFW_RELEASE)
+        Input::keyboardKeys[key] = action;
+
+    // TODO: Get also GLFW_REPEAT
 
 //    if (key == GLFW_KEY_E && action == GLFW_PRESS)
 //        activate_airship();
@@ -25,8 +28,9 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     std::stringstream ss;
     ss << "[Mouse button callback]" << " | BUTTON: " << button << " | ACTION: " << action << " | MODS: " << mods;
     Logger::Info(ss.str());
-//    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-//        popup_menu();
+
+    if (action == GLFW_PRESS || action == GLFW_RELEASE)
+        Input::mouseButtons[button] = action;
 }
 
 void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
@@ -133,6 +137,7 @@ void Input::Update()
     /* NOTE: Temporary */
 
     // REVIEW: How would we manage this?
+    // Joystick
     if (glfwJoystickIsGamepad(GLFW_JOYSTICK_1))
     {
 //        std::cout << "is gamepad" << std::endl;
@@ -151,25 +156,21 @@ void Input::Update()
         }
     }
 
-    // TODO: (WIP) Get from Input system instead of directly from the GLFW framework ;)
-    if (glfwGetKey(Window::GetWindow(), GLFW_KEY_D))
-        if (Camera::HasControl())
-            Camera::MoveRight();
-
-    // TODO: (WIP) Get from Input system instead of directly from the GLFW framework ;)
-    if (glfwGetKey(Window::GetWindow(), GLFW_KEY_A))
-        if (Camera::HasControl())
-            Camera::MoveLeft();
-
-    // TODO: (WIP) Get from Input system instead of directly from the GLFW framework ;)
-    if (glfwGetKey(Window::GetWindow(), GLFW_KEY_W))
+    if (IsKeyboardKeyPressed(Keys::W))
         if (Camera::HasControl())
             Camera::MoveUp();
 
-    // TODO: (WIP) Get from Input system instead of directly from the GLFW framework ;)
-    if (glfwGetKey(Window::GetWindow(), GLFW_KEY_S))
+    if (IsKeyboardKeyPressed(Keys::A))
+        if (Camera::HasControl())
+            Camera::MoveLeft();
+
+    if (IsKeyboardKeyPressed(Keys::S))
         if (Camera::HasControl())
             Camera::MoveDown();
+
+    if (IsKeyboardKeyPressed(Keys::D))
+        if (Camera::HasControl())
+            Camera::MoveRight();
 
     /* NOTE: Temporary END */
 
@@ -206,4 +207,22 @@ void Input::SetupGLFWCallbacks()
 bool Input::IsJoystickButtonPressed(JoystickButton joyButton)
 {
     return joystickButtons[joyButton];
+}
+
+//
+// Keyboard
+//
+
+bool Input::IsKeyboardKeyPressed(Keys key)
+{
+    return keyboardKeys[key];
+}
+
+//
+// Mouse
+//
+
+bool Input::IsMouseButtonPressed(MouseButton mouseButton)
+{
+    return mouseButtons[mouseButton];
 }
