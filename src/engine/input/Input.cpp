@@ -57,35 +57,39 @@ void MousePositionCallback(GLFWwindow* window, double xpos, double ypos)
 
 void JoystickCallback(int jid, int event)
 {
-    std::stringstream ss;
-    GLFWgamepadstate state;
+//    std::stringstream ss;
+//    GLFWgamepadstate state;
 
-    ss << "Joystick event" << event;
-    Logger::Info(ss.str());
+//    int count;
+//    const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &count);
 
-    // checking for connection/disconnection
-    if (event == GLFW_CONNECTED)
-    {
-        // REVIEW: Do we need a joystick object or just its "id" is enough?
-//        auto joy = Joystick();
-//        joy.id = jid;
-        Input::joysticks.push_back(jid);
-
-        ss << "Joystick " << jid << " connected!";
-        Logger::Info(ss.str());
-    }
-    else if (event == GLFW_DISCONNECTED)
-    {
-        // REVIEW: This can probably be better implemented!
-        for (int i = 0; i < Input::joysticks.size(); ++i)
-        {
-            if (i == jid)
-                Input::joysticks.erase(Input::joysticks.begin() + i);
-        }
-
-        ss << "Joystick " << jid << " disconnected!";
-        Logger::Info(ss.str());
-    }
+//    ss << "Joystick event" << event;
+//    ss << "Joystick axes: " << axes << std::endl;
+//    Logger::Info(ss.str());
+//
+//    // checking for connection/disconnection
+//    if (event == GLFW_CONNECTED)
+//    {
+//        // REVIEW: Do we need a joystick object or just its "id" is enough?
+////        auto joy = Joystick();
+////        joy.id = jid;
+//        Input::joysticks.push_back(jid);
+//
+//        ss << "Joystick " << jid << " connected!" << std::endl;
+//        Logger::Info(ss.str());
+//    }
+//    else if (event == GLFW_DISCONNECTED)
+//    {
+//        // REVIEW: This can probably be better implemented!
+//        for (int i = 0; i < Input::joysticks.size(); ++i)
+//        {
+//            if (i == jid)
+//                Input::joysticks.erase(Input::joysticks.begin() + i);
+//        }
+//
+//        ss << "Joystick " << jid << " disconnected!" << std::endl;
+//        Logger::Info(ss.str());
+//    }
 
     // register the inputs of all connected joysticks
     // FIXME: Joystick buttons are not being registered!
@@ -127,6 +131,25 @@ void Input::Update()
     glfwPollEvents();
 
     /* NOTE: Temporary */
+
+    // REVIEW: How would we manage this?
+    if (glfwJoystickIsGamepad(GLFW_JOYSTICK_1))
+    {
+//        std::cout << "is gamepad" << std::endl;
+
+//        const char* name = glfwGetGamepadName(GLFW_JOYSTICK_1);
+//        std::cout << "joystick name " << name << std::endl;
+
+        GLFWgamepadstate state;
+
+        if (glfwGetGamepadState(GLFW_JOYSTICK_1, &state))
+        {
+            for (int i = 0; i < 15; ++i)
+            {
+                joystickButtons[i] = state.buttons[i];
+            }
+        }
+    }
 
     // TODO: (WIP) Get from Input system instead of directly from the GLFW framework ;)
     if (glfwGetKey(Window::GetWindow(), GLFW_KEY_D))
@@ -174,4 +197,13 @@ void Input::SetupGLFWCallbacks()
     glfwSetCursorPosCallback(Window::GetWindow(), MousePositionCallback);
 
     glfwSetJoystickCallback(JoystickCallback);
+}
+
+//
+// Joystick
+//
+
+bool Input::IsJoystickButtonPressed(JoystickButton joyButton)
+{
+    return joystickButtons[joyButton];
 }

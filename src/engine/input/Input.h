@@ -201,18 +201,17 @@ enum JoystickButton
     TRIANGLE = Y
 };
 
-// TODO: Implement
 enum JoystickAxis
 {
-
+    LEFT_X = 0,
+    LEFT_Y = 1,
+    RIGHT_X = 2,
+    RIGHT_Y = 3,
+    LEFT_TRIGGER = 4,
+    RIGHT_TRIGGER = 5
 };
 
-// TODO: Implement
-enum JoystickTrigger
-{
-
-};
-
+// NOTE: Unused for now
 struct Joystick
 {
     uint32_t id;
@@ -238,6 +237,8 @@ public:
     static void Update();
     static void Shutdown();
 
+    static bool IsJoystickButtonPressed(JoystickButton joyButton);
+
     // TODO: Implement
 //    static glm::vec2 GetMouseScreenPosition();
 
@@ -248,6 +249,7 @@ public:
 private:
     static void SetupGLFWCallbacks();
 
+    inline static bool joystickButtons[15];
 
 //    std::vector<uint32_t> keys = {};
 };
