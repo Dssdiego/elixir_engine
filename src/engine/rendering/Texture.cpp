@@ -12,7 +12,7 @@
 void Texture::Create(const std::string& imagePath)
 {
     CreateTextureImage(imagePath);
-    VulkanImage::CreateImageView(image, imageView, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
+    VulkanImage::CreateImageView(image, imageView, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT);
     CreateTextureSampler();
 }
 
@@ -59,19 +59,19 @@ void Texture::CreateTextureImage(const std::string &imagePath)
     stbi_image_free(pixels);
 
     // creating and uploading the image to the GPU
-    VulkanImage::CreateImage(width, height, VK_FORMAT_R8G8B8A8_SRGB,
+    VulkanImage::CreateImage(width, height, VK_FORMAT_R8G8B8A8_UNORM,
                 VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT |
                                          VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                 image, imageMemory);
 
-    VulkanImage::TransitionImageLayout(image, VK_FORMAT_R8G8B8A8_SRGB,
+    VulkanImage::TransitionImageLayout(image, VK_FORMAT_R8G8B8A8_UNORM,
                           VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
     VulkanImage::CopyBufferToImage(stagingBuffer.GetBuffer(), image,
                       static_cast<uint32_t>(width),
                       static_cast<uint32_t>(height));
 
-    VulkanImage::TransitionImageLayout(image, VK_FORMAT_R8G8B8A8_SRGB,
+    VulkanImage::TransitionImageLayout(image, VK_FORMAT_R8G8B8A8_UNORM,
                           VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                           VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
@@ -97,4 +97,15 @@ void Texture::CreateTextureSampler()
     samplerInfo.maxLod = 0.0f;
 
     VK_CHECK(vkCreateSampler(VulkanDevice::GetDevice(), &samplerInfo, nullptr, &sampler));
+
+    Logger::Debug("Created texture sampler");
+}
+
+VkDescriptorImageInfo Texture::DescriptorInfo()
+{
+    VkDescriptorImageInfo imageInfo{};
+    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    imageInfo.imageView = imageView;
+    imageInfo.sampler = sampler;
+    return imageInfo;
 }

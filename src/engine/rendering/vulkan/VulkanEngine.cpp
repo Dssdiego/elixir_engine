@@ -75,6 +75,8 @@ EngineRendererImpl::EngineRendererImpl()
 
     // REVIEW: Recreate swapchain on renderer init?
 
+    // global stuff
+    CreateTexture();
     CreateCommandBuffers();
     CreateUniformBuffers();
     CreateDescriptors();
@@ -100,6 +102,9 @@ EngineRendererImpl::~EngineRendererImpl()
     }
     FreeCommandBuffers();
 
+    texture->Destroy();
+    texture = nullptr;
+
     VulkanSwapchain::Shutdown();
     VulkanDevice::Shutdown();
 }
@@ -114,15 +119,22 @@ void EngineRendererImpl::CreateDescriptors()
 
     descriptorSetLayout = VulkanDescriptorSetLayout::Builder()
             .AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+            .AddBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
             .Build();
 
     descriptorSets.resize(VulkanSwapchain::GetNumberOfFramesInFlight());
 
     for (int i = 0; i < descriptorSets.size(); ++i)
     {
+        // uniform buffer
         auto bufferInfo = uniformBuffers[i]->DescriptorInfo();
+        auto samplerInfo = texture->DescriptorInfo();
+
+        // image sampler
+
         VulkanDescriptorWriter(*descriptorSetLayout, *descriptorPool) // unique_ptr, accessing contents
             .WriteBuffer(0, &bufferInfo)
+            .WriteImage(1, &samplerInfo)
             .Build(descriptorSets[i]);
     }
 
@@ -304,6 +316,12 @@ void EngineRendererImpl::UpdateUniformBuffer(UniformBufferObject &ubo)
 {
     uniformBuffers[currentFrameIndex]->WriteToBuffer(&ubo);
     // NOTE: we don't need to flush at a given index because of the "COHERENT_HOST_BIT" in the buffer flag
-    uniformBuffers[currentFrameIndex]->Flush();
+//    uniformBuffers[currentFrameIndex]->Flush();
 //    globalUboBuffer->FlushIndex(currentFrameIndex);
+}
+
+void EngineRendererImpl::CreateTexture()
+{
+    texture = std::make_unique<Texture>();
+    texture->Create("assets/textures/oh_yeah_homer.jpg");
 }

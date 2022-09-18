@@ -1,6 +1,6 @@
 #version 450
 
-layout(binding = 1) uniform sampler2D texSampler;
+layout(set = 0, binding = 1) uniform sampler2D texSampler;
 
 // inputs from vertex shader
 layout(location = 0) in vec2 uv;
@@ -16,6 +16,6 @@ layout(push_constant) uniform Push {
 
 // shader code
 void main() {
-    outColor = push.color;
-//    outColor = push.color * texture(texSampler, uv);
+//    outColor = vec4(uv, 0.f, 1.f);
+    outColor = push.color * texture(texSampler, uv);
 }

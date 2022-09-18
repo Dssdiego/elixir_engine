@@ -152,12 +152,14 @@ void VulkanPipelineImpl::CreatePipelineLayout(VkPipelineLayout &layout)
 
 void VulkanPipelineImpl::Bind()
 {
+    // bind pipeline
     vkCmdBindPipeline(
             VulkanEngine::GetCurrentCommandBuffer(),
             VK_PIPELINE_BIND_POINT_GRAPHICS,
             GetCurrent().pipeline
     );
 
+    // bind descriptor sets
     vkCmdBindDescriptorSets(
             VulkanEngine::GetCurrentCommandBuffer(),
             VK_PIPELINE_BIND_POINT_GRAPHICS,

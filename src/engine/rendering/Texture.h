@@ -16,6 +16,7 @@ class Texture
 {
 public:
     void Create(const std::string& imagePath);
+    VkDescriptorImageInfo DescriptorInfo();
     void Destroy();
 
 private:

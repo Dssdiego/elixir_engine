@@ -14,6 +14,7 @@
 #include "VulkanBuffer.h"
 #include "descriptors/VulkanDescriptorPool.h"
 #include "descriptors/VulkanDescriptorSetLayout.h"
+#include "../Texture.h"
 
 struct UniformBufferObject
 {
@@ -35,10 +36,13 @@ struct EngineRendererImpl
     int currentFrameIndex{0};
     bool frameHasStarted{false};
 
-    std::unique_ptr<VulkanDescriptorPool> descriptorPool;
-    std::unique_ptr<VulkanDescriptorSetLayout> descriptorSetLayout;
-    std::vector<std::unique_ptr<VulkanBuffer>> uniformBuffers;
-    std::vector<VkDescriptorSet> descriptorSets;
+    std::unique_ptr<VulkanDescriptorPool> descriptorPool; // global descriptor pool
+    std::unique_ptr<VulkanDescriptorSetLayout> descriptorSetLayout; // global descriptor set layout
+    std::vector<std::unique_ptr<VulkanBuffer>> uniformBuffers; // global uniform buffers
+    std::vector<VkDescriptorSet> descriptorSets; // global descriptor sets
+
+    // global texture
+    std::unique_ptr<Texture> texture;
 
     VkCommandBuffer GetCurrentCommandBuffer();
     int GetFrameIndex();
@@ -50,6 +54,8 @@ struct EngineRendererImpl
     void FreeCommandBuffers();
 
     void CreateDescriptors();
+
+    void CreateTexture();
 
     VkCommandBuffer BeginFrame();
     void BeginSwapChainRenderPass();

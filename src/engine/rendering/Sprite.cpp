@@ -22,10 +22,10 @@ Sprite::Sprite()
     color[2] = 1.0f;
     color[3] = 1.0f;
 
-    texture.Create("assets/textures/statue.jpg");
+//    texture.Create("assets/textures/statue.jpg");
 }
 
 Sprite::~Sprite()
 {
-    texture.Destroy();
+//    texture.Destroy();
 }

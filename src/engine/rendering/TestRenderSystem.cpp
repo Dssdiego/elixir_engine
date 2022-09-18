@@ -122,14 +122,13 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     gameObjects.push_back(triangle);
     gameObjects.push_back(quad);
 
-
-
     // Setting camera properties
     // using ortographic projection (updating every frame so it matches the window width and height)
     float aspect = VulkanSwapchain::GetAspectRatio();
-//    Camera::SetPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10.f);
-    Camera::SetOrtographicProjection(-aspect, aspect, -1, 1, -1, 1);
-    Camera::SetWorldPosition(glm::vec3(0.f));
+    Camera::SetPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10.f);
+//    Camera::SetOrtographicProjection(-aspect, aspect, -1, 1, -1, 1);
+//    Camera::SetWorldPosition(glm::vec3(0.f, 0.f, -2.f));
+//    Camera::SetWorldDirection(glm::vec3(0.f, 0.f, 1.f));
     Camera::SetViewDirection(Camera::GetWorldPosition(), Camera::GetWorldDirection()); // camera at "origin", pointing "forward" at the Z axis
 }
 

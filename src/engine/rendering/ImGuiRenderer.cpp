@@ -86,7 +86,7 @@ void ImGuiRenderer::Draw()
     ImGui::Begin("Camera");
     ImGui::Checkbox("Control Camera?", &Camera::takeControl);
 
-    static float position[3] = {0.f, 0.f, 0.f};
+    static float position[3] = {0.f, 0.f, -2.f};
     ImGui::InputFloat3("position", position);
     if (!Camera::HasControl())
         Camera::SetWorldPosition(glm::vec3(position[0], position[1], position[2]));
