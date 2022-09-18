@@ -12,7 +12,7 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 {
     std::stringstream ss;
     ss << "[Key callback] " << "KEY: " << key << " | SCANCODE: " << scancode << " | ACTION: " << action << " | MODS: " << mods;
-    Logger::Info(ss.str());
+//    Logger::Info(ss.str());
 
     if (action == GLFW_PRESS || action == GLFW_RELEASE)
         Input::keyboardKeys[key] = action;
@@ -27,7 +27,7 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
     std::stringstream ss;
     ss << "[Mouse button callback]" << " | BUTTON: " << button << " | ACTION: " << action << " | MODS: " << mods;
-    Logger::Info(ss.str());
+//    Logger::Info(ss.str());
 
     if (action == GLFW_PRESS || action == GLFW_RELEASE)
         Input::mouseButtons[button] = action;
@@ -37,7 +37,7 @@ void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
     std::stringstream ss;
     ss << "[Mouse scroll callback]" << " | OFFSET (X): " << xoffset << " | OFFSET (Y): " << yoffset;
-    Logger::Info(ss.str());
+//    Logger::Info(ss.str());
 
     /* NOTE: Temporary */
     if (yoffset == 1)
@@ -56,7 +56,7 @@ void MousePositionCallback(GLFWwindow* window, double xpos, double ypos)
     glm::vec2 mousePos = glm::vec2(xpos, ypos);
     Camera::ScreenToWorldSpace(mousePos);
 
-    Logger::Info(ss.str());
+//    Logger::Info(ss.str());
 }
 
 void JoystickCallback(int jid, int event)

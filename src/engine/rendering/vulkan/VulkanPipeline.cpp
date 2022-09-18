@@ -135,7 +135,22 @@ void VulkanPipelineImpl::CreatePipelineLayout(VkPipelineLayout &layout)
 
 void VulkanPipelineImpl::Bind()
 {
-    vkCmdBindPipeline(VulkanEngine::GetCurrentCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, GetCurrent().pipeline);
+    vkCmdBindPipeline(
+            VulkanEngine::GetCurrentCommandBuffer(),
+            VK_PIPELINE_BIND_POINT_GRAPHICS,
+            GetCurrent().pipeline
+    );
+
+    vkCmdBindDescriptorSets(
+            VulkanEngine::GetCurrentCommandBuffer(),
+            VK_PIPELINE_BIND_POINT_GRAPHICS,
+            GetCurrent().layout,
+            0,
+            1,
+            &VulkanEngine::GetDescriptorSets()[VulkanEngine::GetFrameIndex()], // REVIEW: My code is possibly wrong here!
+            0,
+            nullptr
+            );
 }
 
 PipelineSet VulkanPipelineImpl::GetCurrent()

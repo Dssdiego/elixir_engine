@@ -18,9 +18,10 @@
 struct UniformBufferObject
 {
 //    glm::mat4 projectView{1.f};
-    alignas(16) glm::mat4 model;
-    alignas(16) glm::mat4 view;
-    alignas(16) glm::mat4 projection;
+    alignas(16) glm::mat4 mvp;
+//    alignas(16) glm::mat4 model;
+//    alignas(16) glm::mat4 view;
+//    alignas(16) glm::mat4 projection;
 };
 
 struct EngineRendererImpl
@@ -37,12 +38,13 @@ struct EngineRendererImpl
     std::unique_ptr<VulkanDescriptorPool> descriptorPool;
     std::unique_ptr<VulkanDescriptorSetLayout> descriptorSetLayout;
     std::vector<std::unique_ptr<VulkanBuffer>> uniformBuffers;
+    std::vector<VkDescriptorSet> descriptorSets;
 
     VkCommandBuffer GetCurrentCommandBuffer();
     int GetFrameIndex();
 
     void CreateUniformBuffers();
-    void UpdateUniformBuffer(UniformBufferObject *ubo);
+    void UpdateUniformBuffer(UniformBufferObject &ubo);
 
     void CreateCommandBuffers();
     void FreeCommandBuffers();
@@ -62,13 +64,14 @@ public:
     static void Shutdown();
 
     static VkDescriptorSetLayout GetDescriptorSetLayout();
+    static std::vector<VkDescriptorSet> GetDescriptorSets();
 
     static VkCommandBuffer GetCurrentCommandBuffer();
     static int GetFrameIndex();
     static VkCommandBuffer BeginFrame();
     static void EndFrame();
 
-    static void UpdateUniformBuffer(UniformBufferObject *ubo);
+    static void UpdateUniformBuffer(UniformBufferObject &ubo);
 };
 
 

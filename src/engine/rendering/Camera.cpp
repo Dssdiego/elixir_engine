@@ -116,8 +116,8 @@ glm::vec3 Camera::ScreenToWorldSpace(glm::vec2 screenCoordinates)
 //    pos.z *= worldPosition.z;
 
 //    std::stringstream ss;
-    std::cout << "[Screen to World Space] X: " << result.x << " | Y: " << result.y << std::endl;
-    std::cout << "[Screen to World Space >> POS] X: " << pos.x << " | Y: " << pos.y << std::endl;
+//    std::cout << "[Screen to World Space] X: " << result.x << " | Y: " << result.y << std::endl;
+//    std::cout << "[Screen to World Space >> POS] X: " << pos.x << " | Y: " << pos.y << std::endl;
 //    Logger::Debug(ss.str());
 
     return result;

@@ -47,7 +47,7 @@ int VulkanEngine::GetFrameIndex()
     return mEngineRendererImpl->GetFrameIndex();
 }
 
-void VulkanEngine::UpdateUniformBuffer(UniformBufferObject *ubo)
+void VulkanEngine::UpdateUniformBuffer(UniformBufferObject &ubo)
 {
     mEngineRendererImpl->UpdateUniformBuffer(ubo);
 }
@@ -55,6 +55,11 @@ void VulkanEngine::UpdateUniformBuffer(UniformBufferObject *ubo)
 VkDescriptorSetLayout VulkanEngine::GetDescriptorSetLayout()
 {
     return mEngineRendererImpl->descriptorSetLayout->GetDescriptorSetLayout();
+}
+
+std::vector<VkDescriptorSet> VulkanEngine::GetDescriptorSets()
+{
+    return mEngineRendererImpl->descriptorSets;
 }
 
 //
@@ -111,7 +116,8 @@ void EngineRendererImpl::CreateDescriptors()
             .AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
             .Build();
 
-    std::vector<VkDescriptorSet> descriptorSets(VulkanSwapchain::GetNumberOfFramesInFlight());
+    descriptorSets.resize(VulkanSwapchain::GetNumberOfFramesInFlight());
+
     for (int i = 0; i < descriptorSets.size(); ++i)
     {
         auto bufferInfo = uniformBuffers[i]->DescriptorInfo();
@@ -294,12 +300,10 @@ void EngineRendererImpl::EndFrame()
     currentFrameIndex = (currentFrameIndex + 1) % VulkanSwapchain::GetNumberOfFramesInFlight();
 }
 
-void EngineRendererImpl::UpdateUniformBuffer(UniformBufferObject *ubo)
+void EngineRendererImpl::UpdateUniformBuffer(UniformBufferObject &ubo)
 {
-    uniformBuffers[currentFrameIndex]->WriteToIndex(ubo, currentFrameIndex);
+    uniformBuffers[currentFrameIndex]->WriteToBuffer(&ubo);
     // NOTE: we don't need to flush at a given index because of the "COHERENT_HOST_BIT" in the buffer flag
-//    uniformBuffers[currentFrameIndex]->Flush();
+    uniformBuffers[currentFrameIndex]->Flush();
 //    globalUboBuffer->FlushIndex(currentFrameIndex);
 }
-
-

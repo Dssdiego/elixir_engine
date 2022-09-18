@@ -129,10 +129,8 @@ void TestRenderSystemImpl::RenderGameObjects()
 {
     // update uniform buffer with new data
     UniformBufferObject ubo{};
-    ubo.model = glm::mat4(1.f);
-    ubo.view = Camera::GetView();
-    ubo.projection = Camera::GetProjection();
-    VulkanEngine::UpdateUniformBuffer(&ubo);
+    ubo.mvp = (Camera::GetProjection() * Camera::GetView()) * glm::mat4(1.f);
+    VulkanEngine::UpdateUniformBuffer(ubo);
 
     // render objects
     for (auto &obj : gameObjects)
@@ -147,12 +145,9 @@ void TestRenderSystemImpl::RenderGameObjects()
 
         VulkanPipeline::Bind();
 
-        // FIXME: We should be passing the "MVP" matrices inside the shader (not at a CPU "level")
-        auto projectionView = Camera::GetProjection() * Camera::GetView();
-
         PushConstantData push{};
         push.color = glm::vec4(obj.color[0], obj.color[1], obj.color[2], obj.color[3]);
-        push.transform = projectionView * obj.transform.mat4();
+        push.transform = obj.transform.mat4();
 
         vkCmdPushConstants(
                 commandBuffer,
