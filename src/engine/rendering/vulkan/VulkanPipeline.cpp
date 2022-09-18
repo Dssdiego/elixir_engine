@@ -73,6 +73,7 @@ VulkanPipelineImpl::~VulkanPipelineImpl()
 
 void VulkanPipelineImpl::CreatePipelineSets()
 {
+    // Shape
     PipelineSet shapePipelineSet
     {
             "shape",
@@ -87,6 +88,7 @@ void VulkanPipelineImpl::CreatePipelineSets()
 
     pipelineSets.push_back(shapePipelineSet);
 
+    // Sprite
     PipelineSet spritePipelineSet
     {
             "sprite",
@@ -99,6 +101,21 @@ void VulkanPipelineImpl::CreatePipelineSets()
             VK_TRUE
     };
     pipelineSets.push_back(spritePipelineSet);
+
+    // UI
+    PipelineSet uiPipelineSet
+            {
+                    "ui",
+                    "assets/shaders/ui.vert.spv",
+                    "assets/shaders/ui.frag.spv",
+                    uiPipeline,
+                    uiPipelineLayout,
+                    VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+                    VK_POLYGON_MODE_FILL,
+                    VK_TRUE
+            };
+
+    pipelineSets.push_back(uiPipelineSet);
 
     for (auto &pipelineSet : pipelineSets)
     {

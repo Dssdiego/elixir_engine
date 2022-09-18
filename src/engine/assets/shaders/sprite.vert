@@ -8,6 +8,11 @@ layout(location = 2) in vec2 v_uv;
 // send to fragment shader
 layout(location = 0) out vec2 uv;
 
+// uniform buffer
+layout(set = 0, binding = 0) uniform UniformBufferObject {
+    mat4 mvp;
+} ubo;
+
 // push constants
 layout(push_constant) uniform Push {
     mat4 transform;
@@ -16,5 +21,5 @@ layout(push_constant) uniform Push {
 
 // shader code
 void main() {
-    gl_Position = push.transform * vec4(v_position, 1.0f);
+    gl_Position = ubo.mvp * push.transform * vec4(v_position, 1.0f);
 }

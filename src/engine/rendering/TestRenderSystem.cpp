@@ -101,10 +101,28 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     sprite.name = "A simple sprite";
     sprite.pipeline = "sprite";
 
+    auto uiSprite = Sprite();
+    uiSprite.id = 4;
+    uiSprite.name = "A simple ui sprite";
+    uiSprite.pipeline = "ui";
+    uiSprite.transform.position[0] = 0.f;
+    uiSprite.transform.position[1] = -0.94f;
+    uiSprite.transform.position[2] = 0.f;
+    uiSprite.transform.scale[0] = 2.f;
+    uiSprite.transform.scale[1] = 0.12f;
+    uiSprite.transform.scale[2] = 0.f;
+    uiSprite.color[0] = 0.f;
+    uiSprite.color[1] = 1.f;
+    uiSprite.color[2] = 0.f;
+    uiSprite.color[3] = 1.f;
+
+    gameObjects.push_back(uiSprite);
     gameObjects.push_back(sprite);
 //    gameObjects.push_back(circle);
     gameObjects.push_back(triangle);
     gameObjects.push_back(quad);
+
+
 
     // Setting camera properties
     // using ortographic projection (updating every frame so it matches the window width and height)
@@ -142,6 +160,9 @@ void TestRenderSystemImpl::RenderGameObjects()
 
         if (obj.pipeline == "sprite")
             VulkanPipeline::SwitchToPipeline(1);
+
+        if (obj.pipeline == "ui")
+            VulkanPipeline::SwitchToPipeline(2);
 
         VulkanPipeline::Bind();
 

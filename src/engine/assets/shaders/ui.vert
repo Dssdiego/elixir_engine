@@ -21,5 +21,5 @@ layout(push_constant) uniform Push {
 
 // shader code
 void main() {
-    gl_Position = ubo.mvp * push.transform * vec4(v_position, 1.0f);
+    gl_Position = push.transform * vec4(v_position, 1.0f);
 }
