@@ -127,7 +127,7 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     float aspect = VulkanSwapchain::GetAspectRatio();
     Camera::SetPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10.f);
 //    Camera::SetOrtographicProjection(-aspect, aspect, -1, 1, -1, 1);
-//    Camera::SetWorldPosition(glm::vec3(0.f, 0.f, -2.f));
+    Camera::SetWorldPosition(glm::vec3(0.f, 0.f, -2.f));
 //    Camera::SetWorldDirection(glm::vec3(0.f, 0.f, 1.f));
     Camera::SetViewDirection(Camera::GetWorldPosition(), Camera::GetWorldDirection()); // camera at "origin", pointing "forward" at the Z axis
 }
@@ -149,11 +149,11 @@ void TestRenderSystemImpl::RenderGameObjects()
     ubo.mvp = (Camera::GetProjection() * Camera::GetView()) * glm::mat4(1.f);
     VulkanEngine::UpdateUniformBuffer(ubo);
 
+    auto commandBuffer = VulkanEngine::GetCurrentCommandBuffer();
+
     // render objects
     for (auto &obj : gameObjects)
     {
-        auto commandBuffer = VulkanEngine::GetCurrentCommandBuffer();
-
         if (obj.pipeline == "shape")
             VulkanPipeline::SwitchToPipeline(0);
 
