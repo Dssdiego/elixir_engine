@@ -116,13 +116,6 @@ std::vector<const char *> Window::GetRequiredExtensions()
     return extensions;
 }
 
-void Window::UpdateFPSInTitle(double fps, uint32_t frameNumber)
-{
-    std::stringstream ss;
-    ss << mWindowImpl->title << " | FPS: " << fps << " | Frame: " << frameNumber;
-    glfwSetWindowTitle(mWindowImpl->window, ss.str().c_str());
-}
-
 double Window::GetTime()
 {
     return glfwGetTime();

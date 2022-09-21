@@ -29,8 +29,6 @@ void Game::Init(EngineConfig* pConfig)
 
 void Game::Run()
 {
-    Window::UpdateFPSInTitle(0.0f, 0);
-
     while(!Window::ShouldCloseWindow())
     {
         // REVIEW: Probably won't need this because the renderer now has BeginFrame() and EndFrame() which could give us the FPS information
@@ -43,10 +41,10 @@ void Game::Run()
         Time::SetDelta(delta);
 
         // FPS calculation
-        if (delta >= 2.0f) // we update the fps info every two seconds
+        if (delta >= 0.5f) // we update the fps info every two seconds
         {
             int fps = int(frameCount / delta);
-            Window::UpdateFPSInTitle(fps, frames);
+            Window::SetFrameInfo(fps, frames);
 
             frameCount = 0;
             previousTime = currentTime;

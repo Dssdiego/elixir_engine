@@ -38,13 +38,19 @@ public:
     static bool ShouldCloseWindow();
     static WindowSize GetSize();
     static GLFWwindow* GetWindow();
-    static void UpdateFPSInTitle(double fps, uint32_t frameNumber);
     static double GetTime();
     static void Close();
+
+    inline static void SetFrameInfo(double _fps, uint32_t _frameNumber) { fps = _fps; frameNumber = _frameNumber; }
+    inline static double GetFPS() { return fps; }
+    inline static uint32_t GetFrameNumber() { return frameNumber; }
 
 private:
     void LoadCursor();
     void Resize();
+
+    inline static double fps = 0.f;
+    inline static uint32_t frameNumber = 0;
 
 };
 

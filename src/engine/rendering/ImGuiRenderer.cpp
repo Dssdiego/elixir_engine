@@ -103,6 +103,12 @@ void ImGuiRenderer::DrawMainMenuBar()
             ImGui::EndMenu();
         }
 
+        std::stringstream ss;
+        ss << "FPS: " << Window::GetFPS() << " | Frame: " << Window::GetFrameNumber() << std::endl;
+
+        ImGui::SetCursorPosX(ImGui::GetWindowWidth() * 0.8f);
+        ImGui::Text("%s", ss.str().c_str());
+
 //        if (ImGui::BeginMenu("Edit"))
 //        {
 //            if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
