@@ -35,6 +35,15 @@ public:
 
 private:
     static void Draw(); // here comes all the things we want to draw with ImGui
+
+    static void DrawMainMenuBar();
+    static void DrawGameWindow();
+    static void DrawObjectInspectorWindow();
+    static void DrawCameraWindow();
+
+    // control variables
+    inline static bool showCameraWindow = false;
+    inline static bool showInspectorWindow = false;
 };
 
 #endif //VULKAN_ENGINE_IMGUIRENDERER_H

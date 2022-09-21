@@ -98,12 +98,12 @@ TestRenderSystemImpl::TestRenderSystemImpl()
 
     auto sprite = Sprite();
     sprite.id = 3;
-    sprite.name = "A simple sprite";
+    sprite.name = "Homer oh yeah";
     sprite.pipeline = "sprite";
 
     auto uiSprite = Sprite();
     uiSprite.id = 4;
-    uiSprite.name = "A simple ui sprite";
+    uiSprite.name = "Green hud";
     uiSprite.pipeline = "ui";
     uiSprite.transform.position[0] = 0.f;
     uiSprite.transform.position[1] = -0.94f;

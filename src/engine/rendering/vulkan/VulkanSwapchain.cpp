@@ -310,12 +310,10 @@ void VulkanSwapChainImpl::CreateDepthResources()
 
 void VulkanSwapChainImpl::CreateFrameBuffers()
 {
-    // resizing the container to hold all of the framebuffers
-    // REVIEW: Use swapchain image count here?
+    // resizing the container to hold all the framebuffers
     swapChainFrameBuffers.resize(swapChainImageViews.size());
 
     // iterate through the image views and create framebuffers from them
-    // REVIEW: Use swapchain image count here?
     for (size_t i = 0; i < swapChainImageViews.size(); i++)
     {
         std::array<VkImageView, 2> attachments = {

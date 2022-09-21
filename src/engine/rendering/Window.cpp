@@ -127,3 +127,11 @@ double Window::GetTime()
 {
     return glfwGetTime();
 }
+
+// This method tells GLFW that we want to close the window.
+// Because all the engine systems are tied to the window "loop", when closing the window all the engine
+//      systems also close automatically :)
+void Window::Close()
+{
+    glfwSetWindowShouldClose(mWindowImpl->window, true);
+}

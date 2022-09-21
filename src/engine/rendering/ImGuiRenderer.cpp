@@ -59,40 +59,97 @@ void ImGuiRenderer::Draw()
 //    bool show_demo = true;
 //    ImGui::ShowDemoWindow(&show_demo);
 
-    // Game object inspector
-    ImGui::Begin("Inspector");
-    if (ImGui::TreeNode("GameObjects"))
+    DrawMainMenuBar();
+
+    if (showInspectorWindow)
+        DrawObjectInspectorWindow();
+
+    if (showCameraWindow)
+        DrawCameraWindow();
+}
+
+//
+// Draw Methods
+//
+void ImGuiRenderer::DrawMainMenuBar()
+{
+    if (ImGui::BeginMainMenuBar())
     {
-        for (auto& obj : *TestRenderSystem::GetGameObjects())
+        // Engine
+        if (ImGui::BeginMenu("Engine"))
         {
-            if (ImGui::TreeNode((void*)(intptr_t) obj.id, "[%d] %s", obj.id, obj.name.c_str()))
-            {
-                ImGui::Text("Pipeline: %s", obj.pipeline.c_str());
-                ImGui::InputFloat3("position", obj.transform.position);
-                ImGui::InputFloat("rotation", &obj.transform.rotation, 0.1f, 1.0f, "%.3f");
-                ImGui::InputFloat3("scale", obj.transform.scale);
-                ImGui::ColorEdit4("color", obj.color);
+            // Engine >> Exit
+            if (ImGui::MenuItem("Exit", "CTRL+Q")) { Window::Close(); }
 
-                ImGui::TreePop();
-            }
+            ImGui::EndMenu();
         }
-        ImGui::TreePop();
+
+        // Game
+        if (ImGui::BeginMenu("Game"))
+        {
+            // Game >> Inspector
+            if (ImGui::MenuItem("Game Object Inspector", nullptr, &showInspectorWindow)) {}
+//            ImGui::EndMenu();
+
+            // Game >> Camera
+            if (ImGui::MenuItem("Camera", nullptr, &showCameraWindow)) {}
+
+            ImGui::EndMenu();
+        }
+
+//        if (ImGui::BeginMenu("Edit"))
+//        {
+//            if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+//            if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+//            ImGui::Separator();
+//            if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+//            if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+//            if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+//            ImGui::EndMenu();
+//        }
+        ImGui::EndMainMenuBar();
     }
+}
 
-    ImGui::End();
-    // Game object inspector END
+void ImGuiRenderer::DrawObjectInspectorWindow()
+{
+    if (ImGui::Begin("Inspector", &showInspectorWindow))
+    {
+        if (ImGui::TreeNode("GameObjects"))
+        {
+            for (auto &obj: *TestRenderSystem::GetGameObjects())
+            {
+                if (ImGui::TreeNode((void *) (intptr_t) obj.id, "[%d] %s", obj.id, obj.name.c_str()))
+                {
+                    ImGui::Text("Pipeline: %s", obj.pipeline.c_str());
+                    ImGui::InputFloat3("position", obj.transform.position);
+                    ImGui::InputFloat("rotation", &obj.transform.rotation, 0.1f, 1.0f, "%.3f");
+                    ImGui::InputFloat3("scale", obj.transform.scale);
+                    ImGui::ColorEdit4("color", obj.color);
 
-    // Camera inspector
-    ImGui::Begin("Camera");
-    ImGui::Checkbox("Control Camera?", &Camera::takeControl);
+                    ImGui::TreePop();
+                }
+            }
+            ImGui::TreePop();
+        }
 
-    static float position[3] = {0.f, 0.f, -2.f};
-    ImGui::InputFloat3("position", position);
-    if (!Camera::HasControl())
-        Camera::SetWorldPosition(glm::vec3(position[0], position[1], position[2]));
+        ImGui::End();
+    }
+}
 
-    ImGui::End();
-    // Camera inspector END
+void ImGuiRenderer::DrawCameraWindow()
+{
+    if (ImGui::Begin("Camera", &showCameraWindow))
+    {
+        ImGui::Checkbox("Control Camera?", &Camera::takeControl);
+
+        static float position[3] = {0.f, 0.f, -2.f};
+        ImGui::InputFloat3("position", position);
+        if (!Camera::HasControl())
+            Camera::SetWorldPosition(glm::vec3(position[0], position[1], position[2]));
+
+        ImGui::End();
+    }
 }
 
 void ImGuiRenderer::Render()

@@ -40,6 +40,7 @@ public:
     static GLFWwindow* GetWindow();
     static void UpdateFPSInTitle(double fps, uint32_t frameNumber);
     static double GetTime();
+    static void Close();
 
 private:
     void LoadCursor();
