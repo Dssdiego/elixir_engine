@@ -40,10 +40,10 @@ void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 //    Logger::Info(ss.str());
 
     /* NOTE: Temporary */
-    if (yoffset == 1)
+    if (yoffset == 1 && Camera::HasControl())
         Camera::ZoomIn();
 
-    if (yoffset == -1)
+    if (yoffset == -1 && Camera::HasControl())
         Camera::ZoomOut();
 }
 
