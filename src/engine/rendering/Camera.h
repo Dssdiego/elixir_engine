@@ -29,6 +29,8 @@ public:
     inline static void SetWorldPosition(glm::vec3 position) { worldPosition = position; UpdateCameraPosition(); }
     inline static void UpdateCameraPosition() { SetViewDirection(worldPosition, worldDirection); }
 
+    inline static void ResetWorldPosition() { SetWorldPosition(glm::vec3(0.f, 0.f, -2.f)); };
+
     inline static glm::vec3 GetWorldDirection() { return worldDirection; }
     inline static void SetWorldDirection(glm::vec3 direction) { worldDirection = direction; }
 

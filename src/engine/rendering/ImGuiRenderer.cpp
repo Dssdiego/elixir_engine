@@ -56,8 +56,8 @@ void ImGuiRenderer::NewFrame()
 
 void ImGuiRenderer::Draw()
 {
-//    bool show_demo = true;
-//    ImGui::ShowDemoWindow(&show_demo);
+    bool show_demo = true;
+    ImGui::ShowDemoWindow(&show_demo);
 
     DrawMainMenuBar();
 
@@ -146,6 +146,9 @@ void ImGuiRenderer::DrawCameraWindow()
         ImGui::InputFloat3("position", (float *) Camera::GetWorldPositionRef());
         if (!Camera::HasControl())
             Camera::SetWorldPosition(Camera::GetWorldPosition());
+
+        if (ImGui::Button("Reset"))
+            Camera::ResetWorldPosition();
 
         ImGui::End();
     }
