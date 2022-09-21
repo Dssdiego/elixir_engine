@@ -56,8 +56,8 @@ void ImGuiRenderer::NewFrame()
 
 void ImGuiRenderer::Draw()
 {
-    bool show_demo = true;
-    ImGui::ShowDemoWindow(&show_demo);
+//    bool show_demo = true;
+//    ImGui::ShowDemoWindow(&show_demo);
 
     DrawMainMenuBar();
 
