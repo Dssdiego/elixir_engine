@@ -29,3 +29,8 @@ VkClearColorValue Color::GetAsVulkanClear(Color color)
     result.float32[3] = color.a;
     return result;
 }
+
+glm::vec4 Color::ToVec4(Color color)
+{
+    return glm::vec4(color.r,color.g,color.b,color.a);
+}

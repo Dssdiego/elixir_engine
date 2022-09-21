@@ -16,7 +16,7 @@
 struct Transform2D {
     glm::vec3 position{0.f, 0.f, 0.f};
     glm::vec3 scale{1.f, 1.f, 1.f};
-    float rotation; // NOTE: Degrees
+    float rotation = 0.f; // NOTE: Degrees
 
     glm::mat4 mat4()
     {
@@ -35,9 +35,8 @@ public:
 
     std::string pipeline = "";
     Transform2D transform{};
-    Shape shape{ShapeType::Triangle}; // TODO: Change this so that we can pass any shape we want ;)
-    float color[4]{};
-//    glm::vec3 color{};
+    Shape shape{ShapeType::Quad}; // TODO: Change this so that we can pass any shape we want ;)
+    Color color = Color::White;
 
 //    uint32_t GetId() { return id; }
 

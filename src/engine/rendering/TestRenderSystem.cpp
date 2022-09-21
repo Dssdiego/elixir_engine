@@ -46,10 +46,7 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     auto triangle = GameObject::Create();
     triangle.id = 0;
     triangle.name = "Triangle";
-    triangle.color[0] = 1.f;
-    triangle.color[1] = 0.f;
-    triangle.color[2] = 0.f;
-    triangle.color[3] = 1.f;
+    triangle.color = Color::Red;
     triangle.shape = Shape(ShapeType::Triangle);
     triangle.transform.position = { 0.f, 0.f, 0.f };
     triangle.transform.scale = { 1.f, 1.f, 1.f };
@@ -61,10 +58,7 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     auto quad = GameObject::Create();
     quad.id = 1;
     quad.name = "Quad";
-    quad.color[0] = 1.f;
-    quad.color[1] = 1.f;
-    quad.color[2] = 0.f;
-    quad.color[3] = 1.f;
+    quad.color = Color::Yellow;
     quad.shape = Shape(ShapeType::Quad);
     quad.transform.position = { 0.35f, -0.2f, 0.f };
     quad.transform.rotation = 0.f;
@@ -92,6 +86,8 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     sprite.id = 3;
     sprite.name = "Homer oh yeah";
     sprite.pipeline = "sprite";
+    sprite.transform.position = { -0.5f, -0.5f, 0.f };
+    sprite.transform.scale = { 0.5f, 0.5f, 0.f };
 
     auto uiSprite = Sprite();
     uiSprite.id = 4;
@@ -99,10 +95,7 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     uiSprite.pipeline = "ui";
     uiSprite.transform.position = { 0.f, -0.94f, 0.f };
     uiSprite.transform.scale = { 2.f, 0.12f, 0.f};
-    uiSprite.color[0] = 0.f;
-    uiSprite.color[1] = 1.f;
-    uiSprite.color[2] = 0.f;
-    uiSprite.color[3] = 1.f;
+    uiSprite.color = Color::Green;
 
     gameObjects.push_back(uiSprite);
     gameObjects.push_back(sprite);
@@ -154,7 +147,7 @@ void TestRenderSystemImpl::RenderGameObjects()
         VulkanPipeline::Bind();
 
         PushConstantData push{};
-        push.color = glm::vec4(obj.color[0], obj.color[1], obj.color[2], obj.color[3]);
+        push.color = Color::ToVec4(obj.color); // REVIEW: Make this better
         push.transform = obj.transform.mat4();
 
         vkCmdPushConstants(

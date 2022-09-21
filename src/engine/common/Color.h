@@ -6,6 +6,7 @@
 #define VULKAN_ENGINE_COLOR_H
 
 #include <cstdint>
+#include <glm/vec4.hpp>
 //#include <string>
 
 class Color
@@ -17,6 +18,7 @@ public:
 
     // Helpers
     static VkClearColorValue GetAsVulkanClear(Color color);
+    static glm::vec4 ToVec4(Color color);
 
     // Definitions
     static const Color Transparent;
