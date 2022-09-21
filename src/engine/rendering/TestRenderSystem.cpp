@@ -51,13 +51,9 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     triangle.color[2] = 0.f;
     triangle.color[3] = 1.f;
     triangle.shape = Shape(ShapeType::Triangle);
-    triangle.transform.position[0] = 0.f;
-    triangle.transform.position[1] = 0.f;
-    triangle.transform.position[2] = 0.f;
+    triangle.transform.position = { 0.f, 0.f, 0.f };
+    triangle.transform.scale = { 1.f, 1.f, 1.f };
     triangle.transform.rotation = 0.0f;
-    triangle.transform.scale[0] = 1.0f;
-    triangle.transform.scale[1] = 1.0f;
-    triangle.transform.scale[2] = 1.0f;
     triangle.pipeline = "shape";
     // FIXME: Make sure we can use glm::vec2 and glm::vec3 with ImGui without converting the original field type!
 
@@ -70,13 +66,9 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     quad.color[2] = 0.f;
     quad.color[3] = 1.f;
     quad.shape = Shape(ShapeType::Quad);
-    quad.transform.position[0] = 0.35f;
-    quad.transform.position[1] = -0.2f;
-    quad.transform.position[2] = 0.f;
+    quad.transform.position = { 0.35f, -0.2f, 0.f };
     quad.transform.rotation = 0.f;
-    quad.transform.scale[0] = 0.8f;
-    quad.transform.scale[1] = 0.8f;
-    quad.transform.scale[2] = 0.8f;
+    quad.transform.scale = { 0.8f, 0.8f, 0.8f};
     quad.pipeline = "shape";
 
     // load circle test game object
@@ -105,12 +97,8 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     uiSprite.id = 4;
     uiSprite.name = "Green hud";
     uiSprite.pipeline = "ui";
-    uiSprite.transform.position[0] = 0.f;
-    uiSprite.transform.position[1] = -0.94f;
-    uiSprite.transform.position[2] = 0.f;
-    uiSprite.transform.scale[0] = 2.f;
-    uiSprite.transform.scale[1] = 0.12f;
-    uiSprite.transform.scale[2] = 0.f;
+    uiSprite.transform.position = { 0.f, -0.94f, 0.f };
+    uiSprite.transform.scale = { 2.f, 0.12f, 0.f};
     uiSprite.color[0] = 0.f;
     uiSprite.color[1] = 1.f;
     uiSprite.color[2] = 0.f;

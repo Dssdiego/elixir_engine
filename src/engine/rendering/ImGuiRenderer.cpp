@@ -122,9 +122,9 @@ void ImGuiRenderer::DrawObjectInspectorWindow()
                 if (ImGui::TreeNode((void *) (intptr_t) obj.id, "[%d] %s", obj.id, obj.name.c_str()))
                 {
                     ImGui::Text("Pipeline: %s", obj.pipeline.c_str());
-                    ImGui::InputFloat3("position", obj.transform.position);
+                    ImGui::InputFloat3("position", (float *) &obj.transform.position);
                     ImGui::InputFloat("rotation", &obj.transform.rotation, 0.1f, 1.0f, "%.3f");
-                    ImGui::InputFloat3("scale", obj.transform.scale);
+                    ImGui::InputFloat3("scale", (float *) &obj.transform.scale);
                     ImGui::ColorEdit4("color", obj.color);
 
                     ImGui::TreePop();
@@ -143,10 +143,9 @@ void ImGuiRenderer::DrawCameraWindow()
     {
         ImGui::Checkbox("Control Camera?", &Camera::takeControl);
 
-        static float position[3] = {0.f, 0.f, -2.f};
-        ImGui::InputFloat3("position", position);
+        ImGui::InputFloat3("position", (float *) Camera::GetWorldPositionRef());
         if (!Camera::HasControl())
-            Camera::SetWorldPosition(glm::vec3(position[0], position[1], position[2]));
+            Camera::SetWorldPosition(Camera::GetWorldPosition());
 
         ImGui::End();
     }

@@ -14,11 +14,9 @@
 #include "../rendering/shapes/Shape.h"
 
 struct Transform2D {
-    float position[3];
-    float scale[3];
-//    glm::vec2 position{};
-//    glm::vec2 scale{1.f, 1.f};
-    float rotation; // REVIEW: In degrees? Radians? Euler angles? What is more intuitive?
+    glm::vec3 position{0.f, 0.f, 0.f};
+    glm::vec3 scale{1.f, 1.f, 1.f};
+    float rotation; // NOTE: Degrees
 
     glm::mat4 mat4()
     {
