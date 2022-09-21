@@ -175,6 +175,9 @@ void ImGuiRenderer::DrawDebugLogWindow()
         for (auto& log : logs)
         {
             ImGui::Text("%s", log.c_str());
+
+            if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+                ImGui::SetScrollHereY(1.0f);
         }
         ImGui::EndChild();
         ImGui::End();
