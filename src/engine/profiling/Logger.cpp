@@ -122,4 +122,7 @@ void Logger::WriteToLogFile(std::string type, std::string msg)
     std::ofstream logFile;
     logFile.open("elixir_" + dateStr + std::string(".log"), std::ios_base::app);
     logFile << buf << "\n";
+
+    // save locally so we can show on ImGui "later"
+    logs.emplace_back(buf.c_str());
 }

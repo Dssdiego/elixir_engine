@@ -66,6 +66,9 @@ void ImGuiRenderer::Draw()
 
     if (showCameraWindow)
         DrawCameraWindow();
+
+    if (showDebugLogWindow)
+        DrawDebugLogWindow();
 }
 
 //
@@ -93,6 +96,9 @@ void ImGuiRenderer::DrawMainMenuBar()
 
             // Game >> Camera
             if (ImGui::MenuItem("Camera", nullptr, &showCameraWindow)) {}
+
+            // Game >> Debug Log
+            if (ImGui::MenuItem("Debug Log", nullptr, &showDebugLogWindow)) {}
 
             ImGui::EndMenu();
         }
@@ -150,6 +156,21 @@ void ImGuiRenderer::DrawCameraWindow()
         if (ImGui::Button("Reset"))
             Camera::ResetWorldPosition();
 
+        ImGui::End();
+    }
+}
+
+void ImGuiRenderer::DrawDebugLogWindow()
+{
+    if (ImGui::Begin("Debug Log", &showDebugLogWindow))
+    {
+        ImGui::BeginChild("ScrollingRegion", ImVec2(0,0), false, ImGuiWindowFlags_HorizontalScrollbar);
+        auto logs = Logger::GetLogs();
+        for (auto& log : logs)
+        {
+            ImGui::Text("%s", log.c_str());
+        }
+        ImGui::EndChild();
         ImGui::End();
     }
 }

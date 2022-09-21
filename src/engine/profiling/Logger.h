@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <ctime>
 #include <sstream>
+#include <vector>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -55,8 +56,12 @@ public:
     static void Error(std::string errMsg, std::string errParam);
     static void Debug(std::string msg);
 
+    inline static std::vector<std::string> GetLogs() { return logs; }
+
 private:
     static void WriteToLogFile(std::string type, std::string msg);
+
+    inline static std::vector<std::string> logs{};
 };
 
 
