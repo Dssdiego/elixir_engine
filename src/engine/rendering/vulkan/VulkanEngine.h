@@ -41,9 +41,6 @@ struct EngineRendererImpl
     std::vector<std::unique_ptr<VulkanBuffer>> uniformBuffers; // global uniform buffers
     std::vector<VkDescriptorSet> descriptorSets; // global descriptor sets
 
-    // global texture
-    std::unique_ptr<Texture> texture;
-
     VkCommandBuffer GetCurrentCommandBuffer();
     int GetFrameIndex();
 
@@ -54,8 +51,6 @@ struct EngineRendererImpl
     void FreeCommandBuffers();
 
     void CreateDescriptors();
-
-    void CreateTexture();
 
     VkCommandBuffer BeginFrame();
     void BeginSwapChainRenderPass();

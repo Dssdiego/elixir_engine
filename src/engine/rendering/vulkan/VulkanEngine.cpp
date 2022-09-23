@@ -4,6 +4,7 @@
 
 #include "VulkanEngine.h"
 #include "descriptors/VulkanDescriptorWriter.h"
+#include "../SpriteAtlas.h"
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
@@ -76,7 +77,7 @@ EngineRendererImpl::EngineRendererImpl()
     // REVIEW: Recreate swapchain on renderer init?
 
     // global stuff
-    CreateTexture();
+    SpriteAtlas::CreateTexture();
     CreateCommandBuffers();
     CreateUniformBuffers();
     CreateDescriptors();
@@ -102,8 +103,7 @@ EngineRendererImpl::~EngineRendererImpl()
     }
     FreeCommandBuffers();
 
-    texture->Destroy();
-    texture = nullptr;
+    SpriteAtlas::DestroyTexture();
 
     VulkanSwapchain::Shutdown();
     VulkanDevice::Shutdown();
@@ -128,7 +128,7 @@ void EngineRendererImpl::CreateDescriptors()
     {
         // uniform buffer
         auto bufferInfo = uniformBuffers[i]->DescriptorInfo();
-        auto samplerInfo = texture->DescriptorInfo();
+        auto samplerInfo = SpriteAtlas::GetTextureDescriptorInfo();
 
         // image sampler
 
@@ -318,10 +318,4 @@ void EngineRendererImpl::UpdateUniformBuffer(UniformBufferObject &ubo)
     // NOTE: we don't need to flush at a given index because of the "COHERENT_HOST_BIT" in the buffer flag
 //    uniformBuffers[currentFrameIndex]->Flush();
 //    globalUboBuffer->FlushIndex(currentFrameIndex);
-}
-
-void EngineRendererImpl::CreateTexture()
-{
-    texture = std::make_unique<Texture>();
-    texture->Create("assets/textures/oh_yeah_homer.jpg");
 }
