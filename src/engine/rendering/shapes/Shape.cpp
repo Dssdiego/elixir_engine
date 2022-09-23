@@ -52,7 +52,6 @@ void Shape::Destroy()
 
 void Shape::CreateVertexBuffer()
 {
-    // REVIEW: Do we really need a staging buffer?
     vertexCount = static_cast<uint32_t>(vertices.size());
     assert(vertexCount >= 3 && "Vertex count must be at least 3 so that we can draw triangles ;)");
 
@@ -168,4 +167,16 @@ void Shape::DefineCircle()
 //        vertices.push_back(uniqueVertices[(i + 1) % numSides]);
 //        vertices.push_back(uniqueVertices[numSides]);
 //    }
+}
+
+void Shape::ReplaceUVs(float startX, float startY, float endX, float endY)
+{
+    vertices[0].uv = {startX, startY};
+    vertices[1].uv = {endX, startY};
+    vertices[2].uv = {endX, endY};
+    vertices[3].uv = {startX, endY};
+
+    // FIXME: Do we need to recreate the shape again when replacing the UVs?
+    //        Can't we pass the UVs at the moment of the shape creation???
+    MakeShape();
 }

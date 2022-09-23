@@ -11,12 +11,15 @@
 
 #include <string>
 #include <vulkan/vulkan.h>
+#include <glm/vec2.hpp>
+#include <glm/vec4.hpp>
 
 class Texture
 {
 public:
     void Create(const std::string& imagePath);
     VkDescriptorImageInfo DescriptorInfo();
+    glm::vec2 Size();
     void Destroy();
 
 private:

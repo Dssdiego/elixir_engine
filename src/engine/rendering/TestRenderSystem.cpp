@@ -82,12 +82,19 @@ TestRenderSystemImpl::TestRenderSystemImpl()
 //    circle.transform.scale[1] = 0.35f;
 //    circle.transform.scale[2] = 0.35f;
 
-    auto sprite = Sprite();
-    sprite.id = 3;
-    sprite.name = "Homer oh yeah";
+    auto sprite = Sprite(0,0);
+    sprite.id = 2;
+    sprite.name = "sprite (0,0)";
     sprite.pipeline = "sprite";
     sprite.transform.position = { -0.5f, -0.5f, 0.f };
     sprite.transform.scale = { 0.5f, 0.5f, 0.f };
+
+    auto sprite1 = Sprite(9,2);
+    sprite1.id = 3;
+    sprite1.name = "sprite (9,2)";
+    sprite1.pipeline = "sprite";
+    sprite1.transform.position = { 0.f, 0.f, 0.f };
+    sprite1.transform.scale = { 0.5f, 0.5f, 0.f };
 
     auto uiSprite = Sprite();
     uiSprite.id = 4;
@@ -99,6 +106,7 @@ TestRenderSystemImpl::TestRenderSystemImpl()
 
     gameObjects.push_back(uiSprite);
     gameObjects.push_back(sprite);
+    gameObjects.push_back(sprite1);
 //    gameObjects.push_back(circle);
     gameObjects.push_back(triangle);
     gameObjects.push_back(quad);

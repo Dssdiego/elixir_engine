@@ -16,10 +16,12 @@ public:
     static void CreateTexture();
     static void DestroyTexture();
     static VkDescriptorImageInfo GetTextureDescriptorInfo();
-//    static glm::vec2 GetTextureSize();
+    static glm::vec2 GetTextureSize();
+    static glm::vec4 GetUVCoordinate(uint32_t line, uint32_t column);
 
 private:
     inline static std::unique_ptr<Texture> texture = nullptr;
+    inline static uint32_t tileSize = 32; // size of the tile in the atlas (we are using 32x32 pixel sprites)
 };
 
 

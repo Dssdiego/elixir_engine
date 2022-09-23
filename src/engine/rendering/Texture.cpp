@@ -109,3 +109,8 @@ VkDescriptorImageInfo Texture::DescriptorInfo()
     imageInfo.sampler = sampler;
     return imageInfo;
 }
+
+glm::vec2 Texture::Size()
+{
+    return {width, height};
+}

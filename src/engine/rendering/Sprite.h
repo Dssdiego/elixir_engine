@@ -12,10 +12,12 @@ class Sprite : public GameObject
 {
 public:
     Sprite();
+    Sprite(uint32_t line, uint32_t column);
     ~Sprite();
 
 private:
-    Texture texture{};
+    uint32_t line; // line reference in the sprite atlas
+    uint32_t column; // column reference in the sprite atlas
 };
 
 

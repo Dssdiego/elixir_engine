@@ -30,6 +30,8 @@ public:
     virtual void Draw();
     virtual void Destroy();
 
+    void ReplaceUVs(float startX, float startY, float endX, float endY);
+
 protected:
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
