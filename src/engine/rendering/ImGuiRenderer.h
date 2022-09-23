@@ -42,8 +42,8 @@ private:
     static void DrawDebugLogWindow();
 
     // control variables
-    inline static bool showCameraWindow = false;
-    inline static bool showInspectorWindow = false;
+    inline static bool showCameraWindow = true;
+    inline static bool showInspectorWindow = true;
     inline static bool showDebugLogWindow = false;
 };
 
