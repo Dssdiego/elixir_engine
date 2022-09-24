@@ -17,5 +17,9 @@ layout(push_constant) uniform Push {
 // shader code
 void main() {
 //    outColor = vec4(uv, 0.f, 1.f);
-    outColor = push.color * texture(texSampler, uv);
+    vec4 texColor = texture(texSampler, uv);
+    if (texColor.a == 0)
+        discard;
+
+    outColor = push.color * texColor;
 }
