@@ -12,6 +12,7 @@
 
 #include <memory>
 #include "../rendering/shapes/Shape.h"
+#include "../rendering/SpriteAtlas.h"
 
 struct Transform2D {
     glm::vec3 position{0.f, 0.f, 0.f};
@@ -37,8 +38,6 @@ public:
     Transform2D transform{};
     Shape shape{ShapeType::Quad}; // TODO: Change this so that we can pass any shape we want ;)
     Color color = Color::White;
-
-//    uint32_t GetId() { return id; }
 
     static GameObject Create() {
         return GameObject{};

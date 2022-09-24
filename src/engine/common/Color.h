@@ -7,7 +7,7 @@
 
 #include <cstdint>
 #include <glm/vec4.hpp>
-//#include <string>
+#include <string>
 
 class Color
 {
@@ -19,6 +19,7 @@ public:
     // Helpers
     static VkClearColorValue GetAsVulkanClear(Color color);
     static glm::vec4 ToVec4(Color color);
+    static Color GetColorFromString(const std::string &value);
 
     // Definitions
     static const Color Transparent;

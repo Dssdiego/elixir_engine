@@ -31,6 +31,7 @@ public:
     virtual void Destroy();
 
     void ReplaceUVs(float startX, float startY, float endX, float endY);
+    static ShapeType GetEnumFromString(const std::string& value);
 
 protected:
     std::vector<Vertex> vertices;

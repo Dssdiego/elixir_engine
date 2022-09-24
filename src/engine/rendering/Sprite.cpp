@@ -14,10 +14,15 @@ Sprite::Sprite() : line(0), column(0)
 
 Sprite::Sprite(uint32_t line, uint32_t column) : line(line), column(column)
 {
-    auto uv = SpriteAtlas::GetUVCoordinate(line, column);
-    shape.ReplaceUVs(uv.x, uv.y, uv.z, uv.w); // FIXME: Refactor me, not very good legibility!
+    SetTile();
 }
 
 Sprite::~Sprite()
 {
+}
+
+void Sprite::SetTile()
+{
+    auto uv = SpriteAtlas::GetUVCoordinate(line, column);
+    shape.ReplaceUVs(uv.x, uv.y, uv.z, uv.w); // FIXME: Refactor me, not very good legibility!
 }

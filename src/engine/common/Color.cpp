@@ -34,3 +34,35 @@ glm::vec4 Color::ToVec4(Color color)
 {
     return glm::vec4(color.r,color.g,color.b,color.a);
 }
+
+// FIXME: This can be done automatically!
+Color Color::GetColorFromString(const std::string &value)
+{
+    auto color = Color::Black;
+
+    if (value == "black")
+        color = Color::Black;
+
+    if (value == "blue")
+        color = Color::Blue;
+
+    if (value == "red")
+        color = Color::Red;
+
+    if (value == "white")
+        color = Color::White;
+
+    if (value == "green")
+        color = Color::Green;
+
+    if (value == "pink")
+        color = Color::Pink;
+
+    if (value == "yellow")
+        color = Color::Yellow;
+
+    if (value == "cyan")
+        color = Color::Cyan;
+
+    return color;
+}

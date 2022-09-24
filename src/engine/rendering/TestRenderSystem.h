@@ -15,10 +15,10 @@ struct TestRenderSystemImpl
     TestRenderSystemImpl();
     ~TestRenderSystemImpl();
 
-    std::vector<GameObject> gameObjects;
+//    std::vector<GameObject> gameObjects;
 
-    void RenderGameObjects();
-    std::vector<GameObject>* GetGameObjects();
+    void RenderGameObjects(std::vector<GameObject> *gameObjects);
+//    std::vector<GameObject>* GetGameObjects();
 };
 
 class TestRenderSystem
@@ -27,8 +27,8 @@ public:
     static void Init();
     static void Shutdown();
 
-    static void RenderGameObjects();
-    static std::vector<GameObject>* GetGameObjects();
+    static void RenderGameObjects(std::vector<GameObject> *gameObjects);
+//    static std::vector<GameObject>* GetGameObjects();
 
 };
 

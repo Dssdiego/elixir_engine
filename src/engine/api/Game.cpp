@@ -7,6 +7,7 @@
 #include "../rendering/TestRenderSystem.h"
 #include "../rendering/text/Font.h"
 #include "../core/Time.h"
+#include "../world/World.h"
 
 /*
  * Methods
@@ -22,6 +23,7 @@ void Game::Init(EngineConfig* pConfig)
     VulkanEngine::Init();
     ImGuiRenderer::Init();
     TestRenderSystem::Init();
+    World::Init();
 //    Font::LoadFont();
 //    Renderer::Init(GraphicsBackend::VULKAN);
 //    CGeforceNow::Init();
@@ -52,6 +54,7 @@ void Game::Run()
 
         Window::Update();
         Input::Update();
+        World::Update();
 
         Draw();
 
@@ -69,7 +72,8 @@ void Game::Draw()
     VulkanEngine::BeginFrame();
     ImGuiRenderer::NewFrame();
 
-    TestRenderSystem::RenderGameObjects();
+    TestRenderSystem::RenderGameObjects(World::GetGameObjects());
+    World::Render();
 
     ImGuiRenderer::Render();
     VulkanEngine::EndFrame();
@@ -79,6 +83,7 @@ void Game::Cleanup()
 {
     // destroy engine systems
 //    CGeforceNow::Shutdown();
+    World::Shutdown();
     TestRenderSystem::Shutdown();
     ImGuiRenderer::Shutdown();
     SceneSystem::Shutdown();

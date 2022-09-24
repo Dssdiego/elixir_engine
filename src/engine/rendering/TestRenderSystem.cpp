@@ -24,15 +24,15 @@ void TestRenderSystem::Shutdown()
     delete mTestRenderSystemImpl;
 }
 
-void TestRenderSystem::RenderGameObjects()
+void TestRenderSystem::RenderGameObjects(std::vector<GameObject> *gameObjects)
 {
-    mTestRenderSystemImpl->RenderGameObjects();
+    mTestRenderSystemImpl->RenderGameObjects(gameObjects);
 }
 
-std::vector<GameObject>* TestRenderSystem::GetGameObjects()
-{
-    return mTestRenderSystemImpl->GetGameObjects();
-}
+//std::vector<GameObject>* TestRenderSystem::GetGameObjects()
+//{
+//    return mTestRenderSystemImpl->GetGameObjects();
+//}
 
 //
 // Implementation
@@ -43,27 +43,27 @@ TestRenderSystemImpl::TestRenderSystemImpl()
     VulkanPipeline::Init();
 
     // load triangle test game object
-    auto triangle = GameObject::Create();
-    triangle.id = 0;
-    triangle.name = "Triangle";
-    triangle.color = Color::Red;
-    triangle.shape = Shape(ShapeType::Triangle);
-    triangle.transform.position = { 0.f, 0.f, 0.f };
-    triangle.transform.scale = { 1.f, 1.f, 1.f };
-    triangle.transform.rotation = 0.0f;
-    triangle.pipeline = "shape";
+//    auto triangle = GameObject::Create();
+//    triangle.id = 0;
+//    triangle.name = "Triangle";
+//    triangle.color = Color::Red;
+//    triangle.shape = Shape(ShapeType::Triangle);
+//    triangle.transform.position = { 0.f, 0.f, 0.f };
+//    triangle.transform.scale = { 1.f, 1.f, 1.f };
+//    triangle.transform.rotation = 0.0f;
+//    triangle.pipeline = "shape";
     // FIXME: Make sure we can use glm::vec2 and glm::vec3 with ImGui without converting the original field type!
 
     // load quad test game object
-    auto quad = GameObject::Create();
-    quad.id = 1;
-    quad.name = "Quad";
-    quad.color = Color::Yellow;
-    quad.shape = Shape(ShapeType::Quad);
-    quad.transform.position = { 0.35f, -0.2f, 0.f };
-    quad.transform.rotation = 0.f;
-    quad.transform.scale = { 0.8f, 0.8f, 0.8f};
-    quad.pipeline = "shape";
+//    auto quad = GameObject::Create();
+//    quad.id = 1;
+//    quad.name = "Quad";
+//    quad.color = Color::Yellow;
+//    quad.shape = Shape(ShapeType::Quad);
+//    quad.transform.position = { 0.35f, -0.2f, 0.f };
+//    quad.transform.rotation = 0.f;
+//    quad.transform.scale = { 0.8f, 0.8f, 0.8f};
+//    quad.pipeline = "shape";
 
     // load circle test game object
 //    auto circle = GameObject::Create();
@@ -82,34 +82,34 @@ TestRenderSystemImpl::TestRenderSystemImpl()
 //    circle.transform.scale[1] = 0.35f;
 //    circle.transform.scale[2] = 0.35f;
 
-    auto sprite = Sprite(0,0);
-    sprite.id = 2;
-    sprite.name = "sprite (0,0)";
-    sprite.pipeline = "sprite";
-    sprite.transform.position = { -0.5f, -0.5f, 0.f };
-    sprite.transform.scale = { 0.5f, 0.5f, 0.f };
+//    auto sprite = Sprite();
+//    sprite.id = 2;
+//    sprite.name = "sprite (0,0)";
+//    sprite.pipeline = "sprite";
+//    sprite.transform.position = { -0.5f, -0.5f, 0.f };
+//    sprite.transform.scale = { 0.5f, 0.5f, 0.f };
+//
+//    auto sprite1 = Sprite(9,2);
+//    sprite1.id = 3;
+//    sprite1.name = "sprite (9,2)";
+//    sprite1.pipeline = "sprite";
+//    sprite1.transform.position = { 0.f, 0.f, 0.f };
+//    sprite1.transform.scale = { 0.5f, 0.5f, 0.f };
+//
+//    auto uiSprite = Sprite();
+//    uiSprite.id = 4;
+//    uiSprite.name = "Green hud";
+//    uiSprite.pipeline = "ui";
+//    uiSprite.transform.position = { 0.f, -0.94f, 0.f };
+//    uiSprite.transform.scale = { 2.f, 0.12f, 0.f};
+//    uiSprite.color = Color::Green;
 
-    auto sprite1 = Sprite(9,2);
-    sprite1.id = 3;
-    sprite1.name = "sprite (9,2)";
-    sprite1.pipeline = "sprite";
-    sprite1.transform.position = { 0.f, 0.f, 0.f };
-    sprite1.transform.scale = { 0.5f, 0.5f, 0.f };
-
-    auto uiSprite = Sprite();
-    uiSprite.id = 4;
-    uiSprite.name = "Green hud";
-    uiSprite.pipeline = "ui";
-    uiSprite.transform.position = { 0.f, -0.94f, 0.f };
-    uiSprite.transform.scale = { 2.f, 0.12f, 0.f};
-    uiSprite.color = Color::Green;
-
-    gameObjects.push_back(uiSprite);
-    gameObjects.push_back(sprite);
-    gameObjects.push_back(sprite1);
+//    gameObjects.push_back(uiSprite);
+//    gameObjects.push_back(sprite);
+//    gameObjects.push_back(sprite1);
 //    gameObjects.push_back(circle);
-    gameObjects.push_back(triangle);
-    gameObjects.push_back(quad);
+//    gameObjects.push_back(triangle);
+//    gameObjects.push_back(quad);
 
     // Setting camera properties
     // using ortographic projection (updating every frame so it matches the window width and height)
@@ -123,15 +123,15 @@ TestRenderSystemImpl::TestRenderSystemImpl()
 
 TestRenderSystemImpl::~TestRenderSystemImpl()
 {
-    for (auto &obj : gameObjects)
-    {
-        obj.shape.Destroy();
-    }
+//    for (auto &obj : gameObjects)
+//    {
+//        obj.shape.Destroy();
+//    }
 
     VulkanPipeline::Shutdown();
 }
 
-void TestRenderSystemImpl::RenderGameObjects()
+void TestRenderSystemImpl::RenderGameObjects(std::vector<GameObject> *gameObjects)
 {
     // update uniform buffer with new data
     UniformBufferObject ubo{};
@@ -141,7 +141,7 @@ void TestRenderSystemImpl::RenderGameObjects()
     auto commandBuffer = VulkanEngine::GetCurrentCommandBuffer();
 
     // render objects
-    for (auto &obj : gameObjects)
+    for (auto &obj : *gameObjects)
     {
         if (obj.pipeline == "shape")
             VulkanPipeline::SwitchToPipeline(0);
@@ -171,7 +171,7 @@ void TestRenderSystemImpl::RenderGameObjects()
     }
 }
 
-std::vector<GameObject>* TestRenderSystemImpl::GetGameObjects()
-{
-    return &gameObjects;
-}
+//std::vector<GameObject>* TestRenderSystemImpl::GetGameObjects()
+//{
+//    return &gameObjects;
+//}

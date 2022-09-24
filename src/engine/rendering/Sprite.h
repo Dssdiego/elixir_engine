@@ -15,6 +15,8 @@ public:
     Sprite(uint32_t line, uint32_t column);
     ~Sprite();
 
+    void SetTile();
+
 private:
     uint32_t line; // line reference in the sprite atlas
     uint32_t column; // column reference in the sprite atlas

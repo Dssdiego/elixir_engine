@@ -11,6 +11,7 @@
 #include "TestRenderSystem.h"
 #include "vulkan/VulkanPipeline.h"
 #include "Camera.h"
+#include "../world/World.h"
 
 // checking for vulkan error
 static void check_vk_result(VkResult err) {
@@ -129,7 +130,7 @@ void ImGuiRenderer::DrawObjectInspectorWindow()
     {
         if (ImGui::TreeNode("GameObjects"))
         {
-            for (auto &obj: *TestRenderSystem::GetGameObjects())
+            for (auto &obj: *World::GetGameObjects())
             {
                 if (ImGui::TreeNode((void *) (intptr_t) obj.id, "[%d] %s", obj.id, obj.name.c_str()))
                 {

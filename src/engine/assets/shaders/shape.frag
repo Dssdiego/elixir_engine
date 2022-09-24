@@ -14,5 +14,9 @@ layout(push_constant) uniform Push {
 
 // shader code
 void main() {
-    outColor = push.color;
+    vec4 finalColor = push.color;
+    if (finalColor.a == 0)
+    discard;
+
+    outColor = finalColor;
 }

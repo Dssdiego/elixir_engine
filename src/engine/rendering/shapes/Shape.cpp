@@ -180,3 +180,20 @@ void Shape::ReplaceUVs(float startX, float startY, float endX, float endY)
     //        Can't we pass the UVs at the moment of the shape creation???
     MakeShape();
 }
+
+// FIXME: This can be done automatically!
+ShapeType Shape::GetEnumFromString(const std::string& value)
+{
+    auto shape = ShapeType::Triangle;
+
+    if (value == "triangle")
+        shape = ShapeType::Triangle;
+
+    if (value == "circle")
+        shape = ShapeType::Circle;
+
+    if (value == "quad")
+        shape = ShapeType::Quad;
+
+    return shape;
+}
