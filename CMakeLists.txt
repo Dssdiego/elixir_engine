@@ -63,6 +63,13 @@ file(COPY
 #add_library(GEFORCE_NOW_LIBRARY SHARED thirdparty/geforce_now/lib/x64/GfnRuntimeSdk.dll)
 #set_target_properties(GEFORCE_NOW_LIBRARY PROPERTIES LINKER_LANGUAGE C)
 
+# LDTK
+set(LDTK_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/thirdparty/ldtk/inc")
+if(WIN32)
+    set(LDTK_LIBRARY "${CMAKE_SOURCE_DIR}/thirdparty/ldtk/lib/LDtkLoader-d.lib" )
+#    file(COPY "${CMAKE_SOURCE_DIR}/thirdparty/freetype/lib/freetype.dll" DESTINATION ${CMAKE_BINARY_DIR})
+endif()
+
 # Messages
 message("Libraries:")
 message(VULKAN_INCLUDE_DIRS: ${Vulkan_INCLUDE_DIRS})
@@ -70,12 +77,14 @@ message(VULKAN_LIB: ${Vulkan_LIBRARIES})
 message(OPENGL_LIBRARIES: ${OPENGL_LIBRARIES})
 message(FMOD_LIBRARY: ${FMOD_LIBRARY})
 message(GEFORCE_NOW_LIBRARY: ${GEFORCE_NOW_LIBRARY})
+message(LDTK_LIBRARY: ${LDTK_LIBRARY})
 
 # include directories
 include_directories(
         thirdparty
         ${FMOD_INCLUDE_DIR}
         ${GEFORCE_NOW_INCLUDE_DIR}
+        ${LDTK_INCLUDE_DIR}
 )
 
 # load source and header files
@@ -110,6 +119,7 @@ if(WIN32)
             TracyClient
             ${FMOD_LIBRARY}
             ${FREETYPE_LIBRARY}
+            ${LDTK_LIBRARY}
     )
 else()
     target_link_libraries(

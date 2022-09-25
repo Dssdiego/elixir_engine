@@ -4,12 +4,14 @@
 
 #include "World.h"
 #include "../rendering/Sprite.h"
+#include <ldtk/inc/Project.hpp>
 
 using json = nlohmann::json;
 
 void World::Init()
 {
-    Load();
+    LoadLDTK();
+//    LoadJSON();
 }
 
 void World::Update()
@@ -37,7 +39,27 @@ void World::Save()
 
 }
 
-void World::Load()
+void World::LoadLDTK()
+{
+    ldtk::Project ldtk_project;
+    ldtk_project.loadFromFile("assets/world/world.ldtk");
+
+    const auto& world = ldtk_project.getWorld();
+
+    const auto& level0 = world.getLevel(0);
+
+    const auto& entitiesLayer = level0.getLayer("Entities");
+    const auto& tilesLayer = level0.getLayer("Tiles");
+
+    // iterate on the tiles of the layer
+    for (const auto& tile : tilesLayer.allTiles()) {
+        auto verts = tile.getVertices();
+        std::cout << "something" << std::endl;
+        // do something with the tile (storing, rendering ...)
+    }
+}
+
+void World::LoadJSON()
 {
     std::ifstream f("assets/jsons/world.json");
     json data = json::parse(f);
@@ -89,3 +111,5 @@ std::vector<GameObject> *World::GetGameObjects()
 {
     return &gameObjects;
 }
+
+

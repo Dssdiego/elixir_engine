@@ -21,7 +21,8 @@ public:
     static void Shutdown();
 
     static void Save();
-    static void Load();
+    static void LoadLDTK();
+    static void LoadJSON();
 
     static std::vector<GameObject> *GetGameObjects();
 
