@@ -42,6 +42,7 @@ private:
     static void DrawCameraWindow();
     static void DrawDebugLogWindow();
     static void DrawAddGameObjectWindow();
+    static void DrawWorldEditorWindow();
 
     // control variables
     inline static bool showCameraWindow = true;
@@ -49,6 +50,7 @@ private:
     inline static bool showDebugLogWindow = false;
     inline static bool showAddGameObjectWindow = false;
     inline static bool showProfilerWindow = false;
+    inline static bool showWorldEditorWindow = true;
 };
 
 #endif //VULKAN_ENGINE_IMGUIRENDERER_H

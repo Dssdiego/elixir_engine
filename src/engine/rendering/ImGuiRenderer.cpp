@@ -76,6 +76,9 @@ void ImGuiRenderer::Draw()
 
     if (showAddGameObjectWindow)
         DrawAddGameObjectWindow();
+
+    if (showWorldEditorWindow)
+        DrawWorldEditorWindow();
 }
 
 //
@@ -97,6 +100,9 @@ void ImGuiRenderer::DrawMainMenuBar()
         // Game
         if (ImGui::BeginMenu("Tools"))
         {
+            // Tools >> World Editor
+            if (ImGui::MenuItem("World Editor", nullptr, &showWorldEditorWindow)) {}
+
             // Tools >> Inspector
             if (ImGui::MenuItem("Game Object Inspector", nullptr, &showInspectorWindow)) {}
 
@@ -238,6 +244,15 @@ void ImGuiRenderer::DrawProfilerWindow()
     ImGui::End();
 }
 
+void ImGuiRenderer::DrawWorldEditorWindow()
+{
+    ImGui::Begin("World Editor");
+    auto imageId = SpriteAtlas::GetImGuiImage();
+    ImGui::ImageButton(imageId, ImVec2(32, 32));
+//    ImGui::Image(imageId, ImVec2(512, 512));
+    ImGui::End();
+}
+
 //
 // Implementation
 //
@@ -249,6 +264,8 @@ ImGuiRendererImpl::ImGuiRendererImpl()
     CreateDescriptorPool();
     SetupContext();
     BindVulkanBackend();
+
+    SpriteAtlas::CreateImGuiImage();
 }
 
 ImGuiRendererImpl::~ImGuiRendererImpl()

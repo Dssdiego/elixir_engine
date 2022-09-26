@@ -6,8 +6,11 @@
 
 void SpriteAtlas::CreateTexture()
 {
+    // create vulkan texture
     texture = std::make_unique<Texture>();
     texture->Create("assets/textures/game_atlas.png");
+
+
 }
 
 void SpriteAtlas::DestroyTexture()
@@ -39,4 +42,17 @@ glm::vec4 SpriteAtlas::GetUVCoordinate(uint32_t line, uint32_t column)
     auto uvEndY = (float) (line + 1) * lineIncrement;
 
     return {uvStartX, uvStartY, uvEndX, uvEndY};
+}
+
+void SpriteAtlas::CreateImGuiImage()
+{
+    // create a descriptor set pointer to imgui (so that we can present the image there)
+    auto descriptorInfo = texture->DescriptorInfo();
+    auto descriptorSet = ImGui_ImplVulkan_AddTexture(descriptorInfo.sampler, descriptorInfo.imageView, descriptorInfo.imageLayout);
+    imguiTexture = (ImTextureID) descriptorSet;
+}
+
+ImTextureID SpriteAtlas::GetImGuiImage()
+{
+    return imguiTexture;
 }
