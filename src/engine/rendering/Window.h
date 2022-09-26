@@ -41,8 +41,17 @@ public:
     static double GetTime();
     static void Close();
 
-    inline static void SetFrameInfo(double _fps, uint32_t _frameNumber) { fps = _fps; frameNumber = _frameNumber; }
+    inline static void SetFrameInfo(double _fps, uint32_t _frameNumber) {
+        fps = _fps;
+        frameNumber = _frameNumber;
+
+        if (fpsHistory.size() > 50)
+            fpsHistory.resize(0);
+        else
+            fpsHistory.push_back((float) fps);
+    }
     inline static double GetFPS() { return fps; }
+    inline static std::vector<float> GetFPSHistory() { return fpsHistory; }
     inline static uint32_t GetFrameNumber() { return frameNumber; }
 
 private:
@@ -51,6 +60,7 @@ private:
 
     inline static double fps = 0.f;
     inline static uint32_t frameNumber = 0;
+    inline static std::vector<float> fpsHistory = {};
 
 };
 

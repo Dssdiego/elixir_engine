@@ -57,19 +57,25 @@ void ImGuiRenderer::NewFrame()
 
 void ImGuiRenderer::Draw()
 {
-//    bool show_demo = true;
-//    ImGui::ShowDemoWindow(&show_demo);
+    bool show_demo = true;
+    ImGui::ShowDemoWindow(&show_demo);
 
     DrawMainMenuBar();
 
     if (showInspectorWindow)
         DrawObjectInspectorWindow();
 
+    if (showProfilerWindow)
+        DrawProfilerWindow();
+
     if (showCameraWindow)
         DrawCameraWindow();
 
     if (showDebugLogWindow)
         DrawDebugLogWindow();
+
+    if (showAddGameObjectWindow)
+        DrawAddGameObjectWindow();
 }
 
 //
@@ -89,17 +95,28 @@ void ImGuiRenderer::DrawMainMenuBar()
         }
 
         // Game
-        if (ImGui::BeginMenu("Game"))
+        if (ImGui::BeginMenu("Tools"))
         {
-            // Game >> Inspector
+            // Tools >> Inspector
             if (ImGui::MenuItem("Game Object Inspector", nullptr, &showInspectorWindow)) {}
-//            ImGui::EndMenu();
 
-            // Game >> Camera
+            // Tools >> Profiler
+            if (ImGui::MenuItem("Profiler", nullptr, &showProfilerWindow)) {}
+
+            // Tools >> Camera
             if (ImGui::MenuItem("Camera", nullptr, &showCameraWindow)) {}
 
-            // Game >> Debug Log
+            // Tools >> Debug Log
             if (ImGui::MenuItem("Debug Log", nullptr, &showDebugLogWindow)) {}
+
+            ImGui::EndMenu();
+        }
+
+        // GameObjects stuff
+        if (ImGui::BeginMenu("GameObject"))
+        {
+            // Game >> Inspector
+            if (ImGui::MenuItem("Add", nullptr, &showAddGameObjectWindow)) {}
 
             ImGui::EndMenu();
         }
@@ -193,6 +210,32 @@ void ImGuiRenderer::Render()
     ImDrawData *drawdata = ImGui::GetDrawData();
     ImGui_ImplVulkan_RenderDrawData(drawdata, VulkanEngine::GetCurrentCommandBuffer());
 #endif
+}
+
+void ImGuiRenderer::DrawAddGameObjectWindow()
+{
+    ImGui::Begin("Add Game Object");
+    const char* items[] = { "Shape", "Sprite" };
+    static int item_current = 0;
+    ImGui::Combo("Type", &item_current, items, IM_ARRAYSIZE(items));
+
+    switch (item_current)
+    {
+        case 0: // shape
+            break;
+        case 1: // sprite
+            break;
+    }
+
+    ImGui::End();
+}
+
+void ImGuiRenderer::DrawProfilerWindow()
+{
+    ImGui::Begin("Profiler");
+    auto arr = Window::GetFPSHistory();
+    ImGui::PlotLines("FPS", arr.data(), arr.size(), 0, nullptr, 0.f, 1000.f, ImVec2(0, 80.0f));
+    ImGui::End();
 }
 
 //

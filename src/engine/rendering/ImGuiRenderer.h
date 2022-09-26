@@ -38,13 +38,17 @@ private:
 
     static void DrawMainMenuBar();
     static void DrawObjectInspectorWindow();
+    static void DrawProfilerWindow();
     static void DrawCameraWindow();
     static void DrawDebugLogWindow();
+    static void DrawAddGameObjectWindow();
 
     // control variables
     inline static bool showCameraWindow = true;
     inline static bool showInspectorWindow = true;
     inline static bool showDebugLogWindow = false;
+    inline static bool showAddGameObjectWindow = false;
+    inline static bool showProfilerWindow = false;
 };
 
 #endif //VULKAN_ENGINE_IMGUIRENDERER_H
