@@ -57,8 +57,8 @@ void ImGuiRenderer::NewFrame()
 
 void ImGuiRenderer::Draw()
 {
-    bool show_demo = true;
-    ImGui::ShowDemoWindow(&show_demo);
+//    bool show_demo = true;
+//    ImGui::ShowDemoWindow(&show_demo);
 
     DrawMainMenuBar();
 
@@ -272,14 +272,17 @@ void ImGuiRenderer::DrawWorldEditorWindow()
     for (int n = 0; n < buttonCount; n++)
     {
         ImGui::PushID(n);
+
         auto uvCoords = SpriteAtlas::GetUVCoordinate((int) uvCoordinates[n].x, (int) uvCoordinates[n].y);
-        ImGui::ImageButton(imageId, buttonSize, ImVec2(uvCoords.x, uvCoords.y), ImVec2(uvCoords.z, uvCoords.w));
-        std::stringstream ss;
-        ss << uvCoordinates[n].x << "," << uvCoordinates[n].y;
+        if (ImGui::ImageButton(imageId, buttonSize, ImVec2(uvCoords.x, uvCoords.y), ImVec2(uvCoords.z, uvCoords.w)))
+            std::cout << "pressed " << n << std::endl;
+
         float lastButtonXPos = ImGui::GetItemRectMax().x;
         float nextButtonXPos = lastButtonXPos + style.ItemSpacing.x + buttonSize.x; // Expected position if next button was on same line
+
         if (n + 1 < buttonCount && nextButtonXPos < windowVisibleXPos)
             ImGui::SameLine();
+
         ImGui::PopID();
     }
 
