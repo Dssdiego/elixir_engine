@@ -9,7 +9,8 @@ using json = nlohmann::json;
 
 void World::Init()
 {
-    Load();
+    CreateGrid();
+//    Load();
 }
 
 void World::Update()
@@ -94,4 +95,37 @@ void World::Load()
 std::vector<GameObject> *World::GetGameObjects()
 {
     return &gameObjects;
+}
+
+void World::CreateGrid()
+{
+    // create the world grid object
+    auto grid = Grid(20,20);
+
+    // draw tiles
+    auto tiles = grid.GetTiles();
+    for (auto &tile : tiles)
+    {
+        GameObject gridObj = GameObject::Create();
+        gridObj.id = currentId;
+        gridObj.name = tile.name;
+        gridObj.shape = Shape(ShapeType::Quad);
+        gridObj.pipeline = "grid";
+        gridObj.color = Color::Red;
+        gridObj.transform.position = tile.worldPosition;
+        gridObj.transform.scale = {
+                grid.TileSize(),
+                grid.TileSize(),
+                grid.TileSize()
+        };
+        gridObj.transform.rotation = grid.Rotation();
+
+        gameObjects.push_back(gridObj);
+        currentId++;
+    }
+}
+
+void World::DestroyGrid()
+{
+    // TODO: Destroy grid
 }

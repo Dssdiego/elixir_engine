@@ -6,6 +6,7 @@
 #define VULKAN_ENGINE_WORLD_H
 
 #include "../common/GameObject.h"
+#include "Grid.h"
 
 #include <vector>
 #include <fstream>
@@ -30,6 +31,9 @@ private:
     //        (i.e. we can change between scenes inside the world)
     inline static std::vector<GameObject> gameObjects{};
     inline static size_t currentId = 0;
+
+    static void CreateGrid();
+    static void DestroyGrid();
 };
 
 
