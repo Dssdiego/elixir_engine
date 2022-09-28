@@ -576,5 +576,5 @@ VkExtent2D VulkanSwapChainImpl::GetSwapChainExtent()
 
 float VulkanSwapChainImpl::GetAspectRatio()
 {
-    return swapChainExtent.width / swapChainExtent.height;
+    return (float) swapChainExtent.width / (float) swapChainExtent.height;
 }
