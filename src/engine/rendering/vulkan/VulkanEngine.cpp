@@ -131,7 +131,6 @@ void EngineRendererImpl::CreateDescriptors()
         auto samplerInfo = SpriteAtlas::GetTextureDescriptorInfo();
 
         // image sampler
-
         VulkanDescriptorWriter(*descriptorSetLayout, *descriptorPool) // unique_ptr, accessing contents
             .WriteBuffer(0, &bufferInfo)
             .WriteImage(1, &samplerInfo)

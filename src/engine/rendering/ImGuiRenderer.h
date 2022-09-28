@@ -50,7 +50,7 @@ private:
     inline static bool showDebugLogWindow = false;
     inline static bool showAddGameObjectWindow = false;
     inline static bool showProfilerWindow = false;
-    inline static bool showWorldEditorWindow = true;
+    inline static bool showWorldEditorWindow = false;
 };
 
 #endif //VULKAN_ENGINE_IMGUIRENDERER_H

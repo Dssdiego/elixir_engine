@@ -65,6 +65,12 @@ void World::Load()
             gameObj = sprite;
         }
 
+        if (obj["type"] == "grid")
+        {
+            gameObj.shape = Shape(ShapeType::Quad);
+            gameObj.pipeline = "grid";
+        }
+
         gameObj.id = currentId;
         gameObj.name = obj["name"];
         gameObj.color = Color::GetColorFromString(obj["color"]);

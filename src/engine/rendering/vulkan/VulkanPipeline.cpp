@@ -117,6 +117,23 @@ void VulkanPipelineImpl::CreatePipelineSets()
 
     pipelineSets.push_back(uiPipelineSet);
 
+
+    // Grid
+    PipelineSet gridPipelineSet
+            {
+                    "grid",
+                    "assets/shaders/grid.vert.spv",
+                    "assets/shaders/grid.frag.spv",
+                    gridPipeline,
+                    gridPipelineLayout,
+                    VK_PRIMITIVE_TOPOLOGY_LINE_STRIP,
+                    VK_POLYGON_MODE_LINE,
+                    VK_TRUE
+            };
+
+    pipelineSets.push_back(gridPipelineSet);
+
+    // Build all pipelines
     for (auto &pipelineSet : pipelineSets)
     {
         CreatePipelineLayout(pipelineSet.layout);
