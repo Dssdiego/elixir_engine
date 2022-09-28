@@ -100,10 +100,10 @@ std::vector<GameObject> *World::GetGameObjects()
 void World::CreateGrid()
 {
     // create the world grid object
-    auto grid = Grid(20,20);
+    Grid::Create(20,20);
 
     // draw tiles
-    auto tiles = grid.GetTiles();
+    auto tiles = Grid::GetTiles();
     for (auto &tile : tiles)
     {
         GameObject gridObj = GameObject::Create();
@@ -114,11 +114,11 @@ void World::CreateGrid()
         gridObj.color = Color::Red;
         gridObj.transform.position = tile.worldPosition;
         gridObj.transform.scale = {
-                grid.TileSize(),
-                grid.TileSize(),
-                grid.TileSize()
+                Grid::TileSize(),
+                Grid::TileSize(),
+                Grid::TileSize()
         };
-        gridObj.transform.rotation = grid.Rotation();
+        gridObj.transform.rotation = Grid::Rotation();
 
         gameObjects.push_back(gridObj);
         currentId++;

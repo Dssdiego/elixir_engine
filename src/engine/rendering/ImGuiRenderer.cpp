@@ -248,34 +248,21 @@ void ImGuiRenderer::DrawWorldEditorWindow()
 {
     ImGui::Begin("World Editor");
     auto imageId = SpriteAtlas::GetImGuiImage();
-//    auto imageSize = SpriteAtlas::GetTextureSize();
-
-    auto tilesInLine = 16; // TODO: Get this dynamically
-    auto tilesInColumn = 16; // TODO: Get this dynamically
-
-    // REVIEW: Probably there is a better way to do this!
-    // get all uv coordinates in a vector
-    std::vector<glm::vec2> uvCoordinates{};
-    for (int i = 0; i < tilesInColumn; i++)
-    {
-        for (int j = 0; j < tilesInLine; j++)
-        {
-            uvCoordinates.emplace_back(i,j);
-        }
-    }
 
     // create image button grid
     ImGuiStyle& style = ImGui::GetStyle();
     ImVec2 buttonSize = ImVec2(48, 48);
-    int buttonCount = (int) uvCoordinates.size();
+    auto tiles = Grid::GetTiles();
+    int buttonCount = (int) tiles.size();
     float windowVisibleXPos = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
     for (int n = 0; n < buttonCount; n++)
     {
         ImGui::PushID(n);
 
-        auto uvCoords = SpriteAtlas::GetUVCoordinate((int) uvCoordinates[n].x, (int) uvCoordinates[n].y);
+        auto tilePos = tiles[n].tilePosition;
+        auto uvCoords = SpriteAtlas::GetUVCoordinate((int) tilePos.x, (int) tilePos.y);
         if (ImGui::ImageButton(imageId, buttonSize, ImVec2(uvCoords.x, uvCoords.y), ImVec2(uvCoords.z, uvCoords.w)))
-            std::cout << "pressed " << n << std::endl;
+            std::cout << "(X: " << tilePos.x << ", Y: " << tilePos.y << ")" << std::endl;
 
         float lastButtonXPos = ImGui::GetItemRectMax().x;
         float nextButtonXPos = lastButtonXPos + style.ItemSpacing.x + buttonSize.x; // Expected position if next button was on same line

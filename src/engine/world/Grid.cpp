@@ -4,12 +4,7 @@
 
 #include "Grid.h"
 
-Grid::Grid(uint32_t lines, uint32_t columns) : lines(lines), columns(columns)
-{
-    Create();
-}
-
-void Grid::Create()
+void Grid::Create(uint32_t lines, uint32_t columns)
 {
     for (int i = 0; i < lines; ++i)
     {
@@ -19,7 +14,8 @@ void Grid::Create()
             ss << "(" << i << "," << j << ")";
             auto gridTile = GridTile{
                 ss.str(),
-                glm::vec3((float) i * tileSize, (float) j * tileSize, 0.f)
+                glm::vec3((float) i * tileSize, (float) j * tileSize, 0.f),
+                glm::vec2(i,j)
             };
             tiles.emplace_back(gridTile);
         }
