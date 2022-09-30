@@ -48,6 +48,8 @@ struct VulkanPipelineImpl
     VkPipelineLayout uiPipelineLayout;
     VkPipeline gridPipeline;
     VkPipelineLayout gridPipelineLayout;
+    VkPipeline gridPlanePipeline;
+    VkPipelineLayout gridPlanePipelineLayout;
 
     // Helpers
     void CreatePipelineSets();

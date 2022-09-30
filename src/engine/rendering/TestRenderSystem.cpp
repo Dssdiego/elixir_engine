@@ -143,18 +143,14 @@ void TestRenderSystemImpl::RenderGameObjects(std::vector<GameObject> *gameObject
     // render objects
     for (auto &obj : *gameObjects)
     {
-        // FIXME: Don't pass a pipeline by its index, instead pass it by name!
-        if (obj.pipeline == "shape")
-            VulkanPipeline::SwitchToPipeline(0);
+        // FIXME: Don't pass a pipeline by its index, instead "pass it" by name!
+        if (obj.pipeline == "shape") VulkanPipeline::SwitchToPipeline(0);
+        if (obj.pipeline == "sprite") VulkanPipeline::SwitchToPipeline(1);
+        if (obj.pipeline == "ui") VulkanPipeline::SwitchToPipeline(2);
+        if (obj.pipeline == "grid") VulkanPipeline::SwitchToPipeline(3);
+        if (obj.pipeline == "grid_plane") VulkanPipeline::SwitchToPipeline(4);
 
-        if (obj.pipeline == "sprite")
-            VulkanPipeline::SwitchToPipeline(1);
-
-        if (obj.pipeline == "ui")
-            VulkanPipeline::SwitchToPipeline(2);
-
-        if (obj.pipeline == "grid")
-            VulkanPipeline::SwitchToPipeline(3);
+//        VulkanPipeline::SwitchToPipeline(obj.pipeline);
 
         VulkanPipeline::Bind();
 

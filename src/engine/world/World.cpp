@@ -9,8 +9,8 @@ using json = nlohmann::json;
 
 void World::Init()
 {
-    CreateGrid();
-//    Load();
+//    CreateGrid();
+    Load();
 }
 
 void World::Update()
@@ -70,6 +70,12 @@ void World::Load()
         {
             gameObj.shape = Shape(ShapeType::Quad);
             gameObj.pipeline = "grid";
+        }
+
+        if (obj["type"] == "grid_plane")
+        {
+            gameObj.shape = Shape(ShapeType::Quad);
+            gameObj.pipeline = "grid_plane";
         }
 
         gameObj.id = currentId;

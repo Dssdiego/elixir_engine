@@ -104,34 +104,48 @@ void VulkanPipelineImpl::CreatePipelineSets()
 
     // UI
     PipelineSet uiPipelineSet
-            {
-                    "ui",
-                    "assets/shaders/ui.vert.spv",
-                    "assets/shaders/ui.frag.spv",
-                    uiPipeline,
-                    uiPipelineLayout,
-                    VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
-                    VK_POLYGON_MODE_FILL,
-                    VK_TRUE
-            };
+    {
+            "ui",
+            "assets/shaders/ui.vert.spv",
+            "assets/shaders/ui.frag.spv",
+            uiPipeline,
+            uiPipelineLayout,
+            VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+            VK_POLYGON_MODE_FILL,
+            VK_TRUE
+    };
 
     pipelineSets.push_back(uiPipelineSet);
 
-
     // Grid
     PipelineSet gridPipelineSet
-            {
-                    "grid",
-                    "assets/shaders/grid.vert.spv",
-                    "assets/shaders/grid.frag.spv",
-                    gridPipeline,
-                    gridPipelineLayout,
-                    VK_PRIMITIVE_TOPOLOGY_LINE_STRIP,
-                    VK_POLYGON_MODE_LINE,
-                    VK_TRUE
-            };
+    {
+            "grid",
+            "assets/shaders/grid.vert.spv",
+            "assets/shaders/grid.frag.spv",
+            gridPipeline,
+            gridPipelineLayout,
+            VK_PRIMITIVE_TOPOLOGY_LINE_STRIP,
+            VK_POLYGON_MODE_LINE,
+            VK_TRUE
+    };
 
     pipelineSets.push_back(gridPipelineSet);
+
+    // Grid Plane
+    PipelineSet gridPlanePipelineSet
+    {
+            "grid_plane",
+            "assets/shaders/gridPlane.vert.spv",
+            "assets/shaders/gridPlane.frag.spv",
+            gridPlanePipeline,
+            gridPlanePipelineLayout,
+            VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+            VK_POLYGON_MODE_FILL,
+            VK_TRUE
+    };
+
+    pipelineSets.push_back(gridPlanePipelineSet);
 
     // Build all pipelines
     for (auto &pipelineSet : pipelineSets)
