@@ -114,7 +114,7 @@ void EngineRendererImpl::CreateDescriptors()
     descriptorPool = VulkanDescriptorPool::Builder()
             .SetMaxSets(VulkanSwapchain::GetNumberOfFramesInFlight())
             .AddPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VulkanSwapchain::GetNumberOfFramesInFlight())
-//            .AddPoolSize(VK_DESCRIPTOR_TYPE_SAMPLER, VulkanSwapchain::GetNumberOfFramesInFlight())
+            .AddPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VulkanSwapchain::GetNumberOfFramesInFlight())
             .Build();
 
     descriptorSetLayout = VulkanDescriptorSetLayout::Builder()
