@@ -186,6 +186,10 @@ void ImGuiRenderer::DrawCameraWindow()
         if (ImGui::Button("Reset"))
             Camera::ResetWorldPosition();
 
+        ImGui::InputFloat3("direction", (float *) Camera::GetWorldDirectionRef());
+        if (!Camera::HasControl())
+            Camera::SetWorldDirection(Camera::GetWorldDirection());
+
         ImGui::End();
     }
 }

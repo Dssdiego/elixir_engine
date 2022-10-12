@@ -32,6 +32,7 @@ public:
     inline static void ResetWorldPosition() { SetWorldPosition(glm::vec3(0.f, 0.f, -2.f)); };
 
     inline static glm::vec3 GetWorldDirection() { return worldDirection; }
+    inline static glm::vec3 *GetWorldDirectionRef() { return &worldDirection; }
     inline static void SetWorldDirection(glm::vec3 direction) { worldDirection = direction; }
 
     // controls whether the camera is being controlled by someone
