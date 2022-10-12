@@ -73,7 +73,7 @@ void Game::Draw()
     ImGuiRenderer::NewFrame();
 
     TestRenderSystem::RenderGameObjects(World::GetGameObjects());
-    World::Render();
+//    World::Render();
 
     ImGuiRenderer::Render();
     VulkanEngine::EndFrame();

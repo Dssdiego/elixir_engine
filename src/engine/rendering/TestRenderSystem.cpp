@@ -29,6 +29,11 @@ void TestRenderSystem::RenderGameObjects(std::vector<GameObject> *gameObjects)
     mTestRenderSystemImpl->RenderGameObjects(gameObjects);
 }
 
+size_t TestRenderSystem::GetDrawCallCount()
+{
+    return mTestRenderSystemImpl->drawCalls;
+}
+
 //std::vector<GameObject>* TestRenderSystem::GetGameObjects()
 //{
 //    return mTestRenderSystemImpl->GetGameObjects();
@@ -133,6 +138,8 @@ TestRenderSystemImpl::~TestRenderSystemImpl()
 
 void TestRenderSystemImpl::RenderGameObjects(std::vector<GameObject> *gameObjects)
 {
+    drawCalls = 0;
+
     // update uniform buffer with new data
     UniformBufferObject ubo{};
     ubo.mvp = (Camera::GetProjection() * Camera::GetView()) * glm::mat4(1.f);
@@ -168,6 +175,8 @@ void TestRenderSystemImpl::RenderGameObjects(std::vector<GameObject> *gameObject
         );
 
         obj.shape.Draw();
+
+        drawCalls++;
     }
 }
 

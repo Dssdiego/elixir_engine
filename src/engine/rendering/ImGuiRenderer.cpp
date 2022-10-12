@@ -128,9 +128,9 @@ void ImGuiRenderer::DrawMainMenuBar()
         }
 
         std::stringstream ss;
-        ss << "FPS: " << Window::GetFPS() << " | Frame: " << Window::GetFrameNumber() << std::endl;
+        ss << "FPS: " << Window::GetFPS() << " | Frame: " << Window::GetFrameNumber() << " | Draw Calls: " << TestRenderSystem::GetDrawCallCount() << std::endl;
 
-        ImGui::SetCursorPosX(ImGui::GetWindowWidth() * 0.8f);
+        ImGui::SetCursorPosX(ImGui::GetWindowWidth() * 0.7f);
         ImGui::Text("%s", ss.str().c_str());
 
 //        if (ImGui::BeginMenu("Edit"))
