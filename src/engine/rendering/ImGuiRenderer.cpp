@@ -169,6 +169,12 @@ void ImGuiRenderer::DrawObjectInspectorWindow()
             ImGui::TreePop();
         }
 
+        if (ImGui::TreeNode("World"))
+        {
+            ImGui::ColorEdit4("background color", (float *) World::GetWorldColorRef());
+            ImGui::TreePop();
+        }
+
         ImGui::End();
     }
 }

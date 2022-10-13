@@ -26,7 +26,7 @@ public:
 private:
     inline static std::unique_ptr<Texture> texture = nullptr;
     inline static ImTextureID imguiTexture = nullptr;
-    inline static uint32_t tileSize = 16; // size of the tile in the atlas (we are using 32x32 pixel sprites)
+    inline static uint32_t tileSize = 32; // size of the tile in the atlas (we are using 32x32 pixel sprites)
 };
 
 

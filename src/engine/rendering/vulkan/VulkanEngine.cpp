@@ -5,6 +5,7 @@
 #include "VulkanEngine.h"
 #include "descriptors/VulkanDescriptorWriter.h"
 #include "../SpriteAtlas.h"
+#include "../../world/World.h"
 
 // TODO: Refactor the code so that we don't use raw pointers. Instead we want to use smart pointers
 //       See more here: https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one
@@ -250,7 +251,7 @@ void EngineRendererImpl::BeginSwapChainRenderPass()
     renderPassBeginInfo.renderArea.extent = VulkanSwapchain::GetSwapChainExtent();
 
     std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = Color::GetAsVulkanClear(Color::Black);
+    clearValues[0].color = World::GetWorldColorInVulkanSpec();
     clearValues[1].depthStencil = {1.0f, 0};
 
     renderPassBeginInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());

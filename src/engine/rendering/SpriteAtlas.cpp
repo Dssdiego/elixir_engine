@@ -8,9 +8,7 @@ void SpriteAtlas::CreateTexture()
 {
     // create vulkan texture
     texture = std::make_unique<Texture>();
-    texture->Create("assets/textures/game_atlas.png");
-
-
+    texture->Create("assets/tiled/tiles.png");
 }
 
 void SpriteAtlas::DestroyTexture()

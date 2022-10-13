@@ -9,6 +9,8 @@ using json = nlohmann::json;
 
 void World::Init()
 {
+    worldColor = Color::Gray;
+
 //    CreateGrid();
     Load();
 }
@@ -135,3 +137,5 @@ void World::DestroyGrid()
 {
     // TODO: Destroy grid
 }
+
+

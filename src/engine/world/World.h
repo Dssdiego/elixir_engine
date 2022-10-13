@@ -26,11 +26,17 @@ public:
 
     static std::vector<GameObject> *GetGameObjects();
 
+    inline static Color GetWorldColor() { return worldColor; }
+    inline static Color *GetWorldColorRef() { return &worldColor; }
+    inline static VkClearColorValue GetWorldColorInVulkanSpec() { return Color::GetAsVulkanClear(worldColor); }
+
 private:
     // FIXME: Game objects should come from scenes instead of being defined here
     //        (i.e. we can change between scenes inside the world)
     inline static std::vector<GameObject> gameObjects{};
     inline static size_t currentId = 0;
+
+    inline static Color worldColor = Color::Gray;
 
     static void CreateGrid();
     static void DestroyGrid();

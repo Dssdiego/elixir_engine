@@ -24,6 +24,7 @@ public:
     // Definitions
     static const Color Transparent;
     static const Color Black;
+    static const Color Gray;
     static const Color White;
     static const Color Red;
     static const Color Green;

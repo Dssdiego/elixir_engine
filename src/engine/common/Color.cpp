@@ -11,6 +11,7 @@ Color::Color(float r, float g, float b, float a): r(r), g(g), b(b), a(a) {}
 // Definitions
 const Color Color::Transparent  = {0.0f,0.0f,0.0f,0.0f};
 const Color Color::Black        = {0.0f,0.0f,0.0f,1.0f};
+const Color Color::Gray         = {0.54f,0.54f,0.54f,1.0f};
 const Color Color::White        = {1.0f,1.0f,1.0f,1.0f};
 const Color Color::Red          = {1.0f,0.0f,0.0f,1.0f};
 const Color Color::Green        = {0.0f,1.0f,0.0f,1.0f};
